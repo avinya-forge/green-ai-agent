@@ -9,6 +9,7 @@
 !release-notes.md
 !vision.md
 !development-standards.md
+!eventlet-migration.md
 
 # Allow .gitignore itself
 !.gitignore

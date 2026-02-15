@@ -16,6 +16,7 @@
 
 ### Documentation
 - **Standards & Vision**: Updated `docs/vision.md` and `docs/development-standards.md` to reflect current capabilities (v0.6.1) and rule definitions.
+- **Migration Plan**: Added comprehensive `docs/eventlet-migration.md` outlining the roadmap to replace Eventlet with FastAPI/Uvicorn.
 
 ## [v0.6.1] - 2026-02-11
 ### Added
