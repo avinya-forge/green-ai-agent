@@ -78,10 +78,13 @@ reports/               # Generated reports (keep .gitkeep)
 /data/*
 !/data/.gitkeep
 
-# /docs/ - HARDCODED WHITELIST: Only these 4 strategic docs are committed
+# /docs/ - HARDCODED WHITELIST: Only these strategic docs are committed
 /docs/*
 !/docs/BACKLOG.md
-!/docs/RELEASE_NOTES.md
+!/docs/release-notes.md
+!/docs/vision.md
+!/docs/development-standards.md
+!/docs/eventlet-migration.md
 !/docs/PRD.md
 !/docs/ROADMAP.md
 !/docs/CONSOLIDATION_REPORT.md
