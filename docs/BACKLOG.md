@@ -2,15 +2,11 @@
 
 ## 📋 Next 10 Prioritized Microtasks
 
-1. **[CORE] Eventlet Migration - Phase 3 (Port Routes)**
-   - Goal: Port all Flask routes to FastAPI endpoints.
-   - Priority: Medium
-
-4. **[CORE] Eventlet Migration - Phase 4 (Switchover)**
+1. **[CORE] Eventlet Migration - Phase 4 (Switchover)**
    - Goal: Update entry points and remove Flask code.
    - Priority: Medium
 
-5. **[QA] Pre-commit Hooks Integration (Sprint 4.1)**
+2. **[QA] Pre-commit Hooks Integration (Sprint 4.1)**
     - Goal: Auto-scan on commit via local hooks (improve DX/install script).
     - Priority: Medium
 
@@ -27,6 +23,10 @@
 - **[CORE] Eventlet Migration - Phase 2 (FastAPI Scaffolding)** (Status: Done)
    - Goal: Create `app_fastapi.py` and initial ASGI setup.
    - Priority: High
+
+- **[CORE] Eventlet Migration - Phase 3 (Port Routes)** (Status: Done)
+   - Goal: Port all Flask routes to FastAPI endpoints.
+   - Priority: Medium
 
 - **[QA] Fix Pre-commit Hook** (Status: Done)
    - Goal: Update `.git_hooks_pre-commit.sh` to allow required documentation files.

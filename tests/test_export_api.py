@@ -18,14 +18,14 @@ class TestExportAPI:
 
     def test_api_export_csv_no_results(self, client):
         """Test CSV export when no results are available"""
-        with patch('src.ui.dashboard_app.last_scan_results', None):
+        with patch('src.ui.state.last_scan_results', None):
             response = client.get('/api/export/csv')
             assert response.status_code == 400
             assert b'No scan results available' in response.data
 
     def test_api_export_html_no_results(self, client):
         """Test HTML export when no results are available"""
-        with patch('src.ui.dashboard_app.last_scan_results', None):
+        with patch('src.ui.state.last_scan_results', None):
             response = client.get('/api/export/html')
             assert response.status_code == 400
             assert b'No scan results available' in response.data
@@ -34,9 +34,9 @@ class TestExportAPI:
         """Test successful CSV export"""
         mock_results = {'issues': []}
 
-        with patch('src.ui.dashboard_app.last_scan_results', mock_results), \
+        with patch('src.ui.state.last_scan_results', mock_results), \
              patch('src.core.export.CSVExporter') as MockExporter, \
-             patch('src.ui.dashboard_app.open', new_callable=MagicMock) as mock_open_file, \
+             patch('builtins.open', new_callable=MagicMock) as mock_open_file, \
              patch('src.ui.dashboard_app.OUTPUT_DIR') as MockOutputDir:
 
             # Mock file reading
@@ -68,9 +68,9 @@ class TestExportAPI:
         """Test successful HTML export"""
         mock_results = {'issues': []}
 
-        with patch('src.ui.dashboard_app.last_scan_results', mock_results), \
+        with patch('src.ui.state.last_scan_results', mock_results), \
              patch('src.core.export.HTMLReporter') as MockReporter, \
-             patch('src.ui.dashboard_app.open', new_callable=MagicMock) as mock_open_file, \
+             patch('builtins.open', new_callable=MagicMock) as mock_open_file, \
              patch('src.ui.dashboard_app.OUTPUT_DIR') as MockOutputDir:
 
             # Mock file reading

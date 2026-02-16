@@ -20,13 +20,13 @@ class TestDashboardResponses:
 
     def test_api_charts_content_type(self, client):
         """Test that api_charts returns application/json"""
-        with patch('src.ui.dashboard_app.last_charts', {'data': [1, 2, 3]}):
+        with patch('src.ui.state.last_charts', {'data': [1, 2, 3]}):
             response = client.get('/api/charts')
             assert response.content_type == 'application/json'
 
     def test_api_results_content_type(self, client):
         """Test that api_results returns application/json"""
-        with patch('src.ui.dashboard_app.last_scan_results', {'issues': []}):
+        with patch('src.ui.state.last_scan_results', {'issues': []}):
             response = client.get('/api/results')
             assert response.content_type == 'application/json'
 
