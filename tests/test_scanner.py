@@ -65,3 +65,15 @@ def test_get_run_command():
     scanner_unknown = Scanner(language='unknown')
     cmd_unknown = scanner_unknown._get_run_command('test.unknown')
     assert cmd_unknown is None
+def test_scan_multiple_files():
+    scanner = Scanner()
+    # Use files that are likely to exist and be small
+    files = ['tests/simple_test.py', 'tests/sample_simple_test.py']
+    results = scanner.scan(files)
+
+    assert 'issues' in results
+    assert 'per_file_emissions' in results
+    # Check that we scanned at least one file (files might be empty or filtered if rules are weird)
+    assert results['metadata']['total_files'] >= 1
+    # Check that metadata path reflects multiple files
+    assert "Multiple paths" in results['metadata']['path']

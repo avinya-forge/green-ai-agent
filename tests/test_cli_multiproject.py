@@ -159,7 +159,7 @@ class TestScanCommandValidation(unittest.TestCase):
         result = self.runner.invoke(cli, ['scan'])
         
         assert result.exit_code == 1
-        assert 'Either PATH or --git-url must be provided' in result.output
+        assert 'Either PATH(s) or --git-url must be provided' in result.output
 
 
 if __name__ == '__main__':
