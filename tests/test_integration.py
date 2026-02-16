@@ -27,9 +27,11 @@ def test_cli_scan_with_runtime():
 
 def test_cli_dashboard():
     # Test dashboard can be imported and initialized
-    from src.ui.dashboard_app import app
+    from src.ui.app_fastapi import app
+    from fastapi.testclient import TestClient
+
     assert app is not None
-    # Dashboard functionality is tested through Flask test client if needed
-    with app.test_client() as client:
-        response = client.get('/')
-        assert response.status_code in [200, 302, 500]  # Allow any response (may not have scan results)
+    # Dashboard functionality is tested through test client
+    client = TestClient(app)
+    response = client.get('/')
+    assert response.status_code in [200, 302, 500]  # Allow any response (may not have scan results)

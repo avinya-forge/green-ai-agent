@@ -4,34 +4,10 @@ Tests for History API Endpoints
 
 import pytest
 import json
-import tempfile
-import shutil
-from pathlib import Path
 from unittest.mock import patch, MagicMock
 
 
-@pytest.fixture
-def client():
-    """Flask test client"""
-    from src.ui.dashboard_app import app
-    app.config['TESTING'] = True
-    with app.test_client() as client:
-        yield client
-
-
-@pytest.fixture
-def temp_history_dir(tmp_path):
-    """Create temporary history directory"""
-    history_dir = tmp_path / "history"
-    history_dir.mkdir()
-    
-    original_home = Path.home()
-    mock_home = tmp_path / "home"
-    mock_home.mkdir()
-    
-    with patch('pathlib.Path.home', return_value=mock_home):
-        yield history_dir
-
+# client fixture is in conftest.py
 
 class TestHistoryAPI:
     """Test history API endpoints"""
@@ -39,64 +15,84 @@ class TestHistoryAPI:
     def test_api_history_missing_project(self, client):
         """Test /api/history without project parameter"""
         response = client.get('/api/history')
-        assert response.status_code == 400
-        data = json.loads(response.data)
-        assert 'error' in data
-        assert 'project' in data['error'].lower()
+        assert response.status_code == 422 # FastAPI validation error for missing query param
     
     def test_api_history_empty(self, client):
         """Test /api/history with no scans"""
-        response = client.get('/api/history?project=empty-project')
-        assert response.status_code == 200
-        data = json.loads(response.data)
-        assert data['project'] == 'empty-project'
-        assert data['count'] == 0
-        assert data['scans'] == []
+        mock_hm = MagicMock()
+        mock_hm.get_project_history.return_value = []
+
+        with patch('src.ui.state.get_history_manager', return_value=mock_hm):
+            response = client.get('/api/history?project=empty-project')
+            assert response.status_code == 200
+            data = response.json()
+            assert data['project'] == 'empty-project'
+            assert data['count'] == 0
+            assert data['scans'] == []
     
     def test_api_trending_missing_project(self, client):
         """Test /api/trending without project parameter"""
         response = client.get('/api/trending')
-        assert response.status_code == 400
-        data = json.loads(response.data)
-        assert 'error' in data
+        assert response.status_code == 422
     
     def test_api_trending_no_scans(self, client):
         """Test /api/trending with no history"""
-        response = client.get('/api/trending?project=new-project')
-        assert response.status_code == 200
-        data = json.loads(response.data)
-        assert data['project'] == 'new-project'
-        assert data['trend'] == 'insufficient_data'
+        mock_hm = MagicMock()
+        mock_hm.get_trending_data.return_value = {'trend': 'insufficient_data'}
+
+        with patch('src.ui.state.get_history_manager', return_value=mock_hm):
+            response = client.get('/api/trending?project=new-project')
+            assert response.status_code == 200
+            data = response.json()
+            assert data['project'] == 'new-project'
+            assert data['trend'] == 'insufficient_data'
     
     def test_api_compare_missing_project(self, client):
         """Test /api/compare without project parameter"""
         response = client.get('/api/compare')
-        assert response.status_code == 400
+        assert response.status_code == 422
     
     def test_api_compare_insufficient_scans(self, client):
         """Test /api/compare with fewer than 2 scans"""
-        response = client.get('/api/compare?project=single-scan-project')
-        assert response.status_code == 400
-        data = json.loads(response.data)
-        assert 'Not enough scans' in data['error']
+        # We need to mock get_project_history to return 1 scan
+        mock_hm = MagicMock()
+        mock_hm.get_project_history.return_value = [MagicMock()]
+
+        with patch('src.ui.state.get_history_manager', return_value=mock_hm):
+            response = client.get('/api/compare?project=single-scan-project')
+            assert response.status_code == 400
+            data = response.json()
+            assert 'Not enough scans' in data['detail']
     
     def test_api_history_invalid_project_name(self, client):
         """Test API with special characters in project name"""
-        response = client.get('/api/history?project=my%20project%20name')
-        assert response.status_code == 200
-        data = json.loads(response.data)
-        assert 'project' in data
+        mock_hm = MagicMock()
+        mock_hm.get_project_history.return_value = []
+
+        with patch('src.ui.state.get_history_manager', return_value=mock_hm):
+            response = client.get('/api/history?project=my%20project%20name')
+            assert response.status_code == 200
+            data = response.json()
+            assert 'project' in data
+            assert data['project'] == 'my project name' # decoded
     
     def test_api_endpoints_return_json(self, client):
         """Test that all history endpoints return valid JSON"""
-        # Test history endpoint
-        response = client.get('/api/history?project=test')
-        assert response.content_type == 'application/json'
-        
-        # Test trending endpoint
-        response = client.get('/api/trending?project=test')
-        assert response.content_type == 'application/json'
-        
-        # Test compare endpoint (will fail due to insufficient scans, but should return JSON)
-        response = client.get('/api/compare?project=test')
-        assert response.content_type == 'application/json'
+        mock_hm = MagicMock()
+        mock_hm.get_project_history.return_value = []
+        mock_hm.get_trending_data.return_value = {'trend': 'insufficient_data'}
+
+        with patch('src.ui.state.get_history_manager', return_value=mock_hm):
+            # Test history endpoint
+            response = client.get('/api/history?project=test')
+            assert 'application/json' in response.headers['content-type']
+
+            # Test trending endpoint
+            response = client.get('/api/trending?project=test')
+            assert 'application/json' in response.headers['content-type']
+
+            # Test compare endpoint (will fail due to insufficient scans, but should return JSON)
+            # Need to mock get_project_history to return < 2 scans
+            # Default mock returns [], so it raises HTTPException 400
+            response = client.get('/api/compare?project=test')
+            assert 'application/json' in response.headers['content-type']

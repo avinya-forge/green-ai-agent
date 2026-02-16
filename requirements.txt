@@ -8,10 +8,9 @@ click
 flask
 pytest
 pyyaml
-eventlet
-flask-socketio
 pydantic>=2.0.0
 fastapi
 uvicorn[standard]
 python-socketio
 jinja2
+httpx
