@@ -2,11 +2,7 @@
 
 ## 📋 Next 10 Prioritized Microtasks
 
-1. **[CORE] Eventlet Migration - Phase 4 (Switchover)**
-   - Goal: Update entry points and remove Flask code.
-   - Priority: Medium
-
-2. **[QA] Pre-commit Hooks Integration (Sprint 4.1)**
+1. **[QA] Pre-commit Hooks Integration (Sprint 4.1)**
     - Goal: Auto-scan on commit via local hooks (improve DX/install script).
     - Priority: Medium
 
@@ -26,6 +22,10 @@
 
 - **[CORE] Eventlet Migration - Phase 3 (Port Routes)** (Status: Done)
    - Goal: Port all Flask routes to FastAPI endpoints.
+   - Priority: Medium
+
+- **[CORE] Eventlet Migration - Phase 4 (Switchover)** (Status: Done)
+   - Goal: Update entry points, remove Flask code, and migrate tests.
    - Priority: Medium
 
 - **[QA] Fix Pre-commit Hook** (Status: Done)
@@ -68,10 +68,10 @@
 
 ## 🐛 Known Issues (P0 - Critical)
 
-### BUG-003: Eventlet Deprecation Warning
+### BUG-003: Eventlet Deprecation Warning (FIXED)
 - **Impact**: Future compatibility risk, deprecated dependency
-- **Fix**: Migrate to FastAPI or Quart
-- **Effort**: 8h (Future Sprint)
+- **Fix**: Migrated to FastAPI and Uvicorn
+- **Status**: Fixed in Phase 4 Switchover
 
 ### BUG-004: Inconsistent Project Data Model
 - **Impact**: Confusion between dict and object representations

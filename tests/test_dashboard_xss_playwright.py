@@ -5,12 +5,13 @@ from unittest.mock import patch, MagicMock
 from playwright.sync_api import sync_playwright
 import sys
 import os
+import uvicorn
 
 # Add src to path just in case
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from src.ui.dashboard_app import app
-from src.core.domain import Project
+from src.ui.app_fastapi import app_asgi
+from src.core.project_manager import Project
 
 # Mock project with XSS payload
 xss_payload = "<img src=x onerror=window.xss_triggered=true>"
@@ -25,12 +26,15 @@ malicious_project = Project(
 @pytest.fixture(scope="module")
 def server():
     # Patch get_project_manager to return our malicious project
-    with patch('src.ui.dashboard_app.get_project_manager') as mock_pm:
+    with patch('src.ui.state.get_project_manager') as mock_pm:
         mock_pm.return_value.list_projects.return_value = [malicious_project]
 
-        # Start server in thread
         port = 5002
-        server_thread = threading.Thread(target=app.run, kwargs={'port': port, 'use_reloader': False})
+
+        def run_server():
+            uvicorn.run(app_asgi, host="127.0.0.1", port=port, log_level="error")
+
+        server_thread = threading.Thread(target=run_server)
         server_thread.daemon = True
         server_thread.start()
 

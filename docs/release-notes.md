@@ -6,8 +6,8 @@
 - **Domain Models**: Implemented Pydantic models for `Project` and `Violation` to ensure data consistency (BUG-004).
 
 ### Changed
-- **Eventlet Migration**: Ported all Flask routes to FastAPI endpoints in `src/ui/app_fastapi.py` (Phase 3). Refactored state management to `src/ui/state.py` to support dual-stack operation during migration.
-- **Server Architecture**: Refactored `src/ui/server.py` to remove global side effects and split application logic into `dashboard_app.py`.
+- **Eventlet Migration**: Completed migration from Flask/Eventlet to FastAPI/Uvicorn (Phase 4). Replaced `dashboard_app.py` with `app_fastapi.py`. Updated `server.py` to use Uvicorn. Updated `requirements.txt`.
+- **Server Architecture**: Refactored `src/ui/server.py` to use Uvicorn ASGI server.
 - **ProjectDTO Refactor**: Updated `ProjectDTO` to use strict Pydantic `ViolationDetails` model instead of `Dict` for better type safety and consistency.
 
 ### Fixed

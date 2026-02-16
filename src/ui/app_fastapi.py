@@ -12,6 +12,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from typing import Any, List, Optional
 import os
+import sys
 import threading
 import asyncio
 
@@ -24,6 +25,68 @@ import src.ui.state as state
 
 # Initialize FastAPI app
 app = FastAPI(title="Green-AI Agent Dashboard")
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize default project and trigger scan if needed."""
+    print("Starting up Green-AI Agent Dashboard...", file=sys.stderr)
+
+    # Ensure globals are initialized
+    pm = state.get_project_manager()
+    hm = state.get_history_manager()
+    state.get_standards_registry()
+    state.get_remediation_agent()
+
+    try:
+        default_project = pm.get_project("Green-AI Agent")
+        # Force use the local path for the default project
+        # root_dir is 3 levels up from this file (src/ui/app_fastapi.py -> src/ui -> src -> root)
+        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+        if not default_project:
+            pm.add_project(
+                name="Green-AI Agent",
+                repo_url=root_dir,
+                branch="main",
+                language="python",
+                is_system=True
+            )
+            print(f"Initialized default project at {root_dir}", file=sys.stderr)
+
+        # Trigger initial scan in background if last_scan is None
+        default_project = pm.get_project("Green-AI Agent")
+        if default_project and not default_project.last_scan:
+            print("Triggering initial background scan for Green-AI Agent...", file=sys.stderr)
+
+            # Use the existing background scan logic but simplified for internal use
+            loop = asyncio.get_running_loop()
+
+            def initial_scan():
+                try:
+                    # Bridge to async emit
+                    def progress_cb(msg, pct):
+                        asyncio.run_coroutine_threadsafe(broadcast_progress(msg, pct), loop)
+
+                    scanner = Scanner(language="python")
+                    results = scanner.scan(root_dir, progress_callback=progress_cb)
+
+                    state.set_last_scan_results(results)
+                    hm.add_scan("Green-AI Agent", results)
+                    pm.update_project_scan("Green-AI Agent", results['issues'], results.get('total_emissions', 0))
+
+                    print("Initial scan completed.", file=sys.stderr)
+                    asyncio.run_coroutine_threadsafe(broadcast_progress("Scan complete!", 100), loop)
+                    asyncio.run_coroutine_threadsafe(sio.emit('scan_finished', {'project_name': "Green-AI Agent"}), loop)
+
+                except Exception as e:
+                    print(f"Initial scan failed: {e}", file=sys.stderr)
+
+            thread = threading.Thread(target=initial_scan)
+            thread.daemon = True
+            thread.start()
+
+    except Exception as e:
+        print(f"Warning: Could not initialize default project: {e}", file=sys.stderr)
 
 # Initialize Socket.IO server (ASGI mode)
 sio = socketio.AsyncServer(async_mode='asgi', cors_allowed_origins='*')
@@ -225,6 +288,8 @@ async def api_compare_scans(
         }
     except IndexError:
          raise HTTPException(status_code=400, detail="Scan index out of range")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

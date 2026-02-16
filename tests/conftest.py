@@ -6,7 +6,15 @@ Project objects and other test entities.
 """
 
 import pytest
+from fastapi.testclient import TestClient
 from src.core.project_manager import Project
+from src.ui.app_fastapi import app
+
+
+@pytest.fixture
+def client():
+    """Fixture providing a TestClient for the FastAPI app."""
+    return TestClient(app)
 
 
 @pytest.fixture
