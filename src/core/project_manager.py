@@ -34,6 +34,7 @@ class ProjectManager:
         self.CONFIG_DIR.mkdir(parents=True, exist_ok=True)
         self.HISTORY_DIR.mkdir(parents=True, exist_ok=True)
         self.projects: Dict[str, Project] = {}
+        self.projects_by_name: Dict[str, str] = {}
         self._load_projects()
     
     def _load_projects(self) -> None:
@@ -45,6 +46,7 @@ class ProjectManager:
                     for project_data in data.get('projects', []):
                         project = Project.from_dict(project_data)
                         self.projects[project.id] = project
+                        self.projects_by_name[project.name] = project.id
                 logger.info(f"Loaded {len(self.projects)} projects from registry")
         except Exception as e:
             logger.warning(f"Error loading projects: {e}")
@@ -112,8 +114,8 @@ class ProjectManager:
         Raises:
             ProjectException: If project name already exists
         """
-        # Check for duplicate names
-        if any(p.name == name for p in self.projects.values()):
+        # Check for duplicate names (O(1) lookup)
+        if name in self.projects_by_name:
             raise ProjectException(f"Project '{name}' already exists")
         
         project = Project(
@@ -124,6 +126,7 @@ class ProjectManager:
             is_system=is_system
         )
         self.projects[project.id] = project
+        self.projects_by_name[project.name] = project.id
         self._save_projects()
         
         logger.info(f"Added project '{name}' (ID: {project.id})" + (" [SYSTEM]" if is_system else ""))
@@ -143,10 +146,10 @@ class ProjectManager:
         if project_id_or_name in self.projects:
             return self.projects[project_id_or_name]
         
-        # Try by name
-        for project in self.projects.values():
-            if project.name == project_id_or_name:
-                return project
+        # Try by name (O(1) lookup)
+        project_id = self.projects_by_name.get(project_id_or_name)
+        if project_id:
+            return self.projects[project_id]
         
         return None
     
@@ -167,6 +170,10 @@ class ProjectManager:
         if project.is_system:
             raise ProjectException(f"Cannot delete system project '{project.name}'")
         
+        # Remove from both mappings
+        if project.name in self.projects_by_name:
+            del self.projects_by_name[project.name]
+
         del self.projects[project.id]
         self._save_projects()
         
