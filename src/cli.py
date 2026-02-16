@@ -27,7 +27,7 @@ def cli():
     pass
 
 @cli.command()
-@click.argument('path', type=click.Path(exists=False), required=False)
+@click.argument('paths', nargs=-1, type=click.Path(exists=False), required=False)
 @click.option('--git-url', default=None, help='Git repository URL (supports @branch syntax)')
 @click.option('--branch', default=None, help='Specific branch to scan (overrides @branch in URL)')
 @click.option('--project-name', default=None, help='Name to register project in registry')
@@ -43,10 +43,10 @@ def cli():
 @click.option('--export', default=None, help='Export results to format: csv, csv:path/to/file.csv, html, html:path/to/report.html')
 @click.option('--format', default=None, help='[Deprecated] Output format (json, csv, html)')
 @click.option('--output', default=None, help='[Deprecated] Output file path')
-def scan(path, git_url, branch, project_name, language, config, disable_rule, enable_rule, runtime, profile, fix_all, fix_specific, manual, export, format, output):
+def scan(paths, git_url, branch, project_name, language, config, disable_rule, enable_rule, runtime, profile, fix_all, fix_specific, manual, export, format, output):
     """Scan a codebase for green software violations
     
-    PATH can be a local directory or omitted if using --git-url
+    PATHS can be one or more local directories/files, or omitted if using --git-url
     """
     try:
         # Handle backward compatibility for --format and --output
@@ -57,8 +57,8 @@ def scan(path, git_url, branch, project_name, language, config, disable_rule, en
                 export = format
 
         # Validate inputs
-        if not path and not git_url:
-            click.echo("Error: Either PATH or --git-url must be provided", err=True)
+        if not paths and not git_url:
+            click.echo("Error: Either PATH(s) or --git-url must be provided", err=True)
             sys.exit(1)
         
         # Determine scan location
@@ -79,7 +79,12 @@ def scan(path, git_url, branch, project_name, language, config, disable_rule, en
                 click.echo(f"Error: {e}", err=True)
                 sys.exit(1)
         else:
-            scan_path = path
+            # Handle single or multiple paths
+            if len(paths) == 1:
+                scan_path = paths[0]
+            else:
+                scan_path = list(paths)
+
             repo_url = None
             detected_branch = None
             cleanup_after = False
@@ -121,10 +126,18 @@ def scan(path, git_url, branch, project_name, language, config, disable_rule, en
             project = manager.get_project(project_name)
             
             if project is None:
+                # Handle repo_url for multiple paths
+                if repo_url:
+                    project_url = repo_url
+                elif isinstance(scan_path, list):
+                    project_url = f"Multiple paths ({len(scan_path)})"
+                else:
+                    project_url = scan_path
+
                 # Create new project
                 project = manager.add_project(
                     name=project_name,
-                    repo_url=repo_url or scan_path,
+                    repo_url=project_url,
                     branch=detected_branch,
                     language=language
                 )

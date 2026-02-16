@@ -38,5 +38,21 @@ if [[ -f "pytest.ini" ]]; then
     echo "✓ Tests will be run in CI/CD"
 fi
 
+# Check 5: Auto-scan staged Python files for Green AI violations
+STAGED_PY_FILES=$(git diff --cached --name-only | grep '\.py$' || true)
+if [ -n "$STAGED_PY_FILES" ]; then
+    echo "🔍 Scanning staged Python files for green software violations..."
+    # Convert newlines to spaces for argument passing
+    FILES_LIST=$(echo "$STAGED_PY_FILES" | tr '\n' ' ')
+
+    # Run scan
+    # We use python3 -m src.cli scan <files>
+    if ! python3 -m src.cli scan $FILES_LIST --language python; then
+        echo "❌ Error: Green AI violations found. Please fix them before committing."
+        echo "   Tip: Use 'green-ai scan <file> --fix-all' or fix manually."
+        exit 1
+    fi
+fi
+
 echo "✅ Pre-commit checks passed!"
 exit 0

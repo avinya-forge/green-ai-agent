@@ -70,6 +70,9 @@ cd green-ai-agent
 # Install dependencies
 pip install -r requirements.txt
 
+# Install pre-commit hooks (Optional but recommended)
+./scripts/install_hooks.sh
+
 # Run tests
 pytest tests/ -v
 ```

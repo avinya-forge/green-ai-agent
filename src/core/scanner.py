@@ -8,7 +8,7 @@ Detects energy inefficiencies and estimates carbon impact.
 import os
 import ast
 import sys
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Union
 from src.core.rules import RuleRepository
 from src.core.fixer import AISuggester
 from src.core.analyzer import EmissionAnalyzer
@@ -152,12 +152,12 @@ class Scanner:
         # For now, use Python ast for both
         return None
     
-    def scan(self, path, progress_callback=None):
+    def scan(self, path: Union[str, List[str]], progress_callback=None):
         """
-        Scan a directory or file.
+        Scan a directory, file, or list of paths.
         
         Args:
-            path: Path to scan.
+            path: Path or list of paths to scan.
             progress_callback: Optional function(message, percentage) for progress reporting.
             
         Returns:
@@ -169,7 +169,18 @@ class Scanner:
         
         logger.info(f"Starting scan on {path}...")
         
-        files = [path] if os.path.isfile(path) else self._get_files(path)
+        if isinstance(path, str):
+            files = [path] if os.path.isfile(path) else self._get_files(path)
+            scan_metadata_path = path
+        else:
+            files = []
+            for p in path:
+                if os.path.isfile(p):
+                    files.append(p)
+                else:
+                    files.extend(self._get_files(p))
+            scan_metadata_path = f"Multiple paths ({len(path)})"
+
         total_files = len(files)
         
         if total_files == 0:
@@ -251,7 +262,7 @@ class Scanner:
             'metadata': {
                 'total_files': total_files,
                 'language': self.language,
-                'path': path
+                'path': scan_metadata_path
             }
         }
         

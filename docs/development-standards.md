@@ -136,3 +136,31 @@ pytest tests/ -v
 2. **Review**: All PRs must be reviewed.
 3. **Merge**: Merge only when all tests pass and coverage is maintained.
 4. **Release**: Update `docs/release-notes.md` with user-facing changes.
+
+## 🛡️ Pre-commit Hooks
+
+We use pre-commit hooks to ensure code quality and prevent violations from being committed.
+
+### Installation
+
+Run the installation script to set up the hooks:
+
+```bash
+./scripts/install_hooks.sh
+```
+
+### Checks Performed
+
+The pre-commit hook performs the following checks:
+1.  **File Placement**: Ensures no CSV/HTML files are in the root directory (must be in `output/`).
+2.  **Documentation**: Enforces strict allowlist for files in `docs/`.
+3.  **Imports**: Checks for correct absolute imports (rooted at `src`).
+4.  **Auto-Scan**: Scans staged Python files for green software violations using `green-ai scan`. If violations are found, the commit is blocked.
+
+### Bypassing (Not Recommended)
+
+If you must bypass the checks (e.g., for work-in-progress commits), use:
+
+```bash
+git commit --no-verify
+```
