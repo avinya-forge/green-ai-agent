@@ -553,7 +553,7 @@ class PythonViolationDetector(ast.NodeVisitor):
         Check for redundant computations in loop that could be moved outside.
         E.g., len(s), range(n) if n is constant, re.compile, etc.
         """
-        redundant_funcs = ['len', 'range', 're.compile', 'datetime.now', 'time.time']
+        redundant_funcs = ['len', 'range', 're.compile', 'datetime.now', 'time.time', 'count']
         
         for child in ast.walk(loop_node):
             if isinstance(child, ast.Call):
@@ -564,6 +564,10 @@ class PythonViolationDetector(ast.NodeVisitor):
                     # Handle re.compile or similar
                     if isinstance(child.func.value, ast.Name):
                         func_name = f"{child.func.value.id}.{child.func.attr}"
+
+                    # Also match .count() regardless of caller
+                    if child.func.attr == 'count':
+                        func_name = 'count'
                 
                 if func_name in redundant_funcs:
                     # Heuristic: Check if arguments are actually dependent on loop variables
@@ -991,31 +995,11 @@ class PatternBasedDetector:
     
     def detect_all(self) -> List[Dict]:
         """Run all pattern-based detectors."""
-        self._detect_redundant_computation()
-        # self._detect_string_concatenation() # Handled by AST
+        # Pattern detectors moved to AST-based PythonViolationDetector for better reliability
         self._detect_dead_code()
         self._detect_inefficient_data_structures()
         
         return self.violations
-    
-    def _detect_redundant_computation(self) -> None:
-        """Detect expensive operations that could be moved outside loops."""
-        patterns = [
-            (r'for\s+\w+\s+in\s+.*:\s*[^\n]*len\(', 'len() in loop'),
-            (r'for\s+\w+\s+in\s+.*:\s*[^\n]*\.count\(', '.count() in loop'),
-            (r'for\s+\w+\s+in\s+.*:\s*[^\n]*re\.compile\(', 're.compile() in loop'),
-        ]
-        
-        for line_num, line in enumerate(self.lines, 1):
-            for pattern, desc in patterns:
-                if re.search(pattern, line):
-                    self.violations.append({
-                        'id': 'unnecessary_computation',
-                        'line': line_num,
-                        'severity': 'critical',
-                        'message': f'Redundant computation detected ({desc}). Move outside loop.',
-                        'pattern_match': 'computation_outside_loop'
-                    })
     
     def _detect_string_concatenation(self) -> None:
         """Detect string concatenation in loops."""
