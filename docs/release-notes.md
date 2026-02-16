@@ -6,6 +6,7 @@
 - **Domain Models**: Implemented Pydantic models for `Project` and `Violation` to ensure data consistency (BUG-004).
 
 ### Changed
+- **Eventlet Migration**: Started migration to FastAPI. Added `fastapi`, `uvicorn`, and `python-socketio` dependencies and created initial scaffolding (Phase 1 & 2).
 - **Server Architecture**: Refactored `src/ui/server.py` to remove global side effects and split application logic into `dashboard_app.py`.
 - **ProjectDTO Refactor**: Updated `ProjectDTO` to use strict Pydantic `ViolationDetails` model instead of `Dict` for better type safety and consistency.
 
