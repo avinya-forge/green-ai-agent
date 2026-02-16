@@ -2,15 +2,7 @@
 
 ## 📋 Next 10 Prioritized Microtasks
 
-1. **[CORE] Eventlet Migration - Phase 1 (Dependencies)**
-   - Goal: Update requirements and remove legacy deps (see `docs/eventlet-migration.md`).
-   - Priority: High
-
-2. **[CORE] Eventlet Migration - Phase 2 (FastAPI Scaffolding)**
-   - Goal: Create `app_fastapi.py` and initial ASGI setup.
-   - Priority: High
-
-3. **[CORE] Eventlet Migration - Phase 3 (Port Routes)**
+1. **[CORE] Eventlet Migration - Phase 3 (Port Routes)**
    - Goal: Port all Flask routes to FastAPI endpoints.
    - Priority: Medium
 
@@ -27,6 +19,14 @@
 - **[JULES] Fix BUG-003.1: Research Eventlet migration path** (Status: Done)
    - Goal: Prepare for eventlet deprecation (Created `docs/eventlet-migration.md`).
    - Priority: Medium
+
+- **[CORE] Eventlet Migration - Phase 1 (Dependencies)** (Status: Done)
+   - Goal: Update requirements (added new deps; legacy deps retained until Phase 4).
+   - Priority: High
+
+- **[CORE] Eventlet Migration - Phase 2 (FastAPI Scaffolding)** (Status: Done)
+   - Goal: Create `app_fastapi.py` and initial ASGI setup.
+   - Priority: High
 
 - **[QA] Fix Pre-commit Hook** (Status: Done)
    - Goal: Update `.git_hooks_pre-commit.sh` to allow required documentation files.
