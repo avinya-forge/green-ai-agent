@@ -22,41 +22,18 @@ from src.core.calibration import CalibrationAgent
 from src.utils.metrics import calculate_projects_grade, calculate_average_grade
 from src.core.export import OUTPUT_DIR
 import threading
+import src.ui.state as state
+from src.ui.state import (
+    get_standards_registry,
+    get_project_manager,
+    get_history_manager,
+    get_remediation_agent,
+    set_last_scan_results,
+    generate_insights
+)
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
-
-# Store last scan results
-last_scan_results = None
-last_charts = None
-standards_registry = None
-project_manager = None
-history_manager = None
-remediation_agent = None
-
-def get_standards_registry():
-    global standards_registry
-    if standards_registry is None:
-        standards_registry = StandardsRegistry()
-    return standards_registry
-
-def get_project_manager():
-    global project_manager
-    if project_manager is None:
-        project_manager = ProjectManager()
-    return project_manager
-
-def get_history_manager():
-    global history_manager
-    if history_manager is None:
-        history_manager = HistoryManager()
-    return history_manager
-
-def get_remediation_agent():
-    global remediation_agent
-    if remediation_agent is None:
-        remediation_agent = RemediationAgent()
-    return remediation_agent
 
 
 def broadcast_progress(message, percentage):
@@ -107,16 +84,11 @@ def initialize_app():
     except Exception as e:
         print(f"Warning: Could not initialize default project: {e}", file=sys.stderr)
 
-def set_last_scan_results(results):
-    global last_scan_results, last_charts
-    last_scan_results = results
-    last_charts = generate_all_charts(results)
-
 @app.route('/')
 def dashboard():
-    if last_scan_results:
-        insights = generate_insights(last_scan_results)
-        return render_template_string(get_dashboard_html(), results=last_scan_results, insights=insights, charts=last_charts)
+    if state.last_scan_results:
+        insights = generate_insights(state.last_scan_results)
+        return render_template_string(get_dashboard_html(), results=state.last_scan_results, insights=insights, charts=state.last_charts)
     else:
         # Show enhanced landing page with stats
         projects = get_project_manager().list_projects()
@@ -134,11 +106,11 @@ def dashboard():
 @app.route('/api/charts')
 def api_charts() -> Any:
     """Return all chart data as JSON"""
-    return jsonify(last_charts or {})
+    return jsonify(state.last_charts or {})
 
 @app.route('/api/results')
 def api_results() -> Any:
-    return jsonify(last_scan_results or {})
+    return jsonify(state.last_scan_results or {})
 
 # Standards API Endpoints
 @app.route('/api/standards')
@@ -413,7 +385,7 @@ def _handle_export(exporter_cls, mime_type, file_extension, encoding='utf-8'):
         # Get project name from query params
         project_name = request.args.get('project', 'Scan')
 
-        if not last_scan_results:
+        if not state.last_scan_results:
             return jsonify({'error': 'No scan results available. Run a scan first.'}), 400
 
         # Create output directory
@@ -421,7 +393,7 @@ def _handle_export(exporter_cls, mime_type, file_extension, encoding='utf-8'):
 
         output_path = OUTPUT_DIR / f'green-ai-report-{project_name}.{file_extension}'
         exporter = exporter_cls(output_path=str(output_path))
-        exporter.export(last_scan_results, project_name)
+        exporter.export(state.last_scan_results, project_name)
 
         # Read and return file
         with open(output_path, 'r', encoding=encoding) as f:
@@ -615,26 +587,3 @@ def get_dashboard_html():
         DASHBOARD_HTML = load_template('dashboard.html')
     return DASHBOARD_HTML
 
-def generate_insights(results):
-    insights = []
-    issue_count = len(results['issues'])
-
-    if issue_count > 5:
-        insights.append("High number of issues detected. Consider refactoring the codebase for better green practices.")
-
-    if any(i.get('severity') == 'high' for i in results['issues']):
-        insights.append("Critical high-severity issues found. Prioritize fixing these for maximum energy savings.")
-
-    scanning_emissions = results.get('scanning_emissions', 0)
-    if scanning_emissions > 0.00001:
-        insights.append("Scan process emissions are notable. Consider optimizing scanning frequency or hardware.")
-
-    codebase_emissions = results.get('codebase_emissions', 0)
-    if codebase_emissions > 0.000001:
-        insights.append(f"Estimated codebase emissions are {codebase_emissions:.9f} kg CO₂. Fixing the high-severity issues will reduce this impact.")
-
-    total_emissions = scanning_emissions + codebase_emissions
-    if codebase_emissions > scanning_emissions * 10:
-        insights.append("Codebase emissions significantly exceed scanning emissions. Focus on optimizing the analyzed code.")
-
-    return insights
