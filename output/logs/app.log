@@ -298,3 +298,9 @@
 2026-02-14 04:41:23,472 - green-ai - INFO - [scanner.py:170] - Starting scan on /app...
 2026-02-14 04:41:23,472 - green-ai - INFO - [scanner.py:331] - Discovering files in /app (Ignoring: *.pyc, __pycache__, .git, .venv, node_modules, output, tests/test_carbon_patterns.py, tests/conftest.py)
 2026-02-14 04:41:23,509 - green-ai - INFO - [scanner.py:352] - Found 115 files to scan.
+2026-02-17 04:42:41,180 - green-ai - INFO - [rules.py:49] - Loading rules from /app/rules
+2026-02-17 04:42:41,212 - green-ai - INFO - [rules.py:58] - Loaded 26 rules for python
+2026-02-17 04:42:41,231 - green-ai - INFO - [rules.py:58] - Loaded 16 rules for javascript
+2026-02-17 04:42:41,231 - green-ai - INFO - [scanner.py:170] - Starting scan on ['src/cli.py', 'src/cli/__init__.py', 'src/cli/__main__.py', 'src/cli/commands/__init__.py', 'src/cli/commands/calibrate.py', 'src/cli/commands/dashboard.py', 'src/cli/commands/project.py', 'src/cli/commands/scan.py', 'src/cli/commands/standards.py', 'src/cli/main.py', 'src/core/detectors.py', 'tests/test_cli_refactored.py', 'tests/test_js_ast_detector.py', 'tests/test_python_visitors.py']...
+2026-02-17 04:42:41,231 - green-ai - INFO - [scanner.py:342] - Discovering files in src/cli.py (Ignoring: *.pyc, __pycache__, .git, .venv, node_modules, output, tests/test_carbon_patterns.py, tests/conftest.py)
+2026-02-17 04:42:41,231 - green-ai - INFO - [scanner.py:363] - Found 0 files to scan.

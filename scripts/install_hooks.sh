@@ -17,6 +17,11 @@ if [ ! -f "$HOOK_SOURCE" ]; then
     exit 1
 fi
 
+if [ -f "$HOOK_DEST" ]; then
+    echo "⚠️  Existing hook found at $HOOK_DEST. Backing up to $HOOK_DEST.bak"
+    cp "$HOOK_DEST" "$HOOK_DEST.bak"
+fi
+
 echo "Installing pre-commit hook..."
 cp "$HOOK_SOURCE" "$HOOK_DEST"
 chmod +x "$HOOK_DEST"

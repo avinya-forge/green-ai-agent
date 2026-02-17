@@ -39,15 +39,20 @@ if [[ -f "pytest.ini" ]]; then
 fi
 
 # Check 5: Auto-scan staged Python files for Green AI violations
-STAGED_PY_FILES=$(git diff --cached --name-only | grep '\.py$' || true)
-if [ -n "$STAGED_PY_FILES" ]; then
+# Collect staged python files into an array to handle spaces correctly
+STAGED_PY_FILES=()
+while IFS= read -r file; do
+    if [[ "$file" == *.py ]]; then
+        STAGED_PY_FILES+=("$file")
+    fi
+done < <(git diff --cached --name-only)
+
+if [ ${#STAGED_PY_FILES[@]} -gt 0 ]; then
     echo "🔍 Scanning staged Python files for green software violations..."
-    # Convert newlines to spaces for argument passing
-    FILES_LIST=$(echo "$STAGED_PY_FILES" | tr '\n' ' ')
 
     # Run scan
     # We use python3 -m src.cli scan <files>
-    if ! python3 -m src.cli scan $FILES_LIST --language python; then
+    if ! python3 -m src.cli scan "${STAGED_PY_FILES[@]}" --language python; then
         echo "❌ Error: Green AI violations found. Please fix them before committing."
         echo "   Tip: Use 'green-ai scan <file> --fix-all' or fix manually."
         exit 1

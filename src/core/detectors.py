@@ -37,6 +37,7 @@ class JavaScriptASTDetector:
             return []
 
         self._detect_excessive_logging()
+        self._detect_console_time()
         self._detect_eval()
         self._detect_magic_numbers()
         self._detect_deprecated_apis()
@@ -44,9 +45,34 @@ class JavaScriptASTDetector:
         self._detect_sync_io()
         self._detect_loops()
         self._detect_dom_manipulation()
+        self._detect_inner_html()
         self._detect_string_concatenation()
 
         return self.violations
+
+    def _detect_console_time(self) -> None:
+        """Detect console.time usage."""
+        query_scm = """
+        (call_expression
+          function: (member_expression
+            object: (identifier) @obj
+            property: (property_identifier) @prop)
+          (#eq? @obj "console")
+          (#match? @prop "^(time|timeEnd)$"))
+        """
+        self._run_query(query_scm, 'console_time', 'minor',
+                       'console.time/timeEnd detected. Remove in production.', 'console_time')
+
+    def _detect_inner_html(self) -> None:
+        """Detect innerHTML usage."""
+        query_scm = """
+        (assignment_expression
+          left: (member_expression
+            property: (property_identifier) @prop)
+          (#eq? @prop "innerHTML"))
+        """
+        self._run_query(query_scm, 'inner_html', 'major',
+                       'Avoid innerHTML. Use textContent or DOM methods.', 'inner_html')
 
     def _detect_excessive_logging(self) -> None:
         """Detect console.log usage."""
@@ -775,6 +801,60 @@ class PythonViolationDetector(ast.NodeVisitor):
                     'pattern_match': 'eager_logging'
                 })
 
+        # Rule: Unnecessary Comprehension (list([...]) or set({...}))
+        if isinstance(node.func, ast.Name) and node.func.id in ['list', 'set', 'dict']:
+            if node.args and isinstance(node.args[0], (ast.ListComp, ast.SetComp, ast.DictComp)):
+                 self.violations.append({
+                    'id': 'unnecessary_comprehension',
+                    'line': node.lineno,
+                    'severity': 'major',
+                    'message': f'Unnecessary comprehension inside {node.func.id}(). Remove brackets for generator expression or use constructor directly.',
+                    'pattern_match': 'unnecessary_comp'
+                })
+
+        # Rule: Numpy Sum vs Python Sum
+        if isinstance(node.func, ast.Name) and node.func.id == 'sum':
+            # Heuristic: Check if arg looks like a numpy array (e.g., np_arr, arr) or function call like np.array()
+            if node.args:
+                arg = node.args[0]
+                is_numpy = False
+                if isinstance(arg, ast.Name):
+                    if arg.id.startswith('np_') or 'array' in arg.id:
+                        is_numpy = True
+                    elif self.var_types.get(arg.id) == 'numpy':
+                        is_numpy = True
+                elif isinstance(arg, ast.Call) and isinstance(arg.func, ast.Attribute):
+                    # check for np.something
+                    if isinstance(arg.func.value, ast.Name) and arg.func.value.id in ['np', 'numpy']:
+                        is_numpy = True
+
+                if is_numpy:
+                     self.violations.append({
+                        'id': 'numpy_sum_vs_python_sum',
+                        'line': node.lineno,
+                        'severity': 'minor',
+                        'message': 'Using python sum() on numpy array. Use np.sum() for better performance.',
+                        'pattern_match': 'numpy_sum'
+                    })
+
+        # Rule: Subprocess Run Without Timeout
+        if func_name == 'subprocess.run' or (isinstance(node.func, ast.Attribute) and node.func.attr == 'run' and
+                                             isinstance(node.func.value, ast.Name) and node.func.value.id == 'subprocess'):
+            has_timeout = False
+            for keyword in node.keywords:
+                if keyword.arg == 'timeout':
+                    has_timeout = True
+                    break
+
+            if not has_timeout:
+                 self.violations.append({
+                    'id': 'subprocess_run_without_timeout',
+                    'line': node.lineno,
+                    'severity': 'major',
+                    'message': 'subprocess.run() called without timeout. Can cause hangs.',
+                    'pattern_match': 'subprocess_timeout'
+                })
+
         self.generic_visit(node)
     
     def visit_Global(self, node: ast.Global) -> None:
@@ -918,6 +998,10 @@ class PythonViolationDetector(ast.NodeVisitor):
                     self.var_types[target.id] = 'efficient'
                 elif isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
                     self.var_types[target.id] = 'str'
+                elif isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Attribute):
+                     # Check np.array()
+                     if isinstance(node.value.func.value, ast.Name) and node.value.func.value.id in ['np', 'numpy'] and node.value.func.attr == 'array':
+                         self.var_types[target.id] = 'numpy'
         self.generic_visit(node)
     
     def visit_Name(self, node: ast.Name) -> None:

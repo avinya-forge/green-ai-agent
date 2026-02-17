@@ -217,3 +217,34 @@ def log_something(val):
 """
         violations = self._get_violations(code)
         assert any(v['id'] == 'eager_logging_formatting' for v in violations)
+
+    def test_unnecessary_comprehension(self):
+        code = """
+def inefficient_comp(items):
+    x = list([i for i in items])
+    y = set({i for i in items})
+"""
+        violations = self._get_violations(code)
+        # Should be detected twice
+        matches = [v for v in violations if v['id'] == 'unnecessary_comprehension']
+        assert len(matches) >= 2
+
+    def test_numpy_sum_vs_python_sum(self):
+        code = """
+import numpy as np
+def inefficient_sum():
+    arr = np.array([1, 2, 3])
+    s = sum(arr)
+"""
+        violations = self._get_violations(code)
+        assert any(v['id'] == 'numpy_sum_vs_python_sum' for v in violations)
+
+    def test_subprocess_run_without_timeout(self):
+        code = """
+import subprocess
+def run_command():
+    subprocess.run(['ls'])
+"""
+        violations = self._get_violations(code)
+        # Note: process_spawning is also triggered
+        assert any(v['id'] == 'subprocess_run_without_timeout' for v in violations)

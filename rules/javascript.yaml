@@ -158,3 +158,25 @@ rules:
     remediation: Use non-blocking modal UI components
     source: ecoCode
     tags: [ux, performance]
+
+  - id: console_time
+    name: Remove Console Time
+    description: console.time() and console.timeEnd() are for debugging and should not be in production.
+    severity: minor
+    languages: [javascript]
+    pattern: |
+      console\.time
+    remediation: Remove console.time() calls.
+    source: ecoCode
+    tags: [debugging, cleanup]
+
+  - id: inner_html
+    name: Avoid innerHTML
+    description: Using innerHTML is slow and can expose XSS vulnerabilities.
+    severity: major
+    languages: [javascript]
+    pattern: |
+      \.innerHTML\s*=
+    remediation: Use textContent or DOM node manipulation methods.
+    source: ecoCode
+    tags: [performance, security]
