@@ -9,10 +9,14 @@
 
 ## [Unreleased]
 ### Added
+- **E2E Dashboard Testing**: Added comprehensive end-to-end tests for the dashboard UI and API interactions.
+- **Standards Sync**: Implemented `sync_standards` to fetch latest green software standards from remote sources (GSF, ecoCode).
+- **Analyzer Robustness**: Added unit tests for `CodeComplexityAnalyzer` and `EmissionAnalyzer` covering edge cases.
 - **Calibration UI**: Added system calibration button to the landing page and exposed `GET /api/calibrate` endpoint to support UI integration.
 - **Domain Models**: Implemented Pydantic models for `Project` and `Violation` to ensure data consistency (BUG-004).
 
 ### Changed
+- **Project Manager Reliability**: Enhanced `ProjectManager` to robustly handle edge cases and default values (e.g., branch defaulting).
 - **Eventlet Migration**: Completed migration from Flask/Eventlet to FastAPI/Uvicorn (Phase 4). Replaced `dashboard_app.py` with `app_fastapi.py`. Updated `server.py` to use Uvicorn. Updated `requirements.txt`.
 - **Server Architecture**: Refactored `src/ui/server.py` to use Uvicorn ASGI server.
 - **ProjectDTO Refactor**: Updated `ProjectDTO` to use strict Pydantic `ViolationDetails` model instead of `Dict` for better type safety and consistency.

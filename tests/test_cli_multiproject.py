@@ -6,7 +6,8 @@ Tests the new Git URL and project management features in the CLI
 import unittest
 from unittest.mock import Mock, patch, MagicMock, call
 from click.testing import CliRunner
-from src.cli import cli, project
+from src.cli.main import cli
+from src.cli.commands.project import project
 
 
 class TestProjectCommands(unittest.TestCase):
@@ -15,7 +16,7 @@ class TestProjectCommands(unittest.TestCase):
     def setUp(self):
         self.runner = CliRunner()
     
-    @patch('src.cli.ProjectManager')
+    @patch('src.cli.commands.project.ProjectManager')
     def test_project_add(self, mock_manager_class):
         """Test adding a project"""
         mock_manager = Mock()
@@ -38,7 +39,7 @@ class TestProjectCommands(unittest.TestCase):
             language='python'
         )
     
-    @patch('src.cli.ProjectManager')
+    @patch('src.cli.commands.project.ProjectManager')
     def test_project_add_duplicate(self, mock_manager_class):
         """Test error when adding duplicate project"""
         mock_manager = Mock()
@@ -53,7 +54,7 @@ class TestProjectCommands(unittest.TestCase):
         assert result.exit_code == 1
         assert 'already exists' in result.output
     
-    @patch('src.cli.ProjectManager')
+    @patch('src.cli.commands.project.ProjectManager')
     def test_project_list(self, mock_manager_class):
         """Test listing projects"""
         mock_manager = Mock()
@@ -93,7 +94,7 @@ class TestProjectCommands(unittest.TestCase):
         assert 'Project2' in result.output
         assert 'Total Projects: 2' in result.output
     
-    @patch('src.cli.ProjectManager')
+    @patch('src.cli.commands.project.ProjectManager')
     def test_project_list_empty(self, mock_manager_class):
         """Test listing projects when none exist"""
         mock_manager = Mock()
@@ -105,7 +106,7 @@ class TestProjectCommands(unittest.TestCase):
         assert result.exit_code == 0
         assert 'No projects registered' in result.output
     
-    @patch('src.cli.ProjectManager')
+    @patch('src.cli.commands.project.ProjectManager')
     def test_project_remove(self, mock_manager_class):
         """Test removing a project"""
         mock_manager = Mock()
@@ -120,7 +121,7 @@ class TestProjectCommands(unittest.TestCase):
         assert result.exit_code == 0
         assert 'Project removed: TestProject' in result.output
     
-    @patch('src.cli.ProjectManager')
+    @patch('src.cli.commands.project.ProjectManager')
     def test_project_remove_not_found(self, mock_manager_class):
         """Test error when removing non-existent project"""
         mock_manager = Mock()
@@ -135,7 +136,7 @@ class TestProjectCommands(unittest.TestCase):
         assert result.exit_code == 1
         assert 'not found' in result.output
     
-    @patch('src.cli.ProjectManager')
+    @patch('src.cli.commands.project.ProjectManager')
     def test_project_export(self, mock_manager_class):
         """Test exporting projects as JSON"""
         mock_manager = Mock()

@@ -101,9 +101,12 @@ class TestStandardsRegistry:
     def test_sync_standards(self):
         registry = StandardsRegistry()
         result = registry.sync_standards()
+
         assert isinstance(result, dict)
-        # Should return all standards
-        assert len(result) >= 5
+        # Currently we support 2 sources for sync: gsf and ecocode
+        assert len(result) >= 2
+        assert 'gsf' in result
+        assert 'ecocode' in result
 
 
 class TestStandardsIntegration:
