@@ -94,7 +94,7 @@ class ProjectManager:
         self,
         name: str,
         repo_url: str,
-        branch: str = "main",
+        branch: Optional[str] = "main",
         language: Optional[str] = None,
         is_system: bool = False
     ) -> Project:
@@ -104,7 +104,7 @@ class ProjectManager:
         Args:
             name: Project name
             repo_url: Git repository URL
-            branch: Git branch (default: main)
+            branch: Git branch (default: main). If None, defaults to "main".
             language: Programming language
             is_system: Whether this is a system project (non-deletable)
             
@@ -114,6 +114,10 @@ class ProjectManager:
         Raises:
             ProjectException: If project name already exists
         """
+        # Explicitly handle None for branch to ensure Pydantic validation passes
+        if branch is None:
+            branch = "main"
+
         # Check for duplicate names (O(1) lookup)
         if name in self.projects_by_name:
             raise ProjectException(f"Project '{name}' already exists")

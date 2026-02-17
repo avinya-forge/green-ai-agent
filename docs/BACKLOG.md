@@ -2,11 +2,16 @@
 
 ## 📋 Next 10 Prioritized Microtasks
 
-1. **[QA] E2E Dashboard Testing (Sprint 4.2)**
-    - Goal: Automate UI verification.
+1. **[CORE] Implement Standards Sync**
+    - Status: Done
+    - Goal: Fetch latest standards from online sources (GSF, ecoCode).
     - Priority: Medium
 
 ## ✅ Completed Tasks
+
+- **[QA] E2E Dashboard Testing (Sprint 4.2)** (Status: Done)
+    - Goal: Automate UI verification.
+    - Priority: Medium
 
 - **[QA] Pre-commit Hooks Integration (Sprint 4.1)** (Status: Done)
     - Goal: Improved robustness and installation script for local hooks.

@@ -246,14 +246,42 @@ class StandardsRegistry:
     
     def sync_standards(self) -> Dict[str, bool]:
         """
-        Sync standards from online sources (placeholder for future implementation)
-        Returns dict of synced standards
+        Sync standards from online sources (GitHub, etc.)
+        Returns dict of synced standards with status
         """
-        # TODO: Implement fetching latest standards from GitHub repos
-        # - GSF: https://github.com/Green-Software-Foundation/standards
-        # - ecoCode: https://github.com/green-code-initiative/ecocode
-        # - SUSCOM: https://suscom.io/standards
-        return {name: True for name in self.standards.keys()}
+        from .sources import GSFSource, EcoCodeSource
+
+        # Initialize sources
+        sources = {
+            'gsf': GSFSource(),
+            'ecocode': EcoCodeSource()
+        }
+
+        results = {}
+        for name, source in sources.items():
+            try:
+                # In a real scenario, this would fetch from the internet.
+                # For now, we simulate success if the class is instantiated,
+                # as we don't want to break local dev without internet.
+                # The actual fetch logic is in source.fetch()
+
+                # Check if we have internet access by trying a lightweight fetch
+                # or just try fetching.
+                new_rules = source.fetch()
+
+                if new_rules:
+                    # Update internal standards if we got new rules
+                    self.standards[name] = new_rules
+                    results[name] = True
+                else:
+                    # Keep existing defaults if fetch fails or returns empty
+                    results[name] = False
+
+            except Exception as e:
+                print(f"Failed to sync {name}: {e}", file=sys.stderr)
+                results[name] = False
+
+        return results
     
     def export_rules_json(self) -> str:
         """Export enabled rules as JSON"""
