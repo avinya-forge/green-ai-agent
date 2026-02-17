@@ -257,3 +257,36 @@ rules:
     remediation: Iterate over the dictionary directly or use .items() if values are needed.
     source: ecoCode
     tags: [performance, code-quality]
+
+  - id: unnecessary_comprehension
+    name: Unnecessary Comprehension
+    description: Wraping a comprehension in a list/set/dict call is inefficient.
+    severity: major
+    languages: [python]
+    pattern: |
+      list([...])
+    remediation: Remove the outer call or use generator expression.
+    source: ecoCode
+    tags: [memory, performance]
+
+  - id: numpy_sum_vs_python_sum
+    name: Numpy Sum vs Python Sum
+    description: Using built-in sum() on numpy arrays is slower than numpy.sum().
+    severity: minor
+    languages: [python]
+    pattern: |
+      sum(np_array)
+    remediation: Use numpy.sum() or array.sum().
+    source: ecoCode
+    tags: [performance, data-science]
+
+  - id: subprocess_run_without_timeout
+    name: Subprocess Run Without Timeout
+    description: subprocess.run() without timeout can hang indefinitely.
+    severity: major
+    languages: [python]
+    pattern: |
+      subprocess.run(...)
+    remediation: Add timeout argument.
+    source: python-guide
+    tags: [reliability, resource-management]

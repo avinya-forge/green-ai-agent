@@ -2,11 +2,27 @@
 
 ## 📋 Next 10 Prioritized Microtasks
 
-1. **[QA] Pre-commit Hooks Integration (Sprint 4.1)**
-    - Goal: Auto-scan on commit via local hooks (improve DX/install script).
+1. **[QA] E2E Dashboard Testing (Sprint 4.2)**
+    - Goal: Automate UI verification.
     - Priority: Medium
 
 ## ✅ Completed Tasks
+
+- **[QA] Pre-commit Hooks Integration (Sprint 4.1)** (Status: Done)
+    - Goal: Improved robustness and installation script for local hooks.
+    - Priority: Medium
+
+- **[CORE] CLI Refactor** (Status: Done)
+    - Goal: Refactor `src/cli.py` into a modular package structure `src/cli/` with subcommands.
+    - Priority: High
+
+- **[CORE] New Python Rules** (Status: Done)
+    - Goal: Added `unnecessary_comprehension`, `numpy_sum_vs_python_sum`, `subprocess_run_without_timeout`.
+    - Priority: Medium
+
+- **[CORE] New JavaScript Rules** (Status: Done)
+    - Goal: Added `console_time`, `inner_html` detection.
+    - Priority: Medium
 
 - **[JULES] Fix BUG-003.1: Research Eventlet migration path** (Status: Done)
    - Goal: Prepare for eventlet deprecation (Created `docs/eventlet-migration.md`).

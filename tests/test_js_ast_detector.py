@@ -60,3 +60,26 @@ def test_no_false_positives():
     detector = JavaScriptASTDetector(code, "test.js")
     violations = detector.detect_all()
     assert len(violations) == 0
+
+def test_console_time():
+    code = """
+    console.time('timer');
+    // do something
+    console.timeEnd('timer');
+    """
+    detector = JavaScriptASTDetector(code, "test.js")
+    violations = detector.detect_all()
+
+    time_violations = [v for v in violations if v['id'] == 'console_time']
+    assert len(time_violations) == 2
+
+def test_inner_html():
+    code = """
+    document.getElementById('div').innerHTML = '<span>Hello</span>';
+    element.innerHTML = 'unsafe';
+    """
+    detector = JavaScriptASTDetector(code, "test.js")
+    violations = detector.detect_all()
+
+    inner_violations = [v for v in violations if v['id'] == 'inner_html']
+    assert len(inner_violations) == 2

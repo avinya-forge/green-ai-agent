@@ -1,5 +1,12 @@
 # Release Notes
 
+## [v0.7.0] - Consolidation & Quality
+### Added
+- **New Python Rules**: Added 3 new rules: `unnecessary_comprehension`, `numpy_sum_vs_python_sum`, `subprocess_run_without_timeout`.
+- **New JavaScript Rules**: Added 2 new rules: `console_time` (remove debug), `inner_html` (security/perf).
+- **CLI Refactor**: Modularized CLI into `src/cli/` package for better maintainability and extensibility.
+- **Pre-commit Hooks**: Enhanced local pre-commit hooks for robustness and better DX.
+
 ## [Unreleased]
 ### Added
 - **Calibration UI**: Added system calibration button to the landing page and exposed `GET /api/calibrate` endpoint to support UI integration.
