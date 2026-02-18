@@ -35,7 +35,7 @@ async def startup_event():
     pm = state.get_project_manager()
     hm = state.get_history_manager()
     state.get_standards_registry()
-    state.get_remediation_agent()
+    state.get_remediation_engine()
 
     try:
         default_project = pm.get_project("Green-AI Agent")
@@ -434,13 +434,13 @@ async def api_remediation_preview(
         with open(file, 'r', encoding='utf-8') as f:
             content = f.read()
 
-        agent = state.get_remediation_agent()
-        diff = agent.get_remediation_diff(file, line, issue_id, content)
-        description = agent.get_fix_description(issue_id)
+        engine = state.get_remediation_engine()
+        diff = engine.get_diff(file, content, line, issue_id)
+        description = engine.get_suggestion(issue_id)
 
         return {
             'status': 'ok',
-            'diff': diff,
+            'diff': diff or "No automated fix available.",
             'description': description
         }
     except Exception as e:

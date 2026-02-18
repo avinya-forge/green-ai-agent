@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional
 from src.standards.registry import StandardsRegistry
 from src.core.project_manager import ProjectManager
 from src.core.history import HistoryManager
-from src.core.remediation import RemediationAgent
+from src.core.remediation.engine import RemediationEngine
 from src.ui.charts import generate_all_charts
 
 # Global State
@@ -14,7 +14,7 @@ last_charts: Optional[Dict[str, Any]] = None
 standards_registry: Optional[StandardsRegistry] = None
 project_manager: Optional[ProjectManager] = None
 history_manager: Optional[HistoryManager] = None
-remediation_agent: Optional[RemediationAgent] = None
+remediation_engine: Optional[RemediationEngine] = None
 
 def get_standards_registry() -> StandardsRegistry:
     global standards_registry
@@ -34,11 +34,11 @@ def get_history_manager() -> HistoryManager:
         history_manager = HistoryManager()
     return history_manager
 
-def get_remediation_agent() -> RemediationAgent:
-    global remediation_agent
-    if remediation_agent is None:
-        remediation_agent = RemediationAgent()
-    return remediation_agent
+def get_remediation_engine() -> RemediationEngine:
+    global remediation_engine
+    if remediation_engine is None:
+        remediation_engine = RemediationEngine()
+    return remediation_engine
 
 def set_last_scan_results(results: Dict[str, Any]):
     global last_scan_results, last_charts
