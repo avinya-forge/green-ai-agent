@@ -118,3 +118,29 @@
 - **v0.6.1**: JavaScript AST Engine
 - **v0.6.0**: Performance & New Rules
 - **v0.5.0-beta**: Carbon Efficiency & Dynamic Rules
+
+## 📝 Planned Improvements (Sprint 4.3 - Consolidated Batch)
+
+- **[CORE] Refactor Detectors Architecture**
+    - Goal: Split monolithic `src/core/detectors.py` into modular package `src/core/detectors/`.
+    - Priority: High
+
+- **[CORE] New Python Rule: Blocking I/O in Async**
+    - Goal: Detect `time.sleep`, `requests.*`, `open` inside `async def`.
+    - Priority: High
+
+- **[CORE] New Python Rule: Requests Timeout**
+    - Goal: Ensure `requests` calls have `timeout` argument.
+    - Priority: High
+
+- **[CORE] New Python Rule: SQL Injection (Basic)**
+    - Goal: Detect f-strings in `cursor.execute`.
+    - Priority: High
+
+- **[CORE] New Rule: Empty Blocks**
+    - Goal: Detect empty functions/classes/loops in Python & JS.
+    - Priority: Medium
+
+- **[CI] CI/CD Workflow**
+    - Goal: Create GitHub Actions workflow for automated testing.
+    - Priority: High
