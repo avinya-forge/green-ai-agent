@@ -545,6 +545,11 @@ class PythonViolationDetector(ast.NodeVisitor):
             })
         self.generic_visit(node)
 
+    def visit_ClassDef(self, node: ast.ClassDef) -> None:
+        """Detect empty classes."""
+        self._check_empty_block(node, 'class')
+        self.generic_visit(node)
+
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
         """Detect high complexity functions and deep recursion."""
         self._check_function_def(node)
@@ -560,6 +565,7 @@ class PythonViolationDetector(ast.NodeVisitor):
 
     def _check_function_def(self, node: [ast.FunctionDef, ast.AsyncFunctionDef]) -> None:
         """Common logic for FunctionDef and AsyncFunctionDef."""
+        self._check_empty_block(node, 'function')
         prev_function = self.current_function
         self.current_function = node.name
 
