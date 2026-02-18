@@ -23,6 +23,21 @@ if condition:
 
     assert any(v['id'] == 'empty_block' for v in violations)
 
+def test_python_empty_func_class():
+    code = """
+def empty_func():
+    pass
+
+class EmptyClass:
+    ...
+"""
+    violations = detect_violations(code, "test.py", "python")
+    empty_blocks = [v for v in violations if v['id'] == 'empty_block']
+
+    assert len(empty_blocks) == 2
+    assert any("function" in v['message'] for v in empty_blocks)
+    assert any("class" in v['message'] for v in empty_blocks)
+
 def test_js_empty_block():
     code = """
 function test() {

@@ -85,6 +85,30 @@
    - Goal: specific `docs/vision.md` and `docs/development-standards.md`.
    - Priority: High (Initialization)
 
+- **[CORE] Refactor Detectors Architecture** (Status: Done)
+    - Goal: Split monolithic `src/core/detectors.py` into modular package `src/core/detectors/`.
+    - Priority: High
+
+- **[CORE] New Python Rule: Blocking I/O in Async** (Status: Done)
+    - Goal: Detect `time.sleep`, `requests.*`, `open` inside `async def`.
+    - Priority: High
+
+- **[CORE] New Python Rule: Requests Timeout** (Status: Done)
+    - Goal: Ensure `requests` calls have `timeout` argument.
+    - Priority: High
+
+- **[CORE] New Python Rule: SQL Injection (Basic)** (Status: Done)
+    - Goal: Detect f-strings in `cursor.execute`.
+    - Priority: High
+
+- **[CORE] New Rule: Empty Blocks** (Status: Done)
+    - Goal: Detect empty functions/classes/loops in Python & JS.
+    - Priority: Medium
+
+- **[CI] CI/CD Workflow** (Status: Done)
+    - Goal: Create GitHub Actions workflow for automated testing.
+    - Priority: High
+
 ---
 
 ## 🐛 Known Issues (P0 - Critical)
@@ -119,28 +143,6 @@
 - **v0.6.0**: Performance & New Rules
 - **v0.5.0-beta**: Carbon Efficiency & Dynamic Rules
 
-## 📝 Planned Improvements (Sprint 4.3 - Consolidated Batch)
+## 📝 Planned Improvements (Sprint 4.4 - Next Batch)
 
-- **[CORE] Refactor Detectors Architecture**
-    - Goal: Split monolithic `src/core/detectors.py` into modular package `src/core/detectors/`.
-    - Priority: High
-
-- **[CORE] New Python Rule: Blocking I/O in Async**
-    - Goal: Detect `time.sleep`, `requests.*`, `open` inside `async def`.
-    - Priority: High
-
-- **[CORE] New Python Rule: Requests Timeout**
-    - Goal: Ensure `requests` calls have `timeout` argument.
-    - Priority: High
-
-- **[CORE] New Python Rule: SQL Injection (Basic)**
-    - Goal: Detect f-strings in `cursor.execute`.
-    - Priority: High
-
-- **[CORE] New Rule: Empty Blocks**
-    - Goal: Detect empty functions/classes/loops in Python & JS.
-    - Priority: Medium
-
-- **[CI] CI/CD Workflow**
-    - Goal: Create GitHub Actions workflow for automated testing.
-    - Priority: High
+*No tasks planned yet.*
