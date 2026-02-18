@@ -10,7 +10,7 @@ import ast
 import sys
 from typing import Optional, Dict, Any, List, Union
 from src.core.rules import RuleRepository
-from src.core.fixer import AISuggester
+from src.core.remediation.engine import RemediationEngine
 from src.core.analyzer import EmissionAnalyzer
 from src.core.detectors import detect_violations
 from src.core.config import ConfigLoader
@@ -28,7 +28,7 @@ def scan_file_worker(file_path: str, language: str, config: Dict, rules: List[Di
     """
     # Initialize analyzer
     analyzer = EmissionAnalyzer()
-    ai_suggester = AISuggester()
+    remediation_engine = RemediationEngine()
 
     issues = []
     emissions = 0.0
@@ -72,7 +72,7 @@ def scan_file_worker(file_path: str, language: str, config: Dict, rules: List[Di
                         'file': file_path,
                         'line': violation.get('line', 0),
                         'remediation': rule.get('remediation', 'N/A'),
-                        'ai_suggestion': ai_suggester.suggest_fix({'id': rule_id}),
+                        'ai_suggestion': remediation_engine.get_suggestion(rule_id),
                         'effort': rule.get('effort', 'Medium'),
                         'tags': rule.get('tags', []),
                         'carbon_impact': rule.get('carbon_impact', 0.000000001),
@@ -140,7 +140,7 @@ class Scanner:
         self.profile = profile
         self.parser = self._setup_parser()
         self.rule_repo = RuleRepository()
-        self.ai_suggester = AISuggester()
+        self.remediation_engine = RemediationEngine()
         
         # Load system calibration
         self.calibration_agent = CalibrationAgent()

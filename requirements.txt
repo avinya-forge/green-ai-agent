@@ -14,3 +14,4 @@ uvicorn[standard]
 python-socketio
 jinja2
 httpx
+libcst>=1.0.0

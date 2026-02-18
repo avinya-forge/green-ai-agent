@@ -9,6 +9,9 @@
 
 ## [Unreleased]
 ### Added
+- **Remediation Engine**: Implemented a robust, CST-based (LibCST) remediation engine for Python. Supports automated refactoring for `inefficient_loop`, `open_without_context`, `range_len_usage`, and `unnecessary_comprehension`.
+- **Automated Fixes**: Added `src/core/remediation/` package replacing legacy regex-based `AISuggester`.
+- **Refactoring Transformers**: Implemented 4 key CST transformers: `ListAppendToComprehension`, `ContextManagerTransformer`, `EnumerateTransformer`, `UnnecessaryComprehensionTransformer`.
 - **E2E Dashboard Testing**: Added comprehensive end-to-end tests for the dashboard UI and API interactions.
 - **Standards Sync**: Implemented `sync_standards` to fetch latest green software standards from remote sources (GSF, ecoCode).
 - **Analyzer Robustness**: Added unit tests for `CodeComplexityAnalyzer` and `EmissionAnalyzer` covering edge cases.
