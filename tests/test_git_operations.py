@@ -4,9 +4,12 @@ Verify URL parsing, cloning, branch checkout, and cleanup operations.
 """
 
 import pytest
+import subprocess
+import shutil
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 from src.core.git_operations import GitOperations, GitException, detect_and_prepare_repository
+from src.core.config import ConfigLoader
 
 
 class TestGitUrlParsing:
@@ -251,7 +254,3 @@ class TestDetectAndPrepare:
         """Invalid location should raise GitException"""
         with pytest.raises(GitException, match="Invalid location"):
             detect_and_prepare_repository("invalid-location")
-
-
-# Import subprocess at module level for timeout test
-import subprocess

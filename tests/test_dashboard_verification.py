@@ -1,8 +1,15 @@
 
 import pytest
-from playwright.sync_api import sync_playwright
 import time
 
+# Conditionally import playwright
+try:
+    from playwright.sync_api import sync_playwright
+    PLAYWRIGHT_AVAILABLE = True
+except ImportError:
+    PLAYWRIGHT_AVAILABLE = False
+
+@pytest.mark.skipif(not PLAYWRIGHT_AVAILABLE, reason="Playwright not installed")
 @pytest.mark.skip(reason="Manual E2E verification script - requires running server")
 def test_dashboard_e2e_manual():
     with sync_playwright() as p:

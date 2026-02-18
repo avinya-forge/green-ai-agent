@@ -2,10 +2,16 @@ import threading
 import time
 import pytest
 from unittest.mock import patch, MagicMock
-from playwright.sync_api import sync_playwright
 import sys
 import os
 import uvicorn
+
+# Conditionally import playwright
+try:
+    from playwright.sync_api import sync_playwright
+    PLAYWRIGHT_AVAILABLE = True
+except ImportError:
+    PLAYWRIGHT_AVAILABLE = False
 
 # Add src to path just in case
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -44,6 +50,7 @@ def server():
 
         yield base_url
 
+@pytest.mark.skipif(not PLAYWRIGHT_AVAILABLE, reason="Playwright not installed")
 def test_dashboard_xss(server):
     with sync_playwright() as p:
         # Launch browser (headless by default)

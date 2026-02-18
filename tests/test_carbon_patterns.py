@@ -3,6 +3,14 @@ Test file to validate carbon calculation against real code patterns.
 This demonstrates the carbon impact of different violations.
 """
 
+# Dummy functions for patterns
+def query_database(query): pass
+def expensive_computation(): return 0
+def calculate_important_thing(): return 0
+def unused_function(): pass
+def another_unused_call(): pass
+def process(line): return line
+
 # PATTERN 1: Nested loops (CRITICAL - O(n³))
 # Energy impact: 100x+ normal loops
 def inefficient_search(data, target):
@@ -174,7 +182,9 @@ def efficient_file_reading_green(filename):
 def efficient_db_query_green(user_ids):
     """Batch query instead of N+1."""
     # Single query: 1 call instead of 1000
-    users = query_database(f"SELECT * FROM users WHERE id IN ({','.join(user_ids)})")
+    # Note: Using join on user_ids requires them to be strings
+    user_ids_str = [str(uid) for uid in user_ids]
+    users = query_database(f"SELECT * FROM users WHERE id IN ({','.join(user_ids_str)})")
     return users
 
 def efficient_string_building_green(words):

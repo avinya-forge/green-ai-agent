@@ -53,7 +53,7 @@ def test_magic_numbers():
 def test_no_false_positives():
     code = """
     const logger = {
-        log: function(msg) {}
+        log: function(msg) { return msg; }
     };
     logger.log("Not console");
     """

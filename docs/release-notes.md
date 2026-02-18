@@ -85,3 +85,20 @@
 ### Added
 - **Core Engine**: Initial AST-based scanner for basic Python and JavaScript violations.
 - **Emissions Modeling**: Basic CO2 impact estimation based on static analysis.
+
+## v0.6.2 - Architecture & Security Update (Consolidated Batch)
+
+### 🏗️ Architectural Refactor
+- **Modular Detectors**: Split the monolithic `src/core/detectors.py` into a modular package `src/core/detectors/` with separate Python and JavaScript detectors. This improves maintainability and extensibility.
+
+### 🛡️ New Detection Rules (Python)
+- **Blocking I/O in Async**: Detects `time.sleep`, `requests.*`, and `open()` calls inside `async def` functions, which can block the event loop.
+- **SQL Injection Risk**: Basic heuristic to detect f-strings or string formatting used directly in `cursor.execute()`.
+- **Requests Timeout**: Warns if `requests.get/post/etc` are called without a `timeout` argument, preventing potential hangs.
+- **Empty Blocks**: Detects empty loops, if-statements, and try-except blocks that should be implemented or removed.
+
+### 🌐 New Detection Rules (JavaScript)
+- **Empty Blocks**: Detects empty statement blocks (`{}`) in JavaScript code.
+
+### ⚙️ Infrastructure
+- **CI/CD**: Added GitHub Actions workflow (`.github/workflows/ci.yml`) to automatically run tests (`pytest`) and linting (`flake8`) on push and PR.

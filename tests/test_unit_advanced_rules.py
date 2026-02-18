@@ -4,8 +4,9 @@ Unit tests for Advanced Rules (Deep Recursion, Inefficient Lookup, Regex in Loop
 import pytest
 import sys
 import os
+import re  # Used in the test code string, not directly imported but good to have for clarity
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.core.detectors import PythonViolationDetector
+from src.core.detectors import PythonViolationDetector  # noqa: E402
 
 class TestAdvancedRules:
     def test_deep_recursion_detection(self):
@@ -46,7 +47,7 @@ def process(items):
         assert found, "Inefficient lookup not detected"
 
     def test_regex_in_loop_detection(self):
-        code = """
+        code = r"""
 import re
 def process(items):
     for item in items:
