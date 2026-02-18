@@ -1,4 +1,5 @@
 import pytest
+import requests
 from unittest.mock import patch, MagicMock
 from src.standards.registry import StandardsRegistry, StandardRule
 from src.standards.sources import GSFSource, EcoCodeSource
@@ -58,8 +59,6 @@ def test_ecocode_source_fetch_success(mock_requests_get):
     assert rules[0].id == 'eco-001'
     assert rules[0].source == 'ecoCode'
 
-import requests
-
 def test_fetch_failure(mock_requests_get):
     """Test handling of fetch failures."""
     mock_requests_get.side_effect = requests.RequestException("Network error")
@@ -91,7 +90,7 @@ def test_registry_sync(mock_requests_get):
 
     # Initial state
     assert 'gsf' in registry.standards
-    original_count = len(registry.standards['gsf'])
+    # original_count = len(registry.standards['gsf'])
 
     # Sync
     result = registry.sync_standards()

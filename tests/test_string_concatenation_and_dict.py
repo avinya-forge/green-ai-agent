@@ -1,9 +1,8 @@
-
 import pytest
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.core.detectors import PythonViolationDetector
+from src.core.detectors import PythonViolationDetector  # noqa: E402
 
 class TestStringConcatenationAndDict:
     def test_string_concatenation_loop_plus(self):
