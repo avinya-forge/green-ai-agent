@@ -145,4 +145,6 @@
 
 ## 📝 Planned Improvements (Sprint 4.4 - Next Batch)
 
-*No tasks planned yet.*
+- **[CORE] Implement TypeScript Support** (Status: Done)
+    - Goal: Add support for `.ts` and `.tsx` files with specific rules (`any`, `enum`) and inherited JS rules.
+    - Priority: High

@@ -8,6 +8,7 @@ from typing import List, Dict
 
 from .python_detector import PythonViolationDetector
 from .javascript_detector import JavaScriptASTDetector, JavaScriptViolationDetector
+from .typescript_detector import TypeScriptASTDetector
 from .pattern_detector import PatternBasedDetector
 
 def detect_violations(content: str, file_path: str, language: str = 'python') -> List[Dict]:
@@ -35,5 +36,10 @@ def detect_violations(content: str, file_path: str, language: str = 'python') ->
         # Regex-based detection (legacy/remaining rules)
         js_detector = JavaScriptViolationDetector(content, file_path)
         violations.extend(js_detector.detect_all())
+
+    elif language == 'typescript':
+        # AST-based detection
+        ts_ast_detector = TypeScriptASTDetector(content, file_path)
+        violations.extend(ts_ast_detector.detect_all())
 
     return violations

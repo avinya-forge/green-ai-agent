@@ -9,6 +9,8 @@
 
 ## [Unreleased]
 ### Added
+- **TypeScript Support**: Added comprehensive support for TypeScript (`.ts`, `.tsx`) analysis using `tree-sitter-typescript`.
+- **New TypeScript Rules**: Added `any_type_usage` and `prefer_const_enum` rules, plus inherited all JavaScript green coding rules.
 - **Remediation Engine**: Implemented a robust, CST-based (LibCST) remediation engine for Python. Supports automated refactoring for `inefficient_loop`, `open_without_context`, `range_len_usage`, and `unnecessary_comprehension`.
 - **Automated Fixes**: Added `src/core/remediation/` package replacing legacy regex-based `AISuggester`.
 - **Refactoring Transformers**: Implemented 4 key CST transformers: `ListAppendToComprehension`, `ContextManagerTransformer`, `EnumerateTransformer`, `UnnecessaryComprehensionTransformer`.
