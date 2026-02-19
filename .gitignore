@@ -119,3 +119,4 @@ Dockerfile.bak
 !.gitkeep
 !README.md
 !requirements.txt
+output/**/*.xml
