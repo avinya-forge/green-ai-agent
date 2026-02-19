@@ -1,6 +1,6 @@
-import pytest
 import xml.etree.ElementTree as ET
 from src.core.export.xml_exporter import JUnitXMLExporter
+
 
 def test_xml_export(tmp_path):
     """Test JUnit XML export."""

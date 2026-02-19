@@ -1,6 +1,0 @@
-INFO     green-ai:discovery.py:26 Discovering files in /tmp/pytest-of-jules/pytest-0/test_file_discoverer0/subdir (Ignoring: *.me)
-INFO     green-ai:discovery.py:53 Found 1 files to scan.
-INFO     green-ai:rules.py:49 Loading rules from /app/rules
-INFO     green-ai:rules.py:58 Loaded 26 rules for python
-INFO     green-ai:rules.py:58 Loaded 16 rules for javascript
-INFO     green-ai:rules.py:58 Loaded 18 rules for typescript

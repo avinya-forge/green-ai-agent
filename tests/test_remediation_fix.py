@@ -1,7 +1,7 @@
-import pytest
 import textwrap
 from src.core.remediation.strategies.python import ListAppendToComprehension
 from src.core.remediation.engine import RemediationEngine
+
 
 def test_apply_fix_list_comprehension():
     """Test applying fix for list comprehension."""
@@ -23,6 +23,7 @@ def test_apply_fix_list_comprehension():
     assert fixed_code is not None
     # LibCST usually maintains indentation
     assert "result.extend([item for item in items])" in fixed_code
+
 
 def test_remediation_engine_fix_file(tmp_path):
     """Test RemediationEngine.fix_file."""

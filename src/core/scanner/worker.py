@@ -4,7 +4,10 @@ from src.core.remediation.engine import RemediationEngine
 from src.core.analyzer import EmissionAnalyzer
 from src.core.detectors import detect_violations
 
-def scan_file_worker(file_path: str, language: str, config: Dict, rules: List[Dict]) -> Dict[str, Any]:
+
+def scan_file_worker(
+    file_path: str, language: str, config: Dict, rules: List[Dict]
+) -> Dict[str, Any]:
     """
     Worker function to scan and analyze a single file.
     Running in a separate process.
@@ -36,7 +39,8 @@ def scan_file_worker(file_path: str, language: str, config: Dict, rules: List[Di
                 rule_id = rule.get('id', violation.get('id', 'unknown'))
 
                 # Check if rule is enabled in config
-                # Re-implement is_rule_enabled logic here since we don't have ConfigLoader instance
+                # Re-implement is_rule_enabled logic here since we don't have
+                # ConfigLoader instance
                 enabled_rules = config.get('rules', {}).get('enabled', [])
                 disabled_rules = config.get('rules', {}).get('disabled', [])
 
@@ -55,10 +59,12 @@ def scan_file_worker(file_path: str, language: str, config: Dict, rules: List[Di
                         'file': file_path,
                         'line': violation.get('line', 0),
                         'remediation': rule.get('remediation', 'N/A'),
-                        'ai_suggestion': remediation_engine.get_suggestion(rule_id),
+                        'ai_suggestion': remediation_engine.get_suggestion(
+                            rule_id
+                        ),
                         'effort': rule.get('effort', 'Medium'),
                         'tags': rule.get('tags', []),
-                        'carbon_impact': rule.get('carbon_impact', 0.000000001),
+                        'carbon_impact': rule.get('carbon_impact', 1e-9),
                         'energy_factor': rule.get('energy_factor', 1),
                         'name': rule.get('name', rule_id)
                     }

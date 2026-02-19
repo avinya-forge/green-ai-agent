@@ -4,6 +4,7 @@ from typing import List
 from src.utils.logger import logger
 from src.core.config import ConfigLoader
 
+
 class FileDiscoverer:
     """Helper class to discover files for scanning."""
 
@@ -23,10 +24,14 @@ class FileDiscoverer:
         ignore_patterns = self.config_loader.get_ignored_files()
         all_files = []
 
-        logger.info(f"Discovering files in {scan_path} (Ignoring: {', '.join(ignore_patterns)})")
+        logger.info(
+            f"Discovering files in {scan_path} "
+            f"(Ignoring: {', '.join(ignore_patterns)})"
+        )
 
         # Walk using path.glob or rglob while filtering
-        # Optimization: We could use os.walk to prune directories, but keeping consistent with original implementation for now
+        # Optimization: We could use os.walk to prune directories,
+        # but keeping consistent with original implementation for now
         for file in path.rglob('*'):
             if not file.is_file():
                 continue
@@ -38,12 +43,14 @@ class FileDiscoverer:
                 # Should not happen with rglob
                 continue
 
-            rel_str = str(rel_path).replace('\\', '/') # Standardize for matching
+            rel_str = str(rel_path).replace('\\', '/')  # Standardize for match
 
             is_ignored = False
             for pattern in ignore_patterns:
                 # Match against filename and path parts
-                if fnmatch.fnmatch(rel_str, pattern) or any(fnmatch.fnmatch(part, pattern) for part in rel_path.parts):
+                if fnmatch.fnmatch(rel_str, pattern) or any(
+                    fnmatch.fnmatch(part, pattern) for part in rel_path.parts
+                ):
                     is_ignored = True
                     break
 

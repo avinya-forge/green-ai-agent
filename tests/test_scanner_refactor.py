@@ -1,11 +1,11 @@
-import pytest
-import os
 from src.core.scanner import Scanner
 from src.core.scanner.discovery import FileDiscoverer
+
 
 def test_scanner_imports():
     """Verify that Scanner can be imported from the new package."""
     assert Scanner is not None
+
 
 def test_file_discoverer(tmp_path):
     """Verify FileDiscoverer logic."""
@@ -28,6 +28,7 @@ def test_file_discoverer(tmp_path):
     assert len(files) == 1
     assert str(p1) in files[0]
     assert "ignore.me" not in files[0]
+
 
 def test_scanner_init():
     """Verify Scanner initialization."""

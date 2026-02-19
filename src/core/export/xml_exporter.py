@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 # Default output directory for all exports
 OUTPUT_DIR = Path(__file__).parent.parent.parent.parent / 'output'
 
+
 class JUnitXMLExporter:
     """Export scan results to JUnit XML format."""
 
@@ -14,7 +15,8 @@ class JUnitXMLExporter:
         Initialize XML exporter.
 
         Args:
-            output_path: Path to write XML file. If None, defaults to 'output/green-ai-report.xml'
+            output_path: Path to write XML file.
+                         If None, defaults to 'output/green-ai-report.xml'
         """
         # Ensure output directory exists
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -24,7 +26,9 @@ class JUnitXMLExporter:
         else:
             self.output_path = str(OUTPUT_DIR / 'green-ai-report.xml')
 
-    def export(self, results: Dict[str, Any], project_name: str = 'Scan') -> str:
+    def export(
+        self, results: Dict[str, Any], project_name: str = 'Scan'
+    ) -> str:
         """
         Export scan results to JUnit XML file.
 
@@ -39,7 +43,7 @@ class JUnitXMLExporter:
 
         # Calculate statistics
         total_tests = len(issues)
-        failures = total_tests  # Every issue is considered a failure in this context
+        failures = total_tests  # Every issue is considered a failure
 
         # Root element
         testsuites = ET.Element('testsuites')
@@ -52,7 +56,7 @@ class JUnitXMLExporter:
         testsuite.set('errors', '0')
         testsuite.set('skipped', '0')
         testsuite.set('timestamp', datetime.now(timezone.utc).isoformat())
-        testsuite.set('time', '0') # Execution time could be added here
+        testsuite.set('time', '0')  # Execution time could be added here
 
         # Add testcases for each issue
         for issue in issues:
@@ -71,7 +75,10 @@ class JUnitXMLExporter:
             failure = ET.SubElement(testcase, 'failure')
             failure.set('message', message)
             failure.set('type', severity)
-            failure.text = f"Rule: {rule_id}\nSeverity: {severity}\nFile: {file_path}:{line}\nMessage: {message}"
+            failure.text = (
+                f"Rule: {rule_id}\nSeverity: {severity}\n"
+                f"File: {file_path}:{line}\nMessage: {message}"
+            )
 
         # Create XML tree
         tree = ET.ElementTree(testsuites)
