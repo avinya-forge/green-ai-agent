@@ -47,7 +47,7 @@ class ConfigLoader:
     
     # Default configuration (works if no .green-ai.yaml exists)
     DEFAULT_CONFIG = {
-        'languages': ['python', 'javascript'],
+        'languages': ['python', 'javascript', 'typescript'],
         'rules': {
             'enabled': [
                 'excessive_nesting_depth',
@@ -93,7 +93,7 @@ class ConfigLoader:
     
     # Configuration schema definition
     SCHEMA = {
-        'languages': (list, ['python', 'javascript']),
+        'languages': (list, ['python', 'javascript', 'typescript']),
         'rules': (dict, {
             'enabled': (list, []),
             'disabled': (list, [])

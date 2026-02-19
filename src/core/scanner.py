@@ -368,6 +368,8 @@ class Scanner:
             return [sys.executable, path]
         elif self.language == 'javascript':
             return ['node', path]
+        elif self.language == 'typescript':
+            return ['npx', 'ts-node', path]
         else:
             return None
     
@@ -376,4 +378,6 @@ class Scanner:
             return file_path.endswith('.py')
         elif self.language == 'javascript':
             return file_path.endswith('.js')
+        elif self.language == 'typescript':
+            return file_path.endswith('.ts') or file_path.endswith('.tsx')
         return False
