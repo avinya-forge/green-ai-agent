@@ -7,6 +7,20 @@ class PythonRemediationStrategy(RemediationStrategy):
     """Base class for Python CST-based remediation strategies."""
 
     def get_diff(self, file_path: str, code: str, line: int) -> Optional[str]:
+        modified_code = self.apply_fix(code, line)
+        if modified_code is None:
+            return None
+
+        diff = difflib.unified_diff(
+            code.splitlines(),
+            modified_code.splitlines(),
+            fromfile=file_path,
+            tofile=file_path,
+            lineterm=''
+        )
+        return '\n'.join(list(diff))
+
+    def apply_fix(self, code: str, line: int) -> Optional[str]:
         try:
             source_tree = cst.parse_module(code)
             wrapper = cst.metadata.MetadataWrapper(source_tree)
@@ -16,22 +30,12 @@ class PythonRemediationStrategy(RemediationStrategy):
             if not transformer.modified:
                 return None
 
-            modified_code = modified_tree.code
-
-            diff = difflib.unified_diff(
-                code.splitlines(),
-                modified_code.splitlines(),
-                fromfile=file_path,
-                tofile=file_path,
-                lineterm=''
-            )
-            return '\n'.join(list(diff))
+            return modified_tree.code
 
         except Exception as e:
             # Log specific errors if needed, but fail gracefully
-            print(f"DEBUG: Exception in get_diff: {e}")
             import traceback
-            traceback.print_exc()
+            # traceback.print_exc()
             return None
 
     def get_transformer(self, line: int) -> cst.CSTTransformer:

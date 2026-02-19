@@ -1,123 +1,20 @@
-"""
-Scanner module for GASA - Green Software Analyzer
-
-Scans Python and JavaScript codebases for green software violations.
-Detects energy inefficiencies and estimates carbon impact.
-"""
-
 import os
-import ast
 import sys
+import concurrent.futures
+import multiprocessing
+from multiprocessing import cpu_count
 from typing import Optional, Dict, Any, List, Union
+
 from src.core.rules import RuleRepository
 from src.core.remediation.engine import RemediationEngine
 from src.core.analyzer import EmissionAnalyzer
-from src.core.detectors import detect_violations
 from src.core.config import ConfigLoader
 from src.core.tracking import create_tracker
 from src.core.calibration import CalibrationAgent
 from src.utils.logger import logger
-import concurrent.futures
-import multiprocessing
-from multiprocessing import cpu_count
 
-def scan_file_worker(file_path: str, language: str, config: Dict, rules: List[Dict]) -> Dict[str, Any]:
-    """
-    Worker function to scan and analyze a single file.
-    Running in a separate process.
-    """
-    # Initialize analyzer
-    analyzer = EmissionAnalyzer()
-    remediation_engine = RemediationEngine()
-
-    issues = []
-    emissions = 0.0
-
-    try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-
-        # Explicitly check for syntax errors
-        if language == 'python':
-            ast.parse(content)
-
-        # Scan for violations
-        violations = detect_violations(content, file_path, language=language)
-
-        # Convert violations to full issue format
-        for violation in violations:
-            # Find rule in provided rules list
-            rule = next((r for r in rules if r['id'] == violation['id']), None)
-
-            if rule:
-                rule_id = rule.get('id', violation.get('id', 'unknown'))
-
-                # Check if rule is enabled in config
-                # Re-implement is_rule_enabled logic here since we don't have ConfigLoader instance
-                enabled_rules = config.get('rules', {}).get('enabled', [])
-                disabled_rules = config.get('rules', {}).get('disabled', [])
-
-                is_enabled = True
-                if rule_id in disabled_rules:
-                    is_enabled = False
-                elif rule_id in enabled_rules:
-                    is_enabled = True
-
-                if is_enabled:
-                    issue = {
-                        'id': rule_id,
-                        'type': 'green_violation',
-                        'severity': rule.get('severity', 'medium'),
-                        'message': violation.get('message', 'N/A'),
-                        'file': file_path,
-                        'line': violation.get('line', 0),
-                        'remediation': rule.get('remediation', 'N/A'),
-                        'ai_suggestion': remediation_engine.get_suggestion(rule_id),
-                        'effort': rule.get('effort', 'Medium'),
-                        'tags': rule.get('tags', []),
-                        'carbon_impact': rule.get('carbon_impact', 0.000000001),
-                        'energy_factor': rule.get('energy_factor', 1),
-                        'name': rule.get('name', rule_id)
-                    }
-                    issues.append(issue)
-
-        # Handle parse errors captured by detect_violations (if any custom handling needed)
-        # But detect_violations returns dicts, some might be errors?
-        # detect_violations returns violations list. Errors are usually raised.
-
-        # Analyze emissions
-        metrics = analyzer.analyze_file(file_path, content)
-        emissions = analyzer.estimate_emissions(metrics)
-
-    except SyntaxError:
-        issues.append({
-            'id': 'syntax_error',
-            'type': 'error',
-            'severity': 'blocker',
-            'message': f'Syntax error in {language} code',
-            'file': file_path,
-            'line': 0,
-            'remediation': 'Fix the syntax error to proceed with scanning.',
-            'effort': 'Low',
-            'tags': ['syntax', 'error']
-        })
-    except Exception as e:
-        issues.append({
-            'id': 'parse_error',
-            'type': 'error',
-            'severity': 'medium',
-            'message': f'Failed to scan file: {str(e)}',
-            'file': file_path,
-            'line': 0,
-            'remediation': 'Check file content and format.',
-            'effort': 'Low',
-            'tags': ['error']
-        })
-
-    return {
-        'issues': issues,
-        'emissions': emissions
-    }
+from src.core.scanner.worker import scan_file_worker
+from src.core.scanner.discovery import FileDiscoverer
 
 class Scanner:
     def __init__(self, language: Optional[str] = None, runtime: bool = False, config_path: Optional[str] = None, profile: bool = False):
@@ -138,7 +35,6 @@ class Scanner:
         self.language = language or self.config_loader.get_enabled_languages()[0]
         self.runtime = runtime
         self.profile = profile
-        self.parser = self._setup_parser()
         self.rule_repo = RuleRepository()
         self.remediation_engine = RemediationEngine()
         
@@ -148,10 +44,8 @@ class Scanner:
             calibration_coefficient=self.calibration_agent.get_coefficient()
         )
         
-    def _setup_parser(self):
-        # For now, use Python ast for both
-        return None
-    
+        self.file_discoverer = FileDiscoverer(self.config_loader)
+
     def scan(self, path: Union[str, List[str]], progress_callback=None):
         """
         Scan a directory, file, or list of paths.
@@ -169,16 +63,18 @@ class Scanner:
         
         logger.info(f"Starting scan on {path}...")
         
+        files = []
+        scan_metadata_path = ""
+
         if isinstance(path, str):
-            files = [path] if os.path.isfile(path) else self._get_files(path)
+            files = self.file_discoverer.get_files(path)
             scan_metadata_path = path
         else:
             files = []
             for p in path:
-                if os.path.isfile(p):
-                    files.append(p)
-                else:
-                    files.extend(self._get_files(p))
+                # We need to handle list of paths correctly with FileDiscoverer
+                # FileDiscoverer.get_files expects a single path string usually
+                files.extend(self.file_discoverer.get_files(p))
             scan_metadata_path = f"Multiple paths ({len(path)})"
 
         total_files = len(files)
@@ -273,6 +169,12 @@ class Scanner:
     
     def _run_with_monitoring(self, path):
         """Safely execute code and monitor basic runtime metrics."""
+        # Note: If path is a list, this might fail. Runtime monitoring usually expects an entry point.
+        if isinstance(path, list):
+             # Just take the first one or fail?
+             # For now, if list, we can't easily run it unless we know the entry point.
+             return {'error': 'Runtime monitoring requires a single entry point path, not a list.'}
+
         if not os.path.isfile(path):
             return {'error': 'Runtime monitoring requires a single file path'}
         
@@ -322,46 +224,6 @@ class Scanner:
                 'execution_time': 'N/A',
                 'emissions': 0.0
             }
-    
-    def _get_files(self, scan_path):
-        """
-        Get all files to scan, respecting ignore patterns from config.
-        
-        Uses pathlib for efficiency and correct cross-platform path handling.
-        """
-        from pathlib import Path
-        import fnmatch
-        
-        path = Path(scan_path)
-        if path.is_file():
-            return [str(path)]
-            
-        ignore_patterns = self.config_loader.get_ignored_files()
-        all_files = []
-        
-        logger.info(f"Discovering files in {scan_path} (Ignoring: {', '.join(ignore_patterns)})")
-        
-        # Walk using path.glob or rglob while filtering
-        for file in path.rglob('*'):
-            if not file.is_file():
-                continue
-                
-            # Check relative path against ignore patterns
-            rel_path = file.relative_to(path)
-            rel_str = str(rel_path).replace('\\', '/') # Standardize for matching
-            
-            is_ignored = False
-            for pattern in ignore_patterns:
-                # Match against filename and path parts
-                if fnmatch.fnmatch(rel_str, pattern) or any(fnmatch.fnmatch(part, pattern) for part in rel_path.parts):
-                    is_ignored = True
-                    break
-            
-            if not is_ignored:
-                all_files.append(str(file))
-                
-        logger.info(f"Found {len(all_files)} files to scan.")
-        return all_files
     
     def _get_run_command(self, path):
         if self.language == 'python':

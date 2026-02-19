@@ -14,8 +14,9 @@ from typing import List, Dict, Any, Optional
 
 
 # Default output directory for all exports
-OUTPUT_DIR = Path(__file__).parent.parent.parent / 'output'
+OUTPUT_DIR = Path(__file__).parent.parent.parent.parent / 'output'
 
+from .xml_exporter import JUnitXMLExporter
 
 class JSONExporter:
     """Export scan results to JSON format."""

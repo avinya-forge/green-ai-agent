@@ -6,7 +6,7 @@ from src.core.scanner import Scanner
 from src.core.config import ConfigLoader
 from src.core.git_operations import GitOperations, GitException
 from src.core.project_manager import ProjectManager
-from src.core.export import CSVExporter, HTMLReporter, JSONExporter
+from src.core.export import CSVExporter, HTMLReporter, JSONExporter, JUnitXMLExporter
 
 # Import set_last_scan_results if needed, or handle differently.
 # src/cli_legacy.py had: # Store results for dashboard (only effective if server is imported/running in same process, which it isn't here)
@@ -189,12 +189,17 @@ def scan(paths, git_url, branch, project_name, language, config, disable_rule, e
                     export_path = None
 
                 # Validate format
-                if export_format not in ['csv', 'html', 'json']:
-                    click.echo(f"Error: Invalid export format '{export_format}'. Use 'csv', 'html', or 'json'.", err=True)
+                if export_format not in ['csv', 'html', 'json', 'xml']:
+                    click.echo(f"Error: Invalid export format '{export_format}'. Use 'csv', 'html', 'json', or 'xml'.", err=True)
                     sys.exit(1)
 
                 # Generate export
-                if export_format == 'csv':
+                if export_format == 'xml':
+                    exporter = JUnitXMLExporter(export_path)
+                    output_file = exporter.export(results, project_name or 'Scan')
+                    click.echo(f"[OK] JUnit XML report exported: {output_file}", err=True)
+
+                elif export_format == 'csv':
                     exporter = CSVExporter(export_path)
                     output_file = exporter.export(results, project_name or 'Scan')
                     click.echo(f"[OK] CSV report exported: {output_file}", err=True)
@@ -268,16 +273,52 @@ def scan(paths, git_url, branch, project_name, language, config, disable_rule, e
         # Handle fixing options
         if fix_all:
             click.echo("\nFixing all issues automatically...", err=True)
+            # Group issues by file
+            issues_by_file = {}
             for issue in results['issues']:
-                click.echo(f"  Fixed: {issue.get('id', 'unknown')}", err=True)
+                file_path = issue.get('file')
+                if file_path:
+                    if file_path not in issues_by_file:
+                        issues_by_file[file_path] = []
+                    issues_by_file[file_path].append(issue)
+
+            total_fixed = 0
+            total_failed = 0
+
+            for file_path, file_issues in issues_by_file.items():
+                click.echo(f"  Processing {file_path}...", err=True)
+                fix_result = scanner.remediation_engine.fix_file(file_path, file_issues)
+                fixed = fix_result.get('fixed', 0)
+                failed = fix_result.get('failed', 0)
+                total_fixed += fixed
+                total_failed += failed
+
+                if fixed > 0:
+                    click.echo(f"    Fixed {fixed} issues.", err=True)
+                if failed > 0:
+                    click.echo(f"    Failed to fix {failed} issues.", err=True)
+
+            click.echo(f"\nTotal: {total_fixed} fixed, {total_failed} failed.", err=True)
+
         elif fix_specific:
             click.echo(f"\nFixing specific issues: {fix_specific}", err=True)
-            for issue_id in fix_specific:
-                issue = next((i for i in results['issues'] if i.get('id') == issue_id), None)
-                if issue:
-                    click.echo(f"  Fixed: {issue_id}", err=True)
-                else:
-                    click.echo(f"  Issue {issue_id} not found", err=True)
+            # Filter issues
+            target_issues = [i for i in results['issues'] if i.get('id') in fix_specific]
+
+            if not target_issues:
+                 click.echo("No matching issues found.", err=True)
+            else:
+                issues_by_file = {}
+                for issue in target_issues:
+                    file_path = issue.get('file')
+                    if file_path:
+                        if file_path not in issues_by_file:
+                            issues_by_file[file_path] = []
+                        issues_by_file[file_path].append(issue)
+
+                for file_path, file_issues in issues_by_file.items():
+                    fix_result = scanner.remediation_engine.fix_file(file_path, file_issues)
+                    click.echo(f"  {file_path}: Fixed {fix_result.get('fixed', 0)}, Failed {fix_result.get('failed', 0)}", err=True)
         elif manual:
             click.echo("\nManual mode: Review issues above and fix manually.", err=True)
         else:

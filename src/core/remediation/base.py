@@ -38,3 +38,16 @@ class RemediationStrategy(ABC):
             String containing the unified diff, or None if fix cannot be applied.
         """
         pass
+
+    def apply_fix(self, code: str, line: int) -> Optional[str]:
+        """
+        Apply the fix and return the modified code.
+
+        Args:
+            code: Content of the file.
+            line: Line number where the violation occurred (1-based).
+
+        Returns:
+            Modified code string, or None if fix cannot be applied.
+        """
+        return None

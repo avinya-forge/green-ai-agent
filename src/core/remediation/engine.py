@@ -84,3 +84,64 @@ class RemediationEngine:
         """Compatibility method for UI (replaces RemediationAgent.get_remediation_diff)."""
         diff = self.get_diff(file_path, original_code, line, issue_id)
         return diff if diff else ""
+
+    def fix_file(self, file_path: str, violations: List[Dict]) -> Dict[str, int]:
+        """
+        Apply fixes to a file for the given violations.
+
+        Args:
+            file_path: Path to the file to fix.
+            violations: List of violations to fix.
+
+        Returns:
+            Dictionary with 'fixed' and 'failed' counts.
+        """
+        fixed_count = 0
+        failed_count = 0
+
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+        except Exception as e:
+            logger.error(f"Failed to read file {file_path}: {e}")
+            return {'fixed': 0, 'failed': len(violations)}
+
+        # Sort violations bottom-up to preserve line numbers for earlier fixes
+        sorted_violations = sorted(violations, key=lambda x: x.get('line', 0), reverse=True)
+
+        current_code = content
+        # Track modified lines to prevent overlapping fixes
+        # Simple heuristic: if we fixed a line, we might have invalidated nearby lines.
+        # But LibCST handles AST, so "line" is just for locating the node.
+        # If we change the AST, line numbers shift. But since we go bottom-up,
+        # changes only affect subsequent lines (which we already processed).
+        # So this should be safe for independent violations.
+
+        for violation in sorted_violations:
+            rule_id = violation.get('id')
+            line = violation.get('line')
+
+            strategy = self._strategies.get(rule_id)
+            if not strategy:
+                failed_count += 1
+                continue
+
+            try:
+                new_code = strategy.apply_fix(current_code, line)
+                if new_code and new_code != current_code:
+                    current_code = new_code
+                    fixed_count += 1
+                else:
+                    failed_count += 1
+            except Exception as e:
+                logger.error(f"Error applying fix for {rule_id} at {file_path}:{line}: {e}")
+                failed_count += 1
+
+        if fixed_count > 0:
+            try:
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    f.write(current_code)
+            except Exception as e:
+                logger.error(f"Failed to write fixed file {file_path}: {e}")
+
+        return {'fixed': fixed_count, 'failed': failed_count}

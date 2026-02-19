@@ -2,7 +2,12 @@
 
 ## 📋 Next 10 Prioritized Microtasks
 
-1. **[CORE] Implement Standards Sync**
+1. **[CORE] Refactor Scanner & Implement CLI Fixes**
+    - Status: In-Progress - Alter-Agent-03
+    - Goal: Modularize Scanner, implement `fix_all`, add XML export.
+    - Priority: High
+
+2. **[CORE] Implement Standards Sync**
     - Status: Done
     - Goal: Fetch latest standards from online sources (GSF, ecoCode).
     - Priority: Medium
