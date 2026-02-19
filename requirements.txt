@@ -16,3 +16,4 @@ jinja2
 httpx
 libcst>=1.0.0
 tree-sitter-typescript
+tree-sitter-java

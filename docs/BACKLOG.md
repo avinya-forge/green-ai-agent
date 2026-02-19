@@ -2,17 +2,20 @@
 
 ## 📋 Next 10 Prioritized Microtasks
 
-1. **[CORE] Refactor Scanner & Implement CLI Fixes**
-    - Status: In-Progress - Alter-Agent-03
+1. **[CORE] Implement Java Support**
+    - Status: In-Progress - Green-AI-Agent-03
+    - Goal: Add support for Java scanning (AST-based detection, rules, config).
+    - Priority: High
+
+## ✅ Completed Tasks
+
+- **[CORE] Refactor Scanner & Implement CLI Fixes** (Status: Done)
     - Goal: Modularize Scanner, implement `fix_all`, add XML export.
     - Priority: High
 
-2. **[CORE] Implement Standards Sync**
-    - Status: Done
+- **[CORE] Implement Standards Sync** (Status: Done)
     - Goal: Fetch latest standards from online sources (GSF, ecoCode).
     - Priority: Medium
-
-## ✅ Completed Tasks
 
 - **[QA] E2E Dashboard Testing (Sprint 4.2)** (Status: Done)
     - Goal: Automate UI verification.
