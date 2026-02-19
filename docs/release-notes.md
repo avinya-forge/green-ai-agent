@@ -9,6 +9,8 @@
 
 ## [Unreleased]
 ### Added
+- **Java Support**: Added support for Java scanning (`.java`) using `tree-sitter-java`.
+- **New Java Rules**: Added `excessive_logging`, `blocking_io`, `string_concatenation_in_loop`, and `empty_block` rules.
 - **TypeScript Support**: Added comprehensive support for TypeScript (`.ts`, `.tsx`) analysis using `tree-sitter-typescript`.
 - **New TypeScript Rules**: Added `any_type_usage` and `prefer_const_enum` rules, plus inherited all JavaScript green coding rules.
 - **Remediation Engine**: Implemented a robust, CST-based (LibCST) remediation engine for Python. Supports automated refactoring for `inefficient_loop`, `open_without_context`, `range_len_usage`, and `unnecessary_comprehension`.

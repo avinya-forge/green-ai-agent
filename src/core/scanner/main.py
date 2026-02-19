@@ -248,6 +248,8 @@ class Scanner:
             return ['node', path]
         elif self.language == 'typescript':
             return ['npx', 'ts-node', path]
+        elif self.language == 'java':
+            return ['java', path]
         else:
             return None
 
@@ -258,4 +260,6 @@ class Scanner:
             return file_path.endswith('.js')
         elif self.language == 'typescript':
             return file_path.endswith('.ts') or file_path.endswith('.tsx')
+        elif self.language == 'java':
+            return file_path.endswith('.java')
         return False

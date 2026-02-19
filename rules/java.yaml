@@ -1,0 +1,40 @@
+rules:
+  - id: excessive_logging
+    name: Excessive Console Logging
+    severity: minor
+    message: System.out.println detected. Use a logger (SLF4J/Log4j) in production.
+    remediation: Replace System.out.println with logger.info() or logger.debug().
+    effort: Low
+    tags: [logging, best_practice]
+    carbon_impact: 1e-8
+    energy_factor: 1
+
+  - id: blocking_io
+    name: Blocking I/O
+    severity: major
+    message: Thread.sleep() blocks the thread. Use scheduled executors or async mechanisms.
+    remediation: Use ScheduledExecutorService or reactive streams.
+    effort: Medium
+    tags: [performance, concurrency]
+    carbon_impact: 5e-7
+    energy_factor: 5
+
+  - id: string_concatenation_in_loop
+    name: String Concatenation in Loop
+    severity: major
+    message: String concatenation in loops creates unnecessary objects. Use StringBuilder.
+    remediation: Use StringBuilder.append() inside the loop.
+    effort: Medium
+    tags: [memory, performance]
+    carbon_impact: 2e-7
+    energy_factor: 2
+
+  - id: empty_block
+    name: Empty Block
+    severity: minor
+    message: Empty block detected. Remove or implement logic.
+    remediation: Remove the empty block or add a comment/implementation.
+    effort: Low
+    tags: [code_quality]
+    carbon_impact: 0
+    energy_factor: 0

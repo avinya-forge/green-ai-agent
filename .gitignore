@@ -41,8 +41,8 @@ coverage.xml
 # Ignore generated CSV/HTML exports but keep folder structure
 output/**/*.csv           # Generated CSV exports in all subdirectories
 output/**/*.html          # Generated HTML reports in all subdirectories
-output/logs/*.log         # Generated log files
-output/logs/pytest.log    # Pytest log file
+output/logs/*.log
+output/logs/pytest.log
 emissions.csv             # CodeCarbon emissions output (allow in output/)
 
 ai_cache/
