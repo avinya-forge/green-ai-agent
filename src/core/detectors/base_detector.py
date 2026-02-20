@@ -33,7 +33,9 @@ class BaseTreeSitterDetector:
         try:
             # Handle special cases where language_lib might need specific init (like TS)
             # But mostly it's language_lib.language()
-            if hasattr(language_lib, 'language'):
+            if isinstance(language_lib, Language):
+                 self.language = language_lib
+            elif hasattr(language_lib, 'language'):
                  self.language = Language(language_lib.language())
             else:
                  # Fallback or direct object

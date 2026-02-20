@@ -8,6 +8,7 @@
 languages:
   - python
   - javascript
+  - go
 
 # Rule configuration
 rules:
@@ -53,7 +54,7 @@ auto_fix: false
 # =============================================================================
 #
 # LANGUAGES:
-#   Supported: python, javascript
+#   Supported: python, javascript, go
 #   Only files matching these languages will be scanned
 #
 # RULES:

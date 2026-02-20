@@ -1,0 +1,54 @@
+# Go Rules for Green-AI Scanner
+# ============================
+
+rules:
+  - id: formatted_print
+    name: Excessive Logging (fmt.Print*)
+    severity: minor
+    message: "fmt.Print* detected. Use a logger or remove in production."
+    remediation: "Replace fmt.Print* with a proper logging library (e.g., log/slog, zap, zerolog) or remove in production builds to reduce I/O overhead."
+    effort: Low
+    tags:
+      - performance
+      - io
+      - logging
+    energy_factor: 2
+    carbon_impact: 0.00000005  # 50 nano-kg per call
+
+  - id: empty_block
+    name: Empty Block
+    severity: minor
+    message: "Empty block detected."
+    remediation: "Remove empty blocks or add comments explaining why they are empty. Empty blocks can indicate missing logic or dead code."
+    effort: Low
+    tags:
+      - maintenance
+      - code-quality
+    energy_factor: 1
+    carbon_impact: 0.00000001
+
+  - id: infinite_loop
+    name: Infinite Loop (for {})
+    severity: critical
+    message: "Infinite loop detected (for {}). Ensure break condition exists."
+    remediation: "Ensure the loop has a termination condition or a break statement to prevent CPU spinning."
+    effort: Medium
+    tags:
+      - performance
+      - cpu
+      - critical
+    energy_factor: 100
+    carbon_impact: 0.0001  # high impact
+
+  - id: string_concatenation_in_loop
+    name: String Concatenation in Loop
+    severity: high
+    message: "String concatenation in loop detected. Use strings.Builder for efficiency."
+    remediation: "Use strings.Builder or bytes.Buffer to construct strings inside loops. Repeated concatenation creates new string objects every iteration (O(n^2))."
+    effort: Medium
+    tags:
+      - performance
+      - memory
+      - algorithmic
+    energy_factor: 10
+    carbon_impact: 0.000005
