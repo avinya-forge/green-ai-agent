@@ -28,6 +28,12 @@ All development, testing, and deployments must target the latest stable environm
 ### 2. Zero Architectural Drift
 Code changes must strictly adhere to the defined architecture and patterns. All deviations must be formally proposed and approved.
 
+### 3. Adversarial Triad Review
+Before entering the backlog or being marked as Done, tasks undergo a rigorous review by:
+1. **OPTIMIZER**: Challenges for O(n) efficiency and code bloat.
+2. **HARDENER**: Challenges for security vulnerabilities and 95% test coverage.
+3. **PRAGMATIST**: Enforces 1-2hr atomicity and the "99% Utility Rule" (eliminate 1% edge-case bloat).
+
 ## ✅ Definition of Done (DoD)
 
 Every atomic task must meet the following criteria before being marked as "Done":

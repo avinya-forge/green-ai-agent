@@ -1,6 +1,27 @@
 # Release Notes
 
 ## [v0.7.0] - Consolidation & Quality
+
+### Vaulted Epics
+#### [EPIC-01] Java Language Support
+- [JAVA-001] | Java AST Parser Integration | INDEPENDENT | DONE
+- [JAVA-002] | Java Rule Engine Implementation | BLOCKS-JAVA-003 | DONE
+- [JAVA-003] | Implement `System.out.println` detection rule | INDEPENDENT | DONE
+- [JAVA-004] | Implement Empty Catch Block detection rule | INDEPENDENT | DONE
+- [JAVA-005] | Java Test Suite & Coverage | BLOCKS-JAVA-006 | DONE
+
+#### [EPIC-02] Go Language Support
+- [GO-001] | Research Go AST libraries & Tree-sitter bindings | INDEPENDENT | DONE
+- [GO-002] | Implement Go Language Detector Class | BLOCKS-GO-003 | DONE
+- [GO-003] | Add Go Tree-sitter integration | BLOCKS-GO-004 | DONE
+- [GO-004] | Implement Go "Empty Block" Rule | INDEPENDENT | DONE
+- [GO-005] | Implement Go Test Suite | BLOCKS-GO-006 | DONE
+- [GO-006] | CLI Integration for Go scanning | INDEPENDENT | DONE
+- [GO-007] | Go End-to-End Test Scenario | INDEPENDENT | DONE
+- [GO-008] | Go specific Documentation | INDEPENDENT | DONE
+- [GO-010] | Release Go Support Beta | BLOCKS-GO-009 | DONE
+- [GO-011] | Implement `string_concatenation_in_loop` Rule | INDEPENDENT | DONE
+
 ### Added
 - **Go Support**: Added support for Go scanning (`.go`) using `tree-sitter-go`.
 - **New Go Rules**: Added `formatted_print`, `empty_block`, and `infinite_loop` rules.
