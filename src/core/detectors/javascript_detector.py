@@ -7,24 +7,13 @@ from typing import List, Dict
 from tree_sitter import Language, Parser, Query, QueryCursor
 import tree_sitter_javascript
 from src.utils.logger import logger
+from .base_detector import BaseTreeSitterDetector
 
-class JavaScriptASTDetector:
+class JavaScriptASTDetector(BaseTreeSitterDetector):
     """AST-based detector for JavaScript using Tree-sitter."""
 
-    def __init__(self, content: str, file_path: str):
-        self.content = content
-        self.file_path = file_path
-        self.violations = []
-        self.tree = None
-        self.language = None
-
-        try:
-            self.language = Language(tree_sitter_javascript.language())
-            self.parser = Parser(self.language)
-            self.tree = self.parser.parse(bytes(self.content, "utf8"))
-        except Exception as e:
-            # Fallback or log error
-            logger.error(f"Error initializing Tree-sitter for {file_path}: {e}")
+    def __init__(self, content: str, file_path: str, language_lib=tree_sitter_javascript):
+        super().__init__(content, file_path, language_lib)
 
     def detect_all(self) -> List[Dict]:
         """Run all AST-based detectors."""
@@ -48,27 +37,7 @@ class JavaScriptASTDetector:
 
     def _detect_empty_blocks(self) -> None:
         """Detect empty blocks."""
-        query_scm = """
-        (statement_block) @block
-        """
-        try:
-            query = Query(self.language, query_scm)
-            cursor = QueryCursor(query)
-            matches = cursor.matches(self.tree.root_node)
-
-            for _, captures in matches:
-                nodes = captures.get('block', [])
-                for node in nodes:
-                    if node.named_child_count == 0:
-                        self.violations.append({
-                            'id': 'empty_block',
-                            'line': node.start_point[0] + 1,
-                            'severity': 'minor',
-                            'message': 'Empty block detected. Remove or implement.',
-                            'pattern_match': 'empty_block_js'
-                        })
-        except Exception as e:
-            logger.error(f"Error in empty block detection: {e}")
+        self._detect_empty_blocks_generic("(statement_block) @block")
 
     def _detect_console_time(self) -> None:
         """Detect console.time usage."""
@@ -414,35 +383,6 @@ class JavaScriptASTDetector:
         except Exception as e:
             logger.error(f"Error in string concat detection: {e}")
 
-    def _run_query(self, query_scm: str, rule_id: str, severity: str, message: str, pattern_match: str) -> None:
-        """Helper to run tree-sitter queries."""
-        try:
-            query = Query(self.language, query_scm)
-            cursor = QueryCursor(query)
-            matches = cursor.matches(self.tree.root_node)
-
-            # Deduplicate by line to avoid multiple reports for same line
-            reported_lines = set()
-
-            for _, captures in matches:
-                if not captures:
-                    continue
-
-                # Use the first captured node to determine line number
-                first_node = next(iter(captures.values()))[0]
-                line = first_node.start_point[0] + 1
-
-                if line not in reported_lines:
-                    self.violations.append({
-                        'id': rule_id,
-                        'line': line,
-                        'severity': severity,
-                        'message': message,
-                        'pattern_match': pattern_match
-                    })
-                    reported_lines.add(line)
-        except Exception as e:
-            logger.error(f"Query error ({rule_id}): {e}")
 
 class JavaScriptViolationDetector:
     """Pattern-based detector for JavaScript violations."""

@@ -6,23 +6,13 @@ from typing import List, Dict
 from tree_sitter import Language, Parser, Query, QueryCursor
 import tree_sitter_java
 from src.utils.logger import logger
+from .base_detector import BaseTreeSitterDetector
 
-class JavaASTDetector:
+class JavaASTDetector(BaseTreeSitterDetector):
     """AST-based detector for Java using Tree-sitter."""
 
     def __init__(self, content: str, file_path: str):
-        self.content = content
-        self.file_path = file_path
-        self.violations = []
-        self.tree = None
-        self.language = None
-
-        try:
-            self.language = Language(tree_sitter_java.language())
-            self.parser = Parser(self.language)
-            self.tree = self.parser.parse(bytes(self.content, "utf8"))
-        except Exception as e:
-            logger.error(f"Error initializing Tree-sitter for {file_path}: {e}")
+        super().__init__(content, file_path, tree_sitter_java)
 
     def detect_all(self) -> List[Dict]:
         """Run all AST-based detectors."""
@@ -122,63 +112,4 @@ class JavaASTDetector:
 
     def _detect_empty_blocks(self) -> None:
         """Detect empty blocks (catch, if, loops)."""
-        query_scm = """
-        (block) @block
-        """
-        try:
-            query = Query(self.language, query_scm)
-            cursor = QueryCursor(query)
-            matches = cursor.matches(self.tree.root_node)
-
-            for _, captures in matches:
-                nodes = captures.get('block', [])
-                for node in nodes:
-                    if node.named_child_count == 0:
-                        self._add_violation(
-                            node,
-                            'empty_block',
-                            'minor',
-                            'Empty block detected.',
-                            'java_empty_block'
-                        )
-        except Exception as e:
-            logger.error(f"Error in empty block detection: {e}")
-
-    def _run_query(self, query_scm: str, rule_id: str, severity: str, message: str, pattern_match: str) -> None:
-        """Helper to run tree-sitter queries."""
-        try:
-            query = Query(self.language, query_scm)
-            cursor = QueryCursor(query)
-            matches = cursor.matches(self.tree.root_node)
-
-            reported_lines = set()
-
-            for _, captures in matches:
-                if not captures:
-                    continue
-
-                # Use the first captured node
-                first_node = next(iter(captures.values()))[0]
-                line = first_node.start_point[0] + 1
-
-                if line not in reported_lines:
-                    self.violations.append({
-                        'id': rule_id,
-                        'line': line,
-                        'severity': severity,
-                        'message': message,
-                        'pattern_match': pattern_match
-                    })
-                    reported_lines.add(line)
-        except Exception as e:
-            logger.error(f"Query error ({rule_id}): {e}")
-
-    def _add_violation(self, node, rule_id, severity, message, pattern_match):
-        line = node.start_point[0] + 1
-        self.violations.append({
-            'id': rule_id,
-            'line': line,
-            'severity': severity,
-            'message': message,
-            'pattern_match': pattern_match
-        })
+        self._detect_empty_blocks_generic("(block) @block")

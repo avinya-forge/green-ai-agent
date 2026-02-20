@@ -47,7 +47,7 @@ class ConfigLoader:
     
     # Default configuration (works if no .green-ai.yaml exists)
     DEFAULT_CONFIG = {
-        'languages': ['python', 'javascript', 'typescript', 'java'],
+        'languages': ['python', 'javascript', 'typescript', 'java', 'go'],
         'rules': {
             'enabled': [
                 'excessive_nesting_depth',
@@ -84,6 +84,7 @@ class ConfigLoader:
                 'momentjs_deprecated',
                 'document_write',
                 'alert_usage',
+                'formatted_print',
             ],
             'disabled': []
         },
@@ -93,7 +94,7 @@ class ConfigLoader:
     
     # Configuration schema definition
     SCHEMA = {
-        'languages': (list, ['python', 'javascript', 'typescript', 'java']),
+        'languages': (list, ['python', 'javascript', 'typescript', 'java', 'go']),
         'rules': (dict, {
             'enabled': (list, []),
             'disabled': (list, [])
