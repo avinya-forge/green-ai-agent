@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
 from src.core.llm.openai_provider import OpenAIProvider
+from src.core.llm.mock_provider import MockLLMProvider
 from src.core.llm.factory import LLMFactory
 
 class TestOpenAIProvider(unittest.TestCase):
@@ -41,6 +42,24 @@ class TestOpenAIProvider(unittest.TestCase):
         fix = self.provider.generate_fix("code", "violation")
         self.assertIsNone(fix)
 
+class TestMockLLMProvider(unittest.TestCase):
+    def test_mock_defaults(self):
+        provider = MockLLMProvider()
+        self.assertIn("Mock fix applied", provider.generate_fix("code", "desc"))
+        self.assertIn("Mock explanation", provider.explain_violation("code", "desc"))
+        self.assertEqual(provider.estimate_cost(10, 10), 0.0)
+
+    def test_mock_custom_responses(self):
+        responses = {
+            "fix": "custom fix",
+            "explanation": "custom explanation",
+            "cost": 0.5
+        }
+        provider = MockLLMProvider(responses=responses)
+        self.assertEqual(provider.generate_fix("code", "desc"), "custom fix")
+        self.assertEqual(provider.explain_violation("code", "desc"), "custom explanation")
+        self.assertEqual(provider.estimate_cost(10, 10), 0.5)
+
 class TestLLMFactory(unittest.TestCase):
 
     @patch('os.getenv')
@@ -59,3 +78,7 @@ class TestLLMFactory(unittest.TestCase):
     def test_unknown_provider(self):
         provider = LLMFactory.get_provider("unknown")
         self.assertIsNone(provider)
+
+    def test_get_mock_provider(self):
+        provider = LLMFactory.get_provider("mock")
+        self.assertIsInstance(provider, MockLLMProvider)
