@@ -2,13 +2,6 @@
 
 ## [v0.7.0] - Consolidation & Quality
 ### Added
-- **New Python Rules**: Added 3 new rules: `unnecessary_comprehension`, `numpy_sum_vs_python_sum`, `subprocess_run_without_timeout`.
-- **New JavaScript Rules**: Added 2 new rules: `console_time` (remove debug), `inner_html` (security/perf).
-- **CLI Refactor**: Modularized CLI into `src/cli/` package for better maintainability and extensibility.
-- **Pre-commit Hooks**: Enhanced local pre-commit hooks for robustness and better DX.
-
-## [Unreleased]
-### Added
 - **Java Support**: Added support for Java scanning (`.java`) using `tree-sitter-java`.
 - **New Java Rules**: Added `excessive_logging`, `blocking_io`, `string_concatenation_in_loop`, and `empty_block` rules.
 - **TypeScript Support**: Added comprehensive support for TypeScript (`.ts`, `.tsx`) analysis using `tree-sitter-typescript`.
@@ -23,6 +16,10 @@
 - **Domain Models**: Implemented Pydantic models for `Project` and `Violation` to ensure data consistency (BUG-004).
 - **CLI Fix Command**: Added `fix_all` capability to `scan` command using `RemediationEngine`.
 - **JUnit XML Export**: Added `xml` export format to `scan` command for CI integration.
+- **New Python Rules**: Added 3 new rules: `unnecessary_comprehension`, `numpy_sum_vs_python_sum`, `subprocess_run_without_timeout`.
+- **New JavaScript Rules**: Added 2 new rules: `console_time` (remove debug), `inner_html` (security/perf).
+- **CLI Refactor**: Modularized CLI into `src/cli/` package for better maintainability and extensibility.
+- **Pre-commit Hooks**: Enhanced local pre-commit hooks for robustness and better DX.
 
 ### Changed
 - **Scanner Refactor**: Refactored `src/core/scanner.py` into a modular package `src/core/scanner/` with `main.py`, `worker.py`, and `discovery.py`.
@@ -40,6 +37,22 @@
 ### Documentation
 - **Standards & Vision**: Updated `docs/vision.md` and `docs/development-standards.md` to reflect current capabilities (v0.6.1) and rule definitions.
 - **Migration Plan**: Added comprehensive `docs/eventlet-migration.md` outlining the roadmap to replace Eventlet with FastAPI/Uvicorn.
+
+## [v0.6.2] - Architecture & Security Update (Consolidated Batch)
+### 🏗️ Architectural Refactor
+- **Modular Detectors**: Split the monolithic `src/core/detectors.py` into a modular package `src/core/detectors/` with separate Python and JavaScript detectors. This improves maintainability and extensibility.
+
+### 🛡️ New Detection Rules (Python)
+- **Blocking I/O in Async**: Detects `time.sleep`, `requests.*`, and `open()` calls inside `async def` functions, which can block the event loop.
+- **SQL Injection Risk**: Basic heuristic to detect f-strings or string formatting used directly in `cursor.execute()`.
+- **Requests Timeout**: Warns if `requests.get/post/etc` are called without a `timeout` argument, preventing potential hangs.
+- **Empty Blocks**: Detects empty loops, if-statements, and try-except blocks that should be implemented or removed.
+
+### 🌐 New Detection Rules (JavaScript)
+- **Empty Blocks**: Detects empty statement blocks (`{}`) in JavaScript code.
+
+### ⚙️ Infrastructure
+- **CI/CD**: Added GitHub Actions workflow (`.github/workflows/ci.yml`) to automatically run tests (`pytest`) and linting (`flake8`) on push and PR.
 
 ## [v0.6.1] - 2026-02-11
 ### Added
@@ -93,20 +106,3 @@
 ### Added
 - **Core Engine**: Initial AST-based scanner for basic Python and JavaScript violations.
 - **Emissions Modeling**: Basic CO2 impact estimation based on static analysis.
-
-## v0.6.2 - Architecture & Security Update (Consolidated Batch)
-
-### 🏗️ Architectural Refactor
-- **Modular Detectors**: Split the monolithic `src/core/detectors.py` into a modular package `src/core/detectors/` with separate Python and JavaScript detectors. This improves maintainability and extensibility.
-
-### 🛡️ New Detection Rules (Python)
-- **Blocking I/O in Async**: Detects `time.sleep`, `requests.*`, and `open()` calls inside `async def` functions, which can block the event loop.
-- **SQL Injection Risk**: Basic heuristic to detect f-strings or string formatting used directly in `cursor.execute()`.
-- **Requests Timeout**: Warns if `requests.get/post/etc` are called without a `timeout` argument, preventing potential hangs.
-- **Empty Blocks**: Detects empty loops, if-statements, and try-except blocks that should be implemented or removed.
-
-### 🌐 New Detection Rules (JavaScript)
-- **Empty Blocks**: Detects empty statement blocks (`{}`) in JavaScript code.
-
-### ⚙️ Infrastructure
-- **CI/CD**: Added GitHub Actions workflow (`.github/workflows/ci.yml`) to automatically run tests (`pytest`) and linting (`flake8`) on push and PR.

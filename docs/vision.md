@@ -20,6 +20,23 @@ The tool itself must be efficient. We practice what we preach—minimizing our o
 ### 4. Transparent & Measurable
 We provide quantifiable metrics (e.g., estimated CO2 reduction, energy cost) to demonstrate the tangible impact of code improvements.
 
+## 📜 Pipeline Laws
+
+### 1. Latest Stable Environment Only
+All development, testing, and deployments must target the latest stable environment configuration to ensure consistency and reliability.
+
+### 2. Zero Architectural Drift
+Code changes must strictly adhere to the defined architecture and patterns. All deviations must be formally proposed and approved.
+
+## ✅ Definition of Done (DoD)
+
+Every atomic task must meet the following criteria before being marked as "Done":
+
+1. **Test (95%)**: Maintain at least 95% test coverage for new code logic.
+2. **Lint (0-err)**: Zero linting errors or warnings in the touched files.
+3. **Opt (Big O)**: Algorithmic complexity analysis performed; avoid O(n^2) or worse unless justified.
+4. **Sec (Sanitize)**: Input sanitization and security best practices applied (e.g., no raw SQL, no shell injection).
+
 ## 🚀 Strategic Roadmap
 
 ### Phase 1: Awareness (MVP) ✅

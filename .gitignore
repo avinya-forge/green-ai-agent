@@ -43,6 +43,7 @@ output/**/*.csv           # Generated CSV exports in all subdirectories
 output/**/*.html          # Generated HTML reports in all subdirectories
 output/logs/*.log
 output/logs/pytest.log
+output/emissions/
 emissions.csv             # CodeCarbon emissions output (allow in output/)
 
 ai_cache/
@@ -80,7 +81,7 @@ reports/               # Generated reports (keep .gitkeep)
 
 # /docs/ - HARDCODED WHITELIST: Only these strategic docs are committed
 /docs/*
-!/docs/BACKLOG.md
+!/docs/backlog.md
 !/docs/release-notes.md
 !/docs/vision.md
 !/docs/development-standards.md
