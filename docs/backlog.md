@@ -4,11 +4,11 @@
 
 ### [EPIC-01] Java Language Support (Completion)
 *Goal: Complete the support for Java scanning, ensuring parity with Python/JS.*
-- [JAVA-001] | Java AST Parser Integration | INDEPENDENT | TODO
-- [JAVA-002] | Java Rule Engine Implementation | BLOCKS-JAVA-003 | TODO
-- [JAVA-003] | Implement `System.out.println` detection rule | INDEPENDENT | TODO
-- [JAVA-004] | Implement Empty Catch Block detection rule | INDEPENDENT | TODO
-- [JAVA-005] | Java Test Suite & Coverage | BLOCKS-JAVA-006 | TODO
+- [JAVA-001] | Java AST Parser Integration | INDEPENDENT | DONE
+- [JAVA-002] | Java Rule Engine Implementation | BLOCKS-JAVA-003 | DONE
+- [JAVA-003] | Implement `System.out.println` detection rule | INDEPENDENT | DONE
+- [JAVA-004] | Implement Empty Catch Block detection rule | INDEPENDENT | DONE
+- [JAVA-005] | Java Test Suite & Coverage | BLOCKS-JAVA-006 | DONE
 
 ### [EPIC-02] Go Language Support
 *Goal: Expand language support to Go as per roadmap.*

@@ -2,6 +2,8 @@
 
 ## [v0.7.0] - Consolidation & Quality
 ### Added
+- **Go Support**: Added support for Go scanning (`.go`) using `tree-sitter-go`.
+- **New Go Rules**: Added `formatted_print`, `empty_block`, and `infinite_loop` rules.
 - **Java Support**: Added support for Java scanning (`.java`) using `tree-sitter-java`.
 - **New Java Rules**: Added `excessive_logging`, `blocking_io`, `string_concatenation_in_loop`, and `empty_block` rules.
 - **TypeScript Support**: Added comprehensive support for TypeScript (`.ts`, `.tsx`) analysis using `tree-sitter-typescript`.
