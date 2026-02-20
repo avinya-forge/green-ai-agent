@@ -32,3 +32,6 @@ try:
 except ImportError as e:
     # Fail fast during development
     raise e
+
+if __name__ == "__main__":
+    cli()

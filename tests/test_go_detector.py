@@ -85,3 +85,28 @@ class TestGoASTDetector:
 
         infinite_violations = [v for v in violations if v['id'] == 'infinite_loop']
         assert len(infinite_violations) == 0
+
+    def test_string_concatenation_in_loop(self):
+        code = """
+        package main
+        func main() {
+            s := ""
+            for i := 0; i < 10; i++ {
+                s += "a"
+                s = s + "b"
+            }
+            s += "c" // Outside loop, should not be detected
+        }
+        """
+        detector = GoASTDetector(code, "main.go")
+        violations = detector.detect_all()
+
+        concat_violations = [v for v in violations if v['id'] == 'string_concatenation_in_loop']
+        assert len(concat_violations) == 2
+        # Lines might vary based on indentation in string, but let's assume lines 6 and 7
+        # Line 6: s += "a"
+        # Line 7: s = s + "b"
+
+        # Verify lines
+        lines = sorted([v['line'] for v in concat_violations])
+        assert lines == [6, 7]
