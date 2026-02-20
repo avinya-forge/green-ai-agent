@@ -1,6 +1,7 @@
 from typing import Optional
 from .provider import LLMProvider
 from .openai_provider import OpenAIProvider
+from .mock_provider import MockLLMProvider
 import os
 
 class LLMFactory:
@@ -14,7 +15,7 @@ class LLMFactory:
         Get an LLM provider instance.
 
         Args:
-            provider_type: The type of provider ("openai").
+            provider_type: The type of provider ("openai", "mock").
             api_key: The API key. If None, it tries to read from environment variables.
 
         Returns:
@@ -30,5 +31,8 @@ class LLMFactory:
                 return None
 
             return OpenAIProvider(api_key)
+
+        elif provider_type == "mock":
+            return MockLLMProvider(api_key or "mock-key")
 
         return None

@@ -27,7 +27,7 @@
 ### [EPIC-03] LLM Integration (Autonomous Fixer)
 *Goal: Implement autonomous fixer using LLM integration.*
 - [LLM-001] | Design LLM Interface & Provider Abstraction | INDEPENDENT | DONE
-- [LLM-002] | Implement Mock LLM Provider for Testing | BLOCKS-LLM-003 | TODO
+- [LLM-002] | Implement Mock LLM Provider for Testing | BLOCKS-LLM-003 | DONE
 - [LLM-003] | Implement OpenAI API Provider | INDEPENDENT | DONE
 - [LLM-004] | Prompt Engineering for Python Fixes | INDEPENDENT | TODO
 - [LLM-005] | Prompt Engineering for JavaScript Fixes | INDEPENDENT | TODO

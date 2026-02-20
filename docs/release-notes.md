@@ -22,6 +22,7 @@
 - **New JavaScript Rules**: Added 2 new rules: `console_time` (remove debug), `inner_html` (security/perf).
 - **CLI Refactor**: Modularized CLI into `src/cli/` package for better maintainability and extensibility.
 - **Pre-commit Hooks**: Enhanced local pre-commit hooks for robustness and better DX.
+- **Mock LLM Provider**: Implemented `MockLLMProvider` for testing LLM integration without API calls.
 
 ### Changed
 - **Scanner Refactor**: Refactored `src/core/scanner.py` into a modular package `src/core/scanner/` with `main.py`, `worker.py`, and `discovery.py`.
