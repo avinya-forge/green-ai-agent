@@ -4,6 +4,7 @@ from .provider import LLMProvider
 import requests
 import json
 from src.utils.logger import logger
+from src.core.llm.prompts import PromptManager
 
 class OpenAIProvider(LLMProvider):
     """
@@ -27,26 +28,16 @@ class OpenAIProvider(LLMProvider):
             "Content-Type": "application/json"
         }
 
-    def generate_fix(self, code_snippet: str, violation_description: str) -> Optional[str]:
+    def generate_fix(self, code_snippet: str, violation_description: str, language: str = "python") -> Optional[str]:
         """
         Generate a fix using OpenAI Chat Completion.
         """
-        system_prompt = (
-            "You are an expert software engineer specializing in green software development "
-            "and performance optimization. Your goal is to provide optimized code snippets "
-            "that fix specific violations while maintaining correctness."
-        )
-
-        user_prompt = (
-            f"Fix the following violation:\n"
-            f"Violation: {violation_description}\n\n"
-            f"Code:\n```\n{code_snippet}\n```\n\n"
-            f"Provide only the corrected code snippet in a markdown code block."
-        )
+        system_prompt = PromptManager.get_system_prompt()
+        user_prompt = PromptManager.get_fix_prompt(language, violation_description, code_snippet)
 
         return self._query_openai(system_prompt, user_prompt)
 
-    def explain_violation(self, code_snippet: str, violation_description: str) -> Optional[str]:
+    def explain_violation(self, code_snippet: str, violation_description: str, language: str = "python") -> Optional[str]:
         """
         Explain the violation.
         """
@@ -56,7 +47,7 @@ class OpenAIProvider(LLMProvider):
         )
 
         user_prompt = (
-            f"Explain why this code is inefficient:\n"
+            f"Explain why this {language} code is inefficient:\n"
             f"Violation: {violation_description}\n\n"
             f"Code:\n```\n{code_snippet}\n```"
         )

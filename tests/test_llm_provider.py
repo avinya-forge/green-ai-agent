@@ -45,9 +45,16 @@ class TestOpenAIProvider(unittest.TestCase):
 class TestMockLLMProvider(unittest.TestCase):
     def test_mock_defaults(self):
         provider = MockLLMProvider()
-        self.assertIn("Mock fix applied", provider.generate_fix("code", "desc"))
+        # Mock provider now returns the code itself if no loop pattern found
+        self.assertEqual("code", provider.generate_fix("code", "desc"))
         self.assertIn("Mock explanation", provider.explain_violation("code", "desc"))
         self.assertEqual(provider.estimate_cost(10, 10), 0.0)
+
+    def test_mock_loop_pattern(self):
+        provider = MockLLMProvider()
+        code = "for i in range(10):\n    pass"
+        fix = provider.generate_fix(code, "loop violation")
+        self.assertIn("# Optimized loop for loop violation", fix)
 
     def test_mock_custom_responses(self):
         responses = {

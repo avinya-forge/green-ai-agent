@@ -12,11 +12,22 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 
-
 # Default output directory for all exports
 OUTPUT_DIR = Path(__file__).parent.parent.parent.parent / 'output'
 
 from .xml_exporter import JUnitXMLExporter
+from src.core.remediation.engine import RemediationEngine
+
+def safe_read_snippet(file_path: str, line_number: int) -> str:
+    """Safely read a single line snippet from a file."""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+            if 0 <= line_number - 1 < len(lines):
+                return lines[line_number - 1].strip()
+    except Exception:
+        pass
+    return ""
 
 class JSONExporter:
     """Export scan results to JSON format."""
@@ -170,9 +181,15 @@ class CSVExporter:
                 if avg_effort_score >= score:
                     avg_effort = effort_level
                     break
+
+        # Instantiate RemediationEngine locally to avoid UI dependency
+        try:
+            remediation_engine = RemediationEngine()
+        except Exception:
+            remediation_engine = None
         
         with open(self.output_path, 'w', newline='', encoding='utf-8-sig') as csvfile:
-            fieldnames = ['file', 'line', 'rule_id', 'severity', 'message', 'energy_factor', 'effort']
+            fieldnames = ['file', 'line', 'rule_id', 'severity', 'message', 'energy_factor', 'effort', 'snippet', 'remediation']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             
             # Write header
@@ -180,6 +197,14 @@ class CSVExporter:
             
             # Write issues
             for issue in sorted_issues:
+                # Get snippet
+                snippet = safe_read_snippet(issue.get('file', ''), issue.get('line', 0))
+
+                # Get remediation
+                remediation = ""
+                if remediation_engine:
+                    remediation = remediation_engine.get_suggestion(issue.get('id', ''))
+
                 writer.writerow({
                     'file': issue.get('file', 'unknown'),
                     'line': issue.get('line', 0),
@@ -187,7 +212,9 @@ class CSVExporter:
                     'severity': issue.get('severity', 'info').lower(),
                     'message': issue.get('message', 'No message'),
                     'energy_factor': self._get_energy_factor(issue),
-                    'effort': self._get_effort(issue)
+                    'effort': self._get_effort(issue),
+                    'snippet': snippet,
+                    'remediation': remediation
                 })
             
             # Write summary row
@@ -202,7 +229,9 @@ class CSVExporter:
                 'severity': '',
                 'message': f'Total Violations: {total_violations} | Critical: {critical_count} | High: {high_count} | Medium: {medium_count} | Low: {low_count} | Avg Effort: {avg_effort} | CO2: {codebase_emissions:.9f}kg',
                 'energy_factor': f'{total_emissions:.9f}kg',
-                'effort': 'varies'
+                'effort': 'varies',
+                'snippet': '',
+                'remediation': ''
             })
         
         return self.output_path
@@ -249,6 +278,7 @@ class CSVExporter:
 
 
 class HTMLReporter:
+    # ... (same as before) ...
     """Export scan results to HTML format with charts and detailed breakdowns."""
     
     def __init__(self, output_path: Optional[str] = None):

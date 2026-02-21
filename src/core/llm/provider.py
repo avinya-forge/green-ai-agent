@@ -50,13 +50,14 @@ class LLMProvider(ABC):
         return self.usage
 
     @abstractmethod
-    def generate_fix(self, code_snippet: str, violation_description: str) -> Optional[str]:
+    def generate_fix(self, code_snippet: str, violation_description: str, language: str = "python") -> Optional[str]:
         """
         Generate a fix for a given code violation.
 
         Args:
             code_snippet: The problematic code snippet.
             violation_description: Description of the violation.
+            language: The programming language of the snippet (default: python).
 
         Returns:
             The suggested fix as a string, or None if generation failed.
@@ -64,13 +65,14 @@ class LLMProvider(ABC):
         pass
 
     @abstractmethod
-    def explain_violation(self, code_snippet: str, violation_description: str) -> Optional[str]:
+    def explain_violation(self, code_snippet: str, violation_description: str, language: str = "python") -> Optional[str]:
         """
         Explain why a piece of code is a violation.
 
         Args:
             code_snippet: The problematic code snippet.
             violation_description: Description of the violation.
+            language: The programming language of the snippet (default: python).
 
         Returns:
             An explanation string.

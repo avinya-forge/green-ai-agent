@@ -13,15 +13,15 @@
 - [LLM-006] | Implement Rate Limiting Config | BLOCKS-LLM-005 | DONE
 - [LLM-007] | LLM CLI command `fix-ai` (Core logic) | INDEPENDENT | DONE
 - [LLM-008] | LLM CLI command `fix-ai` (Prompt integration) | BLOCKS-LLM-007 | DONE
-- [LLM-009] | LLM CLI command `fix-ai` (Diff output) | BLOCKS-LLM-008 | TODO
-- [LLM-010] | Prompt Engineering for Python Loop Fix | INDEPENDENT | TODO
-- [LLM-011] | Prompt Engineering for Python IO Fix | INDEPENDENT | TODO
-- [LLM-012] | Prompt Engineering for Python Logic Fix | INDEPENDENT | TODO
-- [LLM-013] | Prompt Engineering for JS Loop Fix | INDEPENDENT | TODO
-- [LLM-014] | Prompt Engineering for JS DOM Fix | INDEPENDENT | TODO
-- [LLM-015] | Integration Test: OpenAI Mock | INDEPENDENT | TODO
-- [LLM-016] | Integration Test: Token Logic | BLOCKS-LLM-004 | TODO
-- [LLM-017] | Integration Test: Rate Limit Logic | BLOCKS-LLM-005 | TODO
+- [LLM-009] | LLM CLI command `fix-ai` (Diff output) | BLOCKS-LLM-008 | DONE
+- [LLM-010] | Prompt Engineering for Python Loop Fix | INDEPENDENT | DONE
+- [LLM-011] | Prompt Engineering for Python IO Fix | INDEPENDENT | DONE
+- [LLM-012] | Prompt Engineering for Python Logic Fix | INDEPENDENT | DONE
+- [LLM-013] | Prompt Engineering for JS Loop Fix | INDEPENDENT | DONE
+- [LLM-014] | Prompt Engineering for JS DOM Fix | INDEPENDENT | DONE
+- [LLM-015] | Integration Test: OpenAI Mock | INDEPENDENT | DONE
+- [LLM-016] | Integration Test: Token Logic | BLOCKS-LLM-004 | DONE
+- [LLM-017] | Integration Test: Rate Limit Logic | BLOCKS-LLM-005 | DONE
 - [LLM-018] | Security Review: Prompt Injection | INDEPENDENT | TODO
 - [LLM-019] | Security Review: Generated Code Sandbox | INDEPENDENT | TODO
 
@@ -31,9 +31,9 @@
 - [REP-002] | PDF Export: Report Template (HTML/CSS) | BLOCKS-REP-001 | TODO
 - [REP-003] | PDF Export: Chart rendering (static image gen) | BLOCKS-REP-002 | TODO
 - [REP-004] | PDF Export: Layout logic | BLOCKS-REP-003 | TODO
-- [REP-005] | CSV Export: Add violation line number | INDEPENDENT | TODO
-- [REP-006] | CSV Export: Add violation snippet | INDEPENDENT | TODO
-- [REP-007] | CSV Export: Add remediation suggestion | INDEPENDENT | TODO
+- [REP-005] | CSV Export: Add violation line number | INDEPENDENT | DONE
+- [REP-006] | CSV Export: Add violation snippet | INDEPENDENT | DONE
+- [REP-007] | CSV Export: Add remediation suggestion | INDEPENDENT | DONE
 - [REP-008] | HTML Report: Add interactive chart (Chart.js integration) | INDEPENDENT | TODO
 - [REP-009] | HTML Report: Add filtering (JS) | INDEPENDENT | TODO
 - [REP-010] | HTML Report: Add search (JS) | INDEPENDENT | TODO
