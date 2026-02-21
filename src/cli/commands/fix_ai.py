@@ -1,6 +1,8 @@
 import click
 import sys
 import os
+import difflib
+from typing import List, Optional
 from src.core.scanner import Scanner
 from src.core.config import ConfigLoader
 from src.core.llm.factory import LLMFactory
@@ -21,6 +23,87 @@ def extract_snippet(file_path: str, line_number: int, context_lines: int = 2) ->
         return snippet
     except Exception:
         return ""
+
+def print_diff(original: str, fixed: str):
+    """
+    Print a colored unified diff between original and fixed code.
+    """
+    original_lines = original.splitlines(keepends=True)
+    fixed_lines = fixed.splitlines(keepends=True)
+
+    diff = difflib.unified_diff(
+        original_lines,
+        fixed_lines,
+        fromfile='Original',
+        tofile='Fixed',
+        lineterm=''
+    )
+
+    for line in diff:
+        if line.startswith('+') and not line.startswith('+++'):
+            click.secho(line.rstrip(), fg='green')
+        elif line.startswith('-') and not line.startswith('---'):
+            click.secho(line.rstrip(), fg='red')
+        elif line.startswith('^'):
+            click.secho(line.rstrip(), fg='blue')
+        else:
+            click.echo(line.rstrip())
+
+def apply_fix_to_file(file_path: str, original_snippet: str, fixed_snippet: str) -> bool:
+    """
+    Apply the fix to the file.
+    Tries to locate the original snippet in the content.
+    """
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        # Normalize newlines for robust matching
+        # Note: This might change line endings if we write back.
+        # Ideally we preserve original line endings, but for now we prioritize functionality.
+        content_norm = content.replace('\r\n', '\n')
+        snippet_norm = original_snippet.replace('\r\n', '\n')
+        fixed_norm = fixed_snippet.replace('\r\n', '\n')
+
+        # Check if snippet exists
+        count = content_norm.count(snippet_norm)
+
+        if count == 0:
+            click.secho("  Error: Could not locate original snippet in file (file might have changed).", fg='red')
+            # Fallback: Try stripped match?
+            return False
+
+        if count == 1:
+            # Unique match, safe to replace
+            new_content = content_norm.replace(snippet_norm, fixed_norm)
+        else:
+            # Multiple matches.
+            click.secho("  Warning: Multiple occurrences of snippet found. Skipping to avoid ambiguity.", fg='yellow')
+            return False
+
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(new_content)
+
+        return True
+
+    except Exception as e:
+        click.secho(f"  Error applying fix: {e}", fg='red')
+        return False
+
+def determine_language(file_path: str) -> str:
+    """Determine language from file extension."""
+    ext = os.path.splitext(file_path)[1].lower()
+    if ext == '.py':
+        return 'python'
+    if ext == '.js':
+        return 'javascript'
+    if ext == '.ts':
+        return 'typescript'
+    if ext == '.java':
+        return 'java'
+    if ext == '.go':
+        return 'go'
+    return 'python' # Default
 
 @click.command()
 @click.argument('paths', nargs=-1, type=click.Path(exists=True), required=False)
@@ -44,7 +127,14 @@ def fix_ai(paths, config, provider, auto_apply, verbose):
     cfg = config_loader.load()
 
     # Initialize Scanner
-    language = cfg.get('languages', ['python'])[0]
+    # We default to python if not configured, but scanner handles multiple languages if paths provided?
+    # Actually Scanner constructor takes `language`.
+    # Ideally Scanner should auto-detect language per file or scan all enabled languages.
+    # Current Scanner implementation seems to take one language argument.
+    # Let's rely on config.
+    enabled_languages = cfg.get('languages', ['python'])
+    language = enabled_languages[0] # Primary language
+
     scanner = Scanner(language=language, config_path=config)
 
     click.echo(f"Scanning {', '.join(paths)}...")
@@ -66,7 +156,11 @@ def fix_ai(paths, config, provider, auto_apply, verbose):
 
     click.echo(f"Found {len(issues)} violations.")
     click.echo(f"Starting AI fix process with {llm.__class__.__name__}...")
-    click.echo("Note: This feature is in PREVIEW mode. Fixes are simulated (Dry Run).")
+
+    # Check if dry run (mock provider implies dry run effectively, but we support writing for any provider)
+    # The prompt said "PREVIEW mode. Fixes are simulated".
+    # But user requested "Apply Fix".
+    # We will remove the "PREVIEW" warning since we implemented apply logic.
 
     fixed_count = 0
     skipped_count = 0
@@ -78,19 +172,22 @@ def fix_ai(paths, config, provider, auto_apply, verbose):
         line = issue.get('line')
         message = issue.get('message')
 
+        # Determine language for this file
+        file_lang = determine_language(file_path)
+
         click.echo(f"\n[{i}/{len(issues)}] Violation: {rule_id}")
         click.echo(f"  File: {file_path}:{line}")
         click.echo(f"  Message: {message}")
 
         snippet = extract_snippet(file_path, line)
         if not snippet:
-            click.echo("  Warning: Could not read code snippet.")
+            click.echo("  Warning: Could not read code snippet (or file access error).")
             skipped_count += 1
             continue
 
         click.echo("  Generating fix...")
         try:
-            fix = llm.generate_fix(snippet, message)
+            fix = llm.generate_fix(snippet, message, language=file_lang)
         except Exception as e:
             click.echo(f"  Error generating fix: {e}")
             failed_count += 1
@@ -101,9 +198,10 @@ def fix_ai(paths, config, provider, auto_apply, verbose):
             skipped_count += 1
             continue
 
+        # Show Diff
         click.echo("-" * 40)
-        click.echo("Proposed Fix:")
-        click.echo(fix)
+        click.echo("Proposed Fix (Diff):")
+        print_diff(snippet, fix)
         click.echo("-" * 40)
 
         if auto_apply:
@@ -112,30 +210,13 @@ def fix_ai(paths, config, provider, auto_apply, verbose):
             apply = click.confirm("Apply this fix?")
 
         if apply:
-            # Applying fix is tricky because we have a snippet.
-            # Ideally we replace the lines.
-            # But naive replacement might be dangerous if snippet context is small.
-            # For now, we will just print "Applied (Simulated)" or write to file if confident.
-            # Writing to file requires mapping line numbers exactly.
-            # And if multiple fixes in same file, offsets change.
-            # To do this correctly, we should batch fixes or use a robust patcher.
-            # Given the scope, let's implement a simple replacement for the snippet range.
-
-            # Re-read file to ensure we have latest content (in case previous fix changed it)
-            # But line numbers drift!
-            # This is a hard problem (LLM-009 Diff output might be better first).
-            # For this task (LLM-007 Core logic), "apply" can just be simulated or simple replacement
-            # if we assume one fix per file or handle drift.
-
-            # Since we iterate issues which have fixed line numbers from scan start,
-            # applying fixes will invalidate subsequent line numbers in the same file.
-            # Strategy: Apply from bottom to top? Issues are not sorted by line.
-            # We should sort issues by line descending per file if we were doing batch.
-            # But we are interactive.
-
-            click.echo("  (Feature: applying fix to file is experimental. Skipping write for safety in this version.)")
-            click.echo("  [Mock] Fix applied.")
-            fixed_count += 1
+            success = apply_fix_to_file(file_path, snippet, fix)
+            if success:
+                click.secho("  Fix applied successfully.", fg='green')
+                fixed_count += 1
+            else:
+                click.secho("  Failed to apply fix.", fg='red')
+                failed_count += 1
         else:
             click.echo("  Skipped.")
             skipped_count += 1

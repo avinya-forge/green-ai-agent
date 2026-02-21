@@ -23,6 +23,10 @@
 - [GO-011] | Implement `string_concatenation_in_loop` Rule | INDEPENDENT | DONE
 
 ### Added
+- **LLM CLI Enhancements**: Added colored diff view (`difflib`) to `fix-ai` command for verifying changes before applying, plus robust file patching logic.
+- **Prompt Engineering**: Implemented specialized prompts for Python/JS loops, IO, and logic optimization in `src/core/llm/prompts.py`.
+- **CSV Export Improvements**: Added `snippet` and `remediation` columns to CSV export, providing more context for violations.
+- **Integration Tests**: Added comprehensive integration tests for LLM provider, token usage, and rate limiting.
 - **Go Support**: Added support for Go scanning (`.go`) using `tree-sitter-go`.
 - **New Go Rules**: Added `formatted_print`, `empty_block`, and `infinite_loop` rules.
 - **Java Support**: Added support for Java scanning (`.java`) using `tree-sitter-java`.

@@ -36,31 +36,20 @@ def test_fix_ai_command(mock_config_loader, mock_llm_factory, mock_scanner_cls):
     # Mock file reading via builtins open (extract_snippet)
     runner = CliRunner()
     with runner.isolated_filesystem():
+        # Create a file with unique content to ensure snippet is unique
+        # Ensure we have enough lines for line 10
+        unique_content = "\n" * 9 + "violation = True # Line 10\n" + "\n" * 5
         with open("test.py", "w") as f:
-            f.write("\n" * 20) # Create dummy file
-
-        # We need to patch scanner since we don't want real scan
-        # The mock_scanner provided by @patch decorator is already active
-
-        # However, extract_snippet reads the file.
-        # Since we are in isolated filesystem and created the file,
-        # real open() works fine for the dummy file.
-        # But we want to control content if needed?
-        # Actually dummy file content is fine, we just need it to exist for Click validation.
-
-        # But Scanner scan logic calls file reading too.
-        # We mocked Scanner.scan so it won't read file.
-        # But extract_snippet calls open().
-        # So we don't need to patch open if we write the file.
+            f.write(unique_content)
 
         result = runner.invoke(fix_ai, ['test.py', '--provider', 'mock', '--auto-apply'])
 
         assert result.exit_code == 0, result.output
         assert "Found 1 violations" in result.output
         assert "Starting AI fix process" in result.output
-        assert "Proposed Fix:" in result.output
+        assert "Proposed Fix (Diff):" in result.output
         assert "Fixed code snippet" in result.output
-        assert "[Mock] Fix applied" in result.output
+        assert "Fix applied successfully" in result.output
         assert "Token Usage: 100 tokens" in result.output
 
 @patch('src.cli.commands.fix_ai.Scanner')

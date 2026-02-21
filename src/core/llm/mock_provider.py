@@ -18,14 +18,27 @@ class MockLLMProvider(LLMProvider):
         super().__init__(api_key)
         self.responses = responses or {}
 
-    def generate_fix(self, code_snippet: str, violation_description: str) -> Optional[str]:
+    def generate_fix(self, code_snippet: str, violation_description: str, language: str = "python") -> Optional[str]:
         """
         Return a mock fix.
         """
         self.track_usage(100, 50)
-        return self.responses.get("fix", f"# Mock fix applied to:\n# {code_snippet}")
 
-    def explain_violation(self, code_snippet: str, violation_description: str) -> Optional[str]:
+        # If a specific fix is provided in responses, use it
+        if "fix" in self.responses:
+            return self.responses["fix"]
+
+        # Otherwise generate a realistic-looking mock fix
+        lines = code_snippet.split('\n')
+        fixed_lines = []
+        for line in lines:
+            if "for" in line and ":" in line:
+                fixed_lines.append(f"# Optimized loop for {violation_description}")
+            fixed_lines.append(line)
+
+        return "\n".join(fixed_lines)
+
+    def explain_violation(self, code_snippet: str, violation_description: str, language: str = "python") -> Optional[str]:
         """
         Return a mock explanation.
         """
