@@ -89,7 +89,14 @@ class ConfigLoader:
             'disabled': []
         },
         'standards': [],
-        'ignore_files': ['*.pyc', '__pycache__', '.git', '.venv', 'node_modules']
+        'ignore_files': ['*.pyc', '__pycache__', '.git', '.venv', 'node_modules'],
+        'llm': {
+            'provider': 'openai',
+            'rate_limit': {
+                'tpm': 10000,
+                'rpm': 500
+            }
+        }
     }
     
     # Configuration schema definition
@@ -102,7 +109,13 @@ class ConfigLoader:
         'standards': (list, []),
         'ignore_files': (list, []),
         'auto_fix': (bool, False),
-        'llm_provider': (str, None),
+        'llm': (dict, {
+            'provider': (str, 'openai'),
+            'rate_limit': (dict, {
+                'tpm': (int, 10000),
+                'rpm': (int, 500)
+            })
+        })
     }
     
     def __init__(self, config_path: Optional[str] = None):
@@ -220,6 +233,14 @@ class ConfigLoader:
             if not isinstance(config['rules']['disabled'], list):
                 errors.append("rules.disabled must be a list")
         
+        if 'llm' in config and isinstance(config['llm'], dict):
+            if 'rate_limit' in config['llm'] and isinstance(config['llm']['rate_limit'], dict):
+                rl = config['llm']['rate_limit']
+                if 'tpm' in rl and not isinstance(rl['tpm'], int):
+                    errors.append("llm.rate_limit.tpm must be an integer")
+                if 'rpm' in rl and not isinstance(rl['rpm'], int):
+                    errors.append("llm.rate_limit.rpm must be an integer")
+
         if errors:
             error_msg = "Configuration validation failed:\n"
             error_msg += "\n".join(f"  - {e}" for e in errors)

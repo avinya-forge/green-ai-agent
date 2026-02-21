@@ -64,6 +64,12 @@ class OpenAIProvider(LLMProvider):
         return self._query_openai(system_prompt, user_prompt)
 
     def _query_openai(self, system_prompt: str, user_prompt: str) -> Optional[str]:
+        # Apply rate limiting if configured
+        if self.rate_limiter:
+            # Estimate tokens: prompt length / 4 (heuristic)
+            estimated_tokens = (len(system_prompt) + len(user_prompt)) // 4
+            self.rate_limiter.wait_for(estimated_tokens)
+
         payload = {
             "model": self.model,
             "messages": [
@@ -77,6 +83,13 @@ class OpenAIProvider(LLMProvider):
             response = requests.post(self.API_URL, headers=self.headers, json=payload, timeout=30)
             response.raise_for_status()
             data = response.json()
+
+            if 'usage' in data:
+                usage = data['usage']
+                self.track_usage(
+                    prompt_tokens=usage.get('prompt_tokens', 0),
+                    completion_tokens=usage.get('completion_tokens', 0)
+                )
 
             content = data['choices'][0]['message']['content']
 

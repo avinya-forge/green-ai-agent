@@ -29,6 +29,9 @@ try:
     from src.cli.commands.calibrate import calibrate
     cli.add_command(calibrate)
 
+    from src.cli.commands.fix_ai import fix_ai
+    cli.add_command(fix_ai)
+
 except ImportError as e:
     # Fail fast during development
     raise e

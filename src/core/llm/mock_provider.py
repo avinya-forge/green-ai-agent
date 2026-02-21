@@ -22,12 +22,14 @@ class MockLLMProvider(LLMProvider):
         """
         Return a mock fix.
         """
+        self.track_usage(100, 50)
         return self.responses.get("fix", f"# Mock fix applied to:\n# {code_snippet}")
 
     def explain_violation(self, code_snippet: str, violation_description: str) -> Optional[str]:
         """
         Return a mock explanation.
         """
+        self.track_usage(80, 100)
         return self.responses.get("explanation", f"Mock explanation for violation: {violation_description}")
 
     def estimate_cost(self, prompt_tokens: int, completion_tokens: int) -> float:

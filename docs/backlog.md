@@ -8,11 +8,11 @@
 - [LLM-001] | Design LLM Interface & Provider Abstraction | INDEPENDENT | DONE
 - [LLM-002] | Implement Mock LLM Provider for Testing | BLOCKS-LLM-003 | DONE
 - [LLM-003] | Implement OpenAI API Provider | INDEPENDENT | DONE
-- [LLM-004] | Implement Token Usage Logic (Cost estimation per model) | INDEPENDENT | TODO
-- [LLM-005] | Implement Rate Limiting Logic (Token bucket) | INDEPENDENT | TODO
-- [LLM-006] | Implement Rate Limiting Config | BLOCKS-LLM-005 | TODO
-- [LLM-007] | LLM CLI command `fix-ai` (Core logic) | INDEPENDENT | TODO
-- [LLM-008] | LLM CLI command `fix-ai` (Prompt integration) | BLOCKS-LLM-007 | TODO
+- [LLM-004] | Implement Token Usage Logic (Cost estimation per model) | INDEPENDENT | DONE
+- [LLM-005] | Implement Rate Limiting Logic (Token bucket) | INDEPENDENT | DONE
+- [LLM-006] | Implement Rate Limiting Config | BLOCKS-LLM-005 | DONE
+- [LLM-007] | LLM CLI command `fix-ai` (Core logic) | INDEPENDENT | DONE
+- [LLM-008] | LLM CLI command `fix-ai` (Prompt integration) | BLOCKS-LLM-007 | DONE
 - [LLM-009] | LLM CLI command `fix-ai` (Diff output) | BLOCKS-LLM-008 | TODO
 - [LLM-010] | Prompt Engineering for Python Loop Fix | INDEPENDENT | TODO
 - [LLM-011] | Prompt Engineering for Python IO Fix | INDEPENDENT | TODO
