@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Dict, Optional, Any
+from .usage import TokenUsage
+from .rate_limiter import TokenBucketRateLimiter
 
 class LLMProvider(ABC):
     """
@@ -16,6 +18,36 @@ class LLMProvider(ABC):
         """
         self.api_key = api_key
         self.model = model
+        self.usage = TokenUsage()
+        self.rate_limiter: Optional[TokenBucketRateLimiter] = None
+
+    def set_rate_limiter(self, limiter: TokenBucketRateLimiter):
+        """
+        Set the rate limiter for this provider.
+        """
+        self.rate_limiter = limiter
+
+    def track_usage(self, prompt_tokens: int, completion_tokens: int) -> None:
+        """
+        Track usage for a request.
+
+        Args:
+            prompt_tokens: Number of input tokens.
+            completion_tokens: Number of output tokens.
+        """
+        cost = self.estimate_cost(prompt_tokens, completion_tokens)
+        self.usage.add(TokenUsage(
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens,
+            total_tokens=prompt_tokens + completion_tokens,
+            cost=cost
+        ))
+
+    def get_total_usage(self) -> TokenUsage:
+        """
+        Get total usage tracked by this provider.
+        """
+        return self.usage
 
     @abstractmethod
     def generate_fix(self, code_snippet: str, violation_description: str) -> Optional[str]:

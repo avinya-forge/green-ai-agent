@@ -44,6 +44,11 @@
 - **CLI Refactor**: Modularized CLI into `src/cli/` package for better maintainability and extensibility.
 - **Pre-commit Hooks**: Enhanced local pre-commit hooks for robustness and better DX.
 - **Mock LLM Provider**: Implemented `MockLLMProvider` for testing LLM integration without API calls.
+- **LLM Integration**: Implemented comprehensive LLM infrastructure including `LLMProvider`, `OpenAIProvider`, and `MockLLMProvider`.
+- **LLM CLI Command**: Added `fix-ai` command to interactively fix violations using LLM suggestions (Preview Mode).
+- **Rate Limiting**: Implemented `TokenBucketRateLimiter` to enforce TPM and RPM limits for LLM API calls.
+- **Cost Tracking**: Added `TokenUsage` tracking to estimate costs of LLM operations.
+- **Configuration**: Added `llm` section to `.green-ai.yaml` for provider selection and rate limit configuration.
 
 ### Changed
 - **Scanner Refactor**: Refactored `src/core/scanner.py` into a modular package `src/core/scanner/` with `main.py`, `worker.py`, and `discovery.py`.

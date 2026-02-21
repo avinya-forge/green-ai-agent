@@ -1,0 +1,81 @@
+import click
+from click.testing import CliRunner
+from src.cli.commands.fix_ai import fix_ai
+from unittest.mock import patch, MagicMock
+
+@patch('src.cli.commands.fix_ai.Scanner')
+@patch('src.cli.commands.fix_ai.LLMFactory')
+@patch('src.cli.commands.fix_ai.ConfigLoader')
+def test_fix_ai_command(mock_config_loader, mock_llm_factory, mock_scanner_cls):
+    # Mock config
+    mock_config = MagicMock()
+    mock_config.load.return_value = {'languages': ['python']}
+    mock_config_loader.return_value = mock_config
+
+    # Mock scanner
+    mock_scanner = MagicMock()
+    mock_scanner.scan.return_value = {
+        'issues': [
+            {
+                'id': 'test_rule',
+                'type': 'green_violation',
+                'file': 'test.py',
+                'line': 10,
+                'message': 'Violation found'
+            }
+        ]
+    }
+    mock_scanner_cls.return_value = mock_scanner
+
+    # Mock LLM
+    mock_llm = MagicMock()
+    mock_llm.generate_fix.return_value = "Fixed code snippet"
+    mock_llm.get_total_usage.return_value = MagicMock(total_tokens=100, cost=0.01)
+    mock_llm_factory.get_provider.return_value = mock_llm
+
+    # Mock file reading via builtins open (extract_snippet)
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        with open("test.py", "w") as f:
+            f.write("\n" * 20) # Create dummy file
+
+        # We need to patch scanner since we don't want real scan
+        # The mock_scanner provided by @patch decorator is already active
+
+        # However, extract_snippet reads the file.
+        # Since we are in isolated filesystem and created the file,
+        # real open() works fine for the dummy file.
+        # But we want to control content if needed?
+        # Actually dummy file content is fine, we just need it to exist for Click validation.
+
+        # But Scanner scan logic calls file reading too.
+        # We mocked Scanner.scan so it won't read file.
+        # But extract_snippet calls open().
+        # So we don't need to patch open if we write the file.
+
+        result = runner.invoke(fix_ai, ['test.py', '--provider', 'mock', '--auto-apply'])
+
+        assert result.exit_code == 0, result.output
+        assert "Found 1 violations" in result.output
+        assert "Starting AI fix process" in result.output
+        assert "Proposed Fix:" in result.output
+        assert "Fixed code snippet" in result.output
+        assert "[Mock] Fix applied" in result.output
+        assert "Token Usage: 100 tokens" in result.output
+
+@patch('src.cli.commands.fix_ai.Scanner')
+@patch('src.cli.commands.fix_ai.LLMFactory')
+@patch('src.cli.commands.fix_ai.ConfigLoader')
+def test_fix_ai_no_issues(mock_config_loader, mock_llm_factory, mock_scanner_cls):
+    mock_config_loader.return_value.load.return_value = {'languages': ['python']}
+    mock_scanner_cls.return_value.scan.return_value = {'issues': []}
+
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        with open("test.py", "w") as f:
+            f.write("content")
+
+        result = runner.invoke(fix_ai, ['test.py'])
+
+    assert result.exit_code == 0, result.output
+    assert "No violations found" in result.output
