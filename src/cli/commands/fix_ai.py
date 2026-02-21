@@ -1,6 +1,7 @@
 import click
 import sys
 import os
+import ast
 import difflib
 from typing import List, Optional
 from src.core.scanner import Scanner
@@ -23,6 +24,47 @@ def extract_snippet(file_path: str, line_number: int, context_lines: int = 2) ->
         return snippet
     except Exception:
         return ""
+
+def check_code_safety(code: str, language: str) -> List[str]:
+    """
+    Analyze code for potential security risks.
+    Returns a list of warnings.
+    """
+    warnings = []
+    if language == 'python':
+        try:
+            # Wrap in a function to allow valid parsing of indented blocks if snippet is partial
+            # But ast.parse handles modules. If snippet is indented, it might fail.
+            # Try to dedent or just parse as is.
+            import textwrap
+            try:
+                tree = ast.parse(textwrap.dedent(code))
+            except SyntaxError:
+                tree = ast.parse(code)
+
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    for alias in node.names:
+                        if alias.name in ('os', 'subprocess', 'sys', 'shutil', 'socket'):
+                            warnings.append(f"Import of '{alias.name}' detected.")
+                elif isinstance(node, ast.ImportFrom):
+                    if node.module in ('os', 'subprocess', 'sys', 'shutil', 'socket'):
+                        warnings.append(f"Import from '{node.module}' detected.")
+                elif isinstance(node, ast.Call):
+                    if isinstance(node.func, ast.Name):
+                        if node.func.id in ('eval', 'exec', 'input', '__import__'):
+                            warnings.append(f"Usage of '{node.func.id}' detected.")
+        except Exception:
+            # Code snippet might not be parsable (e.g. partial code), ignore AST errors
+            pass
+
+    # Simple keyword check for other languages or as fallback
+    risky_keywords = ['os.system', 'subprocess.call', 'eval(', 'exec(', 'child_process']
+    for keyword in risky_keywords:
+        if keyword in code:
+             warnings.append(f"Potential risky keyword '{keyword}' detected.")
+
+    return list(set(warnings))
 
 def print_diff(original: str, fixed: str):
     """
@@ -197,6 +239,22 @@ def fix_ai(paths, config, provider, auto_apply, verbose):
             click.echo("  No fix generated.")
             skipped_count += 1
             continue
+
+        # Security Check
+        warnings = check_code_safety(fix, file_lang)
+        if warnings:
+            click.secho("  [SECURITY WARNING] Generated code contains potentially risky patterns:", fg='yellow', bold=True)
+            for w in warnings:
+                click.secho(f"    - {w}", fg='yellow')
+
+            if auto_apply:
+                 click.secho("  Skipping auto-apply due to security warnings.", fg='red')
+                 skipped_count += 1
+                 continue
+
+            if not click.confirm("  Do you want to proceed with this fix?"):
+                skipped_count += 1
+                continue
 
         # Show Diff
         click.echo("-" * 40)

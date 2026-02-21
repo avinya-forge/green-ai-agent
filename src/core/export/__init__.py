@@ -373,6 +373,18 @@ class HTMLReporter:
         file_labels_json = json.dumps(list(by_file.keys())).replace('<', '\\u003c').replace('>', '\\u003e')
         file_counts_json = json.dumps([len(issues) for issues in by_file.values()])
 
+        # Group by rule ID for the new chart
+        rule_counts = {}
+        for issue in issues:
+            rule_id = issue.get('id', 'unknown')
+            if rule_id not in rule_counts:
+                rule_counts[rule_id] = 0
+            rule_counts[rule_id] += 1
+
+        sorted_rules = sorted(rule_counts.items(), key=lambda x: x[1], reverse=True)
+        rule_labels_json = json.dumps([r[0] for r in sorted_rules]).replace('<', '\\u003c').replace('>', '\\u003e')
+        rule_counts_json = json.dumps([r[1] for r in sorted_rules])
+
         # Build HTML content
         html_content = f"""<!DOCTYPE html>
 <html lang="en">
@@ -435,6 +447,35 @@ class HTMLReporter:
             padding: 30px;
             background: #f8f9fa;
             border-bottom: 2px solid #e9ecef;
+        }}
+
+        .controls {{
+            padding: 20px 30px;
+            background: white;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }}
+
+        .search-box, .filter-box {{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }}
+
+        .search-box input, .filter-box select {{
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            outline: none;
+        }}
+
+        .search-box input:focus, .filter-box select:focus {{
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
         }}
         
         .metric {{
@@ -629,7 +670,7 @@ class HTMLReporter:
         <div class="summary">
             <div class="metric">
                 <h3>Total Violations</h3>
-                <div class="value">{len(issues)}</div>
+                <div class="value" id="totalViolations">{len(issues)}</div>
             </div>
             <div class="metric">
                 <h3>Critical Issues</h3>
@@ -644,6 +685,24 @@ class HTMLReporter:
                 <div class="value">{codebase_emissions:.6f}kg</div>
             </div>
         </div>
+
+        <div class="controls">
+            <div class="search-box">
+                <label for="searchInput">🔍 Search:</label>
+                <input type="text" id="searchInput" placeholder="Search files, rules, or messages...">
+            </div>
+            <div class="filter-box">
+                <label for="severityFilter">Filter by Severity:</label>
+                <select id="severityFilter">
+                    <option value="all">All Severities</option>
+                    <option value="critical">Critical</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                    <option value="info">Info</option>
+                </select>
+            </div>
+        </div>
         
         <div class="content">
             <div class="section">
@@ -656,6 +715,10 @@ class HTMLReporter:
                     <div class="chart-container">
                         <h3>By File</h3>
                         <canvas id="fileChart"></canvas>
+                    </div>
+                     <div class="chart-container">
+                        <h3>By Rule</h3>
+                        <canvas id="ruleChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -780,6 +843,87 @@ class HTMLReporter:
                 }}
             }}
         }});
+
+        // Rule Chart
+        const ruleCtx = document.getElementById('ruleChart').getContext('2d');
+        const ruleLabels = {rule_labels_json};
+        const ruleCounts = {rule_counts_json};
+
+        new Chart(ruleCtx, {{
+            type: 'bar',
+            data: {{
+                labels: ruleLabels.slice(0, 10),
+                datasets: [{{
+                    label: 'Violations',
+                    data: ruleCounts.slice(0, 10),
+                    backgroundColor: '#8b5cf6',
+                    borderColor: '#8b5cf6',
+                    borderWidth: 1
+                }}]
+            }},
+            options: {{
+                responsive: true,
+                maintainAspectRatio: true,
+                indexAxis: 'y',
+                plugins: {{
+                    legend: {{
+                        display: false
+                    }}
+                }},
+                scales: {{
+                    x: {{
+                        beginAtZero: true
+                    }}
+                }}
+            }}
+        }});
+
+        // Search and Filter Logic
+        const searchInput = document.getElementById('searchInput');
+        const severityFilter = document.getElementById('severityFilter');
+        const violationItems = document.querySelectorAll('.violation-item');
+        const fileSections = document.querySelectorAll('.file-section');
+        const totalViolationsElement = document.getElementById('totalViolations');
+
+        function filterViolations() {{
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedSeverity = severityFilter.value.toLowerCase();
+            let visibleCount = 0;
+
+            fileSections.forEach(section => {{
+                let hasVisibleViolations = false;
+                const items = section.querySelectorAll('.violation-item');
+
+                items.forEach(item => {{
+                    const text = item.textContent.toLowerCase();
+                    const severityClass = Array.from(item.classList).find(c => c.startsWith('severity-'));
+                    const severity = severityClass ? severityClass.replace('severity-', '') : '';
+
+                    const matchesSearch = text.includes(searchTerm);
+                    const matchesSeverity = selectedSeverity === 'all' || severity === selectedSeverity;
+
+                    if (matchesSearch && matchesSeverity) {{
+                        item.style.display = 'grid';
+                        hasVisibleViolations = true;
+                        visibleCount++;
+                    }} else {{
+                        item.style.display = 'none';
+                    }}
+                }});
+
+                if (hasVisibleViolations) {{
+                    section.style.display = 'block';
+                }} else {{
+                    section.style.display = 'none';
+                }}
+            }});
+
+            totalViolationsElement.textContent = visibleCount;
+        }}
+
+        searchInput.addEventListener('input', filterViolations);
+        severityFilter.addEventListener('change', filterViolations);
+
     </script>
 </body>
 </html>
