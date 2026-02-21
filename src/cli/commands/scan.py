@@ -49,6 +49,10 @@ from src.ui.state import set_last_scan_results
     help='Enable emissions profiling (adds 10-15% overhead, default fast mode)'
 )
 @click.option(
+    '--perf-profile', is_flag=True,
+    help='Enable internal cProfile for performance analysis'
+)
+@click.option(
     '--fix-all', is_flag=True, help='Fix all issues automatically'
 )
 @click.option(
@@ -66,8 +70,8 @@ from src.ui.state import set_last_scan_results
 @click.option('--output', default=None, help='[Deprecated] Output file path')
 def scan(
     paths, git_url, branch, project_name, language, config, disable_rule,
-    enable_rule, runtime, profile, fix_all, fix_specific, manual, export,
-    format, output
+    enable_rule, runtime, profile, perf_profile, fix_all, fix_specific,
+    manual, export, format, output
 ):
     """Scan a codebase for green software violations.
 
@@ -160,7 +164,30 @@ def scan(
                         rule_id
                     )
 
+        if perf_profile:
+            import cProfile
+            import pstats
+            from pathlib import Path
+
+            click.echo("Running with cProfile enabled...", err=True)
+            profiler = cProfile.Profile()
+            profiler.enable()
+
         results = scanner.scan(scan_path)
+
+        if perf_profile:
+            profiler.disable()
+            stats = pstats.Stats(profiler).sort_stats('cumtime')
+
+            # Ensure output directory exists
+            output_dir = Path('output')
+            output_dir.mkdir(exist_ok=True)
+            stats_file = output_dir / 'scanner_profile.stats'
+            stats.dump_stats(stats_file)
+
+            click.echo(f"\n[PERF] Profile stats saved to {stats_file}", err=True)
+            click.echo("[PERF] Top 20 functions by cumulative time:", err=True)
+            stats.print_stats(20)
 
         # Update project registry if project name provided
         if project_name:

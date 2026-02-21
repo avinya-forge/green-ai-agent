@@ -16,6 +16,7 @@ from typing import List, Dict, Any, Optional
 OUTPUT_DIR = Path(__file__).parent.parent.parent.parent / 'output'
 
 from .xml_exporter import JUnitXMLExporter
+from .schemas import ScanResultSchema
 from src.core.remediation.engine import RemediationEngine
 
 def safe_read_snippet(file_path: str, line_number: int) -> str:
@@ -57,6 +58,9 @@ class JSONExporter:
 
         Returns:
             Path to generated JSON file
+
+        Raises:
+            ValidationError: If the results do not match the expected schema.
         """
         # Add timestamp and project info if not present
         if 'metadata' not in results:
@@ -65,8 +69,12 @@ class JSONExporter:
         results['metadata']['exported_at'] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
         results['metadata']['project_name'] = project_name
 
+        # Validate against schema
+        validated_results = ScanResultSchema.model_validate(results)
+        output_data = validated_results.model_dump(mode='json')
+
         with open(self.output_path, 'w', encoding='utf-8') as f:
-            json.dump(results, f, indent=2)
+            json.dump(output_data, f, indent=2)
 
         return self.output_path
 

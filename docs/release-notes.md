@@ -23,6 +23,11 @@
 - [GO-011] | Implement `string_concatenation_in_loop` Rule | INDEPENDENT | DONE
 
 ### Added
+- **JSON Export Schema**: Implemented robust Pydantic schemas for JSON export validation (REP-011).
+- **JSON Validation**: Added validation logic to `JSONExporter` to ensure data consistency (REP-012).
+- **Export Metadata**: Standardized metadata fields in JSON export (REP-013).
+- **Performance Profiling**: Added `--perf-profile` flag to `scan` command for internal cProfile analysis (PERF-001).
+- **Bottleneck Analysis**: Conducted initial performance analysis and documented findings in `docs/performance_analysis.md` (PERF-002).
 - **LLM CLI Enhancements**: Added colored diff view (`difflib`) to `fix-ai` command for verifying changes before applying, plus robust file patching logic.
 - **Prompt Engineering**: Implemented specialized prompts for Python/JS loops, IO, and logic optimization in `src/core/llm/prompts.py`.
 - **CSV Export Improvements**: Added `snippet` and `remediation` columns to CSV export, providing more context for violations.
