@@ -6,7 +6,86 @@ import pytest
 import os
 import csv
 import tempfile
-from src.core.export import CSVExporter, HTMLReporter
+from src.core.export import CSVExporter, HTMLReporter, JSONExporter
+from pydantic import ValidationError
+import json
+
+
+class TestJSONExporter:
+    """Test JSON export functionality."""
+
+    @pytest.fixture
+    def sample_results(self):
+        """Create sample scan results for testing."""
+        return {
+            'issues': [
+                {
+                    'id': 'excessive_nesting_depth',
+                    'line': 12,
+                    'severity': 'critical',
+                    'message': '3-level nested loop detected',
+                    'file': 'app.py',
+                    'energy_factor': '100x',
+                    'effort': 'high'
+                }
+            ],
+            'codebase_emissions': 0.000001234,
+            'scanning_emissions': 0.000000567,
+            'per_file_emissions': {
+                'app.py': 0.000001
+            }
+        }
+
+    def test_json_export_creates_file(self, sample_results):
+        """Test that JSON export creates a file."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_path = os.path.join(tmpdir, 'test_report.json')
+            exporter = JSONExporter(output_path)
+            result = exporter.export(sample_results)
+
+            assert os.path.exists(result)
+            assert result == output_path
+
+    def test_json_export_schema_validation(self, sample_results):
+        """Test that valid results pass validation."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_path = os.path.join(tmpdir, 'test_report.json')
+            exporter = JSONExporter(output_path)
+            exporter.export(sample_results)
+
+            with open(output_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+
+            assert data['issues'][0]['id'] == 'excessive_nesting_depth'
+            assert data['metadata']['project_name'] == 'Scan'
+            assert 'exported_at' in data['metadata']
+
+    def test_json_export_metadata(self, sample_results):
+        """Test metadata fields are correctly added."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_path = os.path.join(tmpdir, 'test_report.json')
+            exporter = JSONExporter(output_path)
+            exporter.export(sample_results, project_name='My Project')
+
+            with open(output_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+
+            assert data['metadata']['project_name'] == 'My Project'
+
+    def test_json_export_invalid_schema(self):
+        """Test validation fails for invalid data."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_path = os.path.join(tmpdir, 'test_report.json')
+            exporter = JSONExporter(output_path)
+
+            # Missing required 'issues' field
+            invalid_results = {
+                'codebase_emissions': 0,
+                'scanning_emissions': 0
+            }
+
+            with pytest.raises(ValidationError):
+                exporter.export(invalid_results)
 
 
 class TestCSVExporter:

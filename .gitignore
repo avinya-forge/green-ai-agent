@@ -61,6 +61,7 @@ openai_cache/
 *.bak
 .*.swp
 *~
+*.stats
 
 # OS Files
 

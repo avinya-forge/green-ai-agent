@@ -37,10 +37,10 @@
 - [REP-008] | HTML Report: Add interactive chart (Chart.js integration) | INDEPENDENT | TODO
 - [REP-009] | HTML Report: Add filtering (JS) | INDEPENDENT | TODO
 - [REP-010] | HTML Report: Add search (JS) | INDEPENDENT | TODO
-- [REP-011] | JSON Export: Schema definition (Pydantic) | INDEPENDENT | TODO
-- [REP-012] | JSON Export: Validation logic | BLOCKS-REP-011 | TODO
-- [REP-013] | JSON Export: Metadata fields (version, timestamp) | BLOCKS-REP-011 | TODO
-- [REP-014] | JSON Export: Unit Tests | BLOCKS-REP-011 | TODO
+- [REP-011] | JSON Export: Schema definition (Pydantic) | INDEPENDENT | DONE
+- [REP-012] | JSON Export: Validation logic | BLOCKS-REP-011 | DONE
+- [REP-013] | JSON Export: Metadata fields (version, timestamp) | BLOCKS-REP-011 | DONE
+- [REP-014] | JSON Export: Unit Tests | BLOCKS-REP-011 | DONE
 - [REP-015] | PDF Export: Integration Test | BLOCKS-REP-004 | TODO
 
 ### [EPIC-05] CI/CD GitHub Action V2
@@ -59,8 +59,8 @@
 ### [EPIC-06] Performance Optimization
 *Goal: Ensure the tool remains lightweight and fast.*
 - [GO-009] | Go Performance Benchmark | INDEPENDENT | TODO
-- [PERF-001] | Profile Scanner: cProfile setup | INDEPENDENT | TODO
-- [PERF-002] | Profile Scanner: Identify bottlenecks | BLOCKS-PERF-001 | TODO
+- [PERF-001] | Profile Scanner: cProfile setup | INDEPENDENT | DONE
+- [PERF-002] | Profile Scanner: Identify bottlenecks | BLOCKS-PERF-001 | DONE
 - [PERF-003] | Optimize Query: Review Python queries | INDEPENDENT | TODO
 - [PERF-004] | Optimize Query: Review JS queries | INDEPENDENT | TODO
 - [PERF-005] | Parallel Processing: Multiprocessing pool tuning | INDEPENDENT | TODO
