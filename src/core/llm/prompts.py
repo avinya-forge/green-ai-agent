@@ -78,6 +78,15 @@ class PromptManager:
         return cls.SYSTEM_PROMPT
 
     @classmethod
+    def _sanitize(cls, text: str) -> str:
+        """
+        Sanitize input text to prevent prompt injection.
+        Removes or escapes characters that might interfere with the prompt structure.
+        """
+        # Prevent breaking out of code blocks
+        return text.replace("```", "'''")
+
+    @classmethod
     def get_fix_prompt(cls, language: str, violation_description: str, code_snippet: str) -> str:
         """
         Generate a prompt for fixing a specific violation.
@@ -85,10 +94,17 @@ class PromptManager:
         key = cls._determine_key(language, violation_description)
         template = cls._TEMPLATES.get(key, cls._TEMPLATES["generic"])
 
+        # Sanitize inputs to prevent prompt injection
+        sanitized_violation = cls._sanitize(violation_description)
+
+        # Sanitize code snippet to ensure it doesn't break the markdown block
+        # Replacing triple backticks with triple single quotes to maintain block integrity
+        sanitized_code = cls._sanitize(code_snippet)
+
         return template.format(
             language=language,
-            violation=violation_description,
-            code=code_snippet
+            violation=sanitized_violation,
+            code=sanitized_code
         )
 
     @classmethod
