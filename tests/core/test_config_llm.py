@@ -39,7 +39,8 @@ def test_config_loader_llm_validation_error():
         loader = ConfigLoader(tmp_path)
         with pytest.raises(Exception) as excinfo:
             loader.load()
-        assert "llm.rate_limit.tpm must be an integer" in str(excinfo.value)
+        # Pydantic error message
+        assert "Input should be a valid integer" in str(excinfo.value)
     finally:
         os.remove(tmp_path)
 
