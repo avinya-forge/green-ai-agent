@@ -125,6 +125,23 @@ class ConfigLoader:
             current = current.parent
         
         return None
+
+    def _find_global_config_file(self) -> Optional[str]:
+        """Find global configuration file in home or XDG directory."""
+        home = Path.home()
+
+        # Check ~/.green-ai.yaml
+        global_config = home / '.green-ai.yaml'
+        if global_config.exists():
+            return str(global_config)
+
+        # Check XDG_CONFIG_HOME
+        xdg_home = os.environ.get('XDG_CONFIG_HOME', str(home / '.config'))
+        xdg_config = Path(xdg_home) / 'green-ai' / 'config.yaml'
+        if xdg_config.exists():
+            return str(xdg_config)
+
+        return None
     
     def load(self) -> Dict[str, Any]:
         """
@@ -136,10 +153,8 @@ class ConfigLoader:
         Raises:
             ConfigError: If YAML is invalid or required field missing
         """
-        if not self.config_path or not os.path.exists(self.config_path):
-            # No config file found, use defaults
-            self.config = self.DEFAULT_CONFIG.copy()
-            return self.config
+        # Start with defaults
+        config = self.DEFAULT_CONFIG.copy()
         
         # Import yaml when needed
         try:
@@ -149,21 +164,31 @@ class ConfigLoader:
                 "PyYAML not installed. Install with: pip install pyyaml\n"
                 "Or remove .green-ai.yaml to use defaults."
             )
-        
-        # Load YAML file
-        try:
-            with open(self.config_path, 'r') as f:
-                file_config = yaml.safe_load(f) or {}
-        except yaml.YAMLError as e:
-            raise ConfigError(f"Invalid YAML in {self.config_path}: {e}")
-        except IOError as e:
-            raise ConfigError(f"Cannot read {self.config_path}: {e}")
-        
-        # Merge with defaults (user config overrides defaults)
-        merged_config = self._merge_config(self.DEFAULT_CONFIG.copy(), file_config)
+
+        # 1. Load Global Config (merged into defaults)
+        global_path = self._find_global_config_file()
+        if global_path:
+            try:
+                with open(global_path, 'r') as f:
+                    global_conf = yaml.safe_load(f) or {}
+                config = self._merge_config(config, global_conf)
+            except Exception:
+                # Silently ignore global config errors to avoid breaking execution
+                pass
+
+        # 2. Load Local Config (merged into defaults+global)
+        if self.config_path and os.path.exists(self.config_path):
+            try:
+                with open(self.config_path, 'r') as f:
+                    file_config = yaml.safe_load(f) or {}
+                config = self._merge_config(config, file_config)
+            except yaml.YAMLError as e:
+                raise ConfigError(f"Invalid YAML in {self.config_path}: {e}")
+            except IOError as e:
+                raise ConfigError(f"Cannot read {self.config_path}: {e}")
         
         # Validate using Pydantic
-        self.config = self._validate_config(merged_config)
+        self.config = self._validate_config(config)
         
         return self.config
     
