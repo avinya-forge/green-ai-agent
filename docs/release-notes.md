@@ -23,6 +23,10 @@
 - [GO-011] | Implement `string_concatenation_in_loop` Rule | INDEPENDENT | DONE
 
 ### Added
+- **Configuration Init**: Added `green-ai init` CLI command to easily generate configuration files (CFG-009).
+- **Deep Merge Utility**: Implemented robust recursive dictionary merging for configuration layering (CFG-007).
+- **Config Validation**: Migrated configuration validation to Pydantic models for stricter type safety and schema enforcement (CFG-005, CFG-006).
+- **Security Rules**: Added detection for hardcoded secrets and AWS keys in Python code (SEC-005, SEC-007).
 - **JSON Export Schema**: Implemented robust Pydantic schemas for JSON export validation (REP-011).
 - **JSON Validation**: Added validation logic to `JSONExporter` to ensure data consistency (REP-012).
 - **Export Metadata**: Standardized metadata fields in JSON export (REP-013).

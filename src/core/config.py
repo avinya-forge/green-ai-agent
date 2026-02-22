@@ -99,25 +99,6 @@ class ConfigLoader:
         }
     }
     
-    # Configuration schema definition
-    SCHEMA = {
-        'languages': (list, ['python', 'javascript', 'typescript', 'java', 'go']),
-        'rules': (dict, {
-            'enabled': (list, []),
-            'disabled': (list, [])
-        }),
-        'standards': (list, []),
-        'ignore_files': (list, []),
-        'auto_fix': (bool, False),
-        'llm': (dict, {
-            'provider': (str, 'openai'),
-            'rate_limit': (dict, {
-                'tpm': (int, 10000),
-                'rpm': (int, 500)
-            })
-        })
-    }
-    
     def __init__(self, config_path: Optional[str] = None):
         """
         Initialize config loader.
@@ -179,72 +160,33 @@ class ConfigLoader:
             raise ConfigError(f"Cannot read {self.config_path}: {e}")
         
         # Merge with defaults (user config overrides defaults)
-        self.config = self._merge_config(self.DEFAULT_CONFIG.copy(), file_config)
+        merged_config = self._merge_config(self.DEFAULT_CONFIG.copy(), file_config)
         
-        # Validate
-        self._validate_config(self.config)
+        # Validate using Pydantic
+        self.config = self._validate_config(merged_config)
         
         return self.config
     
     def _merge_config(self, default: Dict, user: Dict) -> Dict:
         """Recursively merge user config into defaults."""
-        result = default.copy()
-        
-        for key, value in user.items():
-            if key in result and isinstance(result[key], dict) and isinstance(value, dict):
-                result[key] = self._merge_config(result[key], value)
-            else:
-                result[key] = value
-        
-        return result
+        from src.utils.dict_utils import deep_merge
+        return deep_merge(default, user)
     
-    def _validate_config(self, config: Dict[str, Any]) -> None:
+    def _validate_config(self, config: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Validate configuration against schema.
+        Validate configuration using Pydantic model.
         
         Raises:
             ConfigError: If validation fails
         """
-        errors = []
-        
-        for key, (expected_type, default) in self.SCHEMA.items():
-            if key not in config:
-                config[key] = default
-                continue
-            
-            value = config[key]
-            
-            # Check type
-            if not isinstance(value, expected_type):
-                errors.append(
-                    f"{key}: expected {expected_type.__name__}, "
-                    f"got {type(value).__name__}"
-                )
-        
-        # Validate nested structures
-        if 'rules' in config and isinstance(config['rules'], dict):
-            if 'enabled' not in config['rules']:
-                config['rules']['enabled'] = []
-            if 'disabled' not in config['rules']:
-                config['rules']['disabled'] = []
-            
-            if not isinstance(config['rules']['enabled'], list):
-                errors.append("rules.enabled must be a list")
-            if not isinstance(config['rules']['disabled'], list):
-                errors.append("rules.disabled must be a list")
-        
-        if 'llm' in config and isinstance(config['llm'], dict):
-            if 'rate_limit' in config['llm'] and isinstance(config['llm']['rate_limit'], dict):
-                rl = config['llm']['rate_limit']
-                if 'tpm' in rl and not isinstance(rl['tpm'], int):
-                    errors.append("llm.rate_limit.tpm must be an integer")
-                if 'rpm' in rl and not isinstance(rl['rpm'], int):
-                    errors.append("llm.rate_limit.rpm must be an integer")
-
-        if errors:
-            error_msg = "Configuration validation failed:\n"
-            error_msg += "\n".join(f"  - {e}" for e in errors)
-            raise ConfigError(error_msg)
+        try:
+            from src.core.config_models import GreenAIConfig
+            model = GreenAIConfig(**config)
+            return model.model_dump()
+        except ImportError:
+            raise ConfigError("Pydantic not installed or config_models missing.")
+        except Exception as e:
+            raise ConfigError(f"Configuration validation failed: {e}")
     
     def get(self, key: str, default: Any = None) -> Any:
         """
@@ -273,6 +215,31 @@ class ConfigLoader:
         
         return self.config.get(key, default)
     
+    def get_rule_severity(self, rule_id: str, default_severity: str = "medium") -> str:
+        """
+        Get rule severity with overrides.
+
+        Args:
+            rule_id: Rule ID to check
+            default_severity: Default severity if not overridden
+
+        Returns:
+            Severity string (e.g. 'critical', 'major')
+        """
+        if not self.config:
+            self.load()
+
+        # Get rules dictionary safely
+        rules_config = self.config.get('rules', {})
+        if not isinstance(rules_config, dict):
+            return default_severity
+
+        severity_map = rules_config.get('severity', {})
+        if not severity_map or not isinstance(severity_map, dict):
+            return default_severity
+
+        return severity_map.get(rule_id, default_severity)
+
     def is_rule_enabled(self, rule_id: str) -> bool:
         """
         Check if a rule is enabled.

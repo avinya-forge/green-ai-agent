@@ -113,11 +113,11 @@
 *Goal: Enhance dynamic configuration capabilities.*
 - [CFG-001] | Remote Config: URL fetcher | INDEPENDENT | TODO
 - [CFG-002] | Remote Config: Caching logic | BLOCKS-CFG-001 | TODO
-- [CFG-003] | Severity Override: Config parsing logic | INDEPENDENT | TODO
+- [CFG-003] | Severity Override: Config parsing logic | INDEPENDENT | DONE
 - [CFG-004] | Severity Override: Rule application logic | BLOCKS-CFG-003 | TODO
-- [CFG-005] | JSON Schema: Define schema.json | INDEPENDENT | TODO
-- [CFG-006] | JSON Schema: Validate config on load | BLOCKS-CFG-005 | TODO
-- [CFG-007] | Merge Configs: Deep merge utility | INDEPENDENT | TODO
+- [CFG-005] | JSON Schema: Define schema.json | INDEPENDENT | DONE
+- [CFG-006] | JSON Schema: Validate config on load | BLOCKS-CFG-005 | DONE
+- [CFG-007] | Merge Configs: Deep merge utility | INDEPENDENT | DONE
 - [CFG-008] | Merge Configs: Precedence logic (CLI > Local > Global) | BLOCKS-CFG-007 | TODO
-- [CFG-009] | CLI Generator: `init` command logic | INDEPENDENT | TODO
+- [CFG-009] | CLI Generator: `init` command logic | INDEPENDENT | DONE
 - [CFG-010] | CLI Generator: Template creation | BLOCKS-CFG-009 | TODO

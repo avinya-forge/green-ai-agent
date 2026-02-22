@@ -636,6 +636,10 @@ class PythonViolationDetector(ast.NodeVisitor):
     
     def visit_Assign(self, node: ast.Assign) -> None:
         """Track variable assignments."""
+
+        # Check for hardcoded secrets
+        self._check_hardcoded_secrets(node)
+
         # Check for string accumulation in loop: s = s + ...
         if self.in_loop and isinstance(node.value, ast.BinOp) and isinstance(node.value.op, ast.Add):
             for target in node.targets:
@@ -676,6 +680,29 @@ class PythonViolationDetector(ast.NodeVisitor):
                          self.var_types[target.id] = 'numpy'
         self.generic_visit(node)
     
+    def _check_hardcoded_secrets(self, node: ast.Assign) -> None:
+        """Check for hardcoded secrets in assignments."""
+        secret_patterns = ['password', 'secret', 'key', 'token', 'auth', 'credential', 'api_key']
+
+        for target in node.targets:
+            if isinstance(target, ast.Name):
+                var_name = target.id.lower()
+
+                # Check variable name
+                if any(p in var_name for p in secret_patterns):
+                    # Check if value is a string literal
+                    if isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
+                        val = node.value.value
+                        # Filter out empty strings, short strings, placeholders
+                        if len(val) > 8 and ' ' not in val and not val.startswith('<') and 'YOUR_' not in val and not val.startswith('os.getenv'):
+                             self.violations.append({
+                                'id': 'hardcoded_secret',
+                                'line': node.lineno,
+                                'severity': 'critical',
+                                'message': f'Potential hardcoded secret in variable "{target.id}". Use environment variables.',
+                                'pattern_match': 'hardcoded_secret_var'
+                            })
+
     def visit_Name(self, node: ast.Name) -> None:
         """Track variable usage."""
         if isinstance(node.ctx, ast.Load):
@@ -683,7 +710,7 @@ class PythonViolationDetector(ast.NodeVisitor):
         self.generic_visit(node)
     
     def visit_Constant(self, node: ast.Constant) -> None:
-        """Detect magic numbers (Python 3.8+)."""
+        """Detect magic numbers and exposed secrets."""
         if isinstance(node.value, (int, float)) and not isinstance(node.value, bool):
             if node.value > 100 and node.value not in [1000, 1024, 60, 3600]: # Exempt common constants
                 self.violations.append({
@@ -693,6 +720,23 @@ class PythonViolationDetector(ast.NodeVisitor):
                     'message': f'Magic number "{node.value}" usage. Use named constants.',
                     'pattern_match': 'magic_number'
                 })
+
+        # Check for exposed secrets in strings
+        if isinstance(node.value, str):
+            val = node.value
+            # AWS Access Key ID (AKIA + 16 chars)
+            if "AKIA" in val and len(val) >= 20:
+                # Basic heuristic: if it looks like an ID
+                import re
+                if re.search(r'AKIA[0-9A-Z]{16}', val):
+                     self.violations.append({
+                        'id': 'exposed_aws_key',
+                        'line': node.lineno,
+                        'severity': 'critical',
+                        'message': 'Potential AWS Access Key ID detected.',
+                        'pattern_match': 'aws_key'
+                    })
+
         self.generic_visit(node)
 
     def visit_With(self, node: ast.With) -> None:

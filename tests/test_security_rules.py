@@ -65,3 +65,39 @@ def fetch():
     violations = detect_violations(code, "test.py", "python")
     found = any(v['id'] == 'requests_without_timeout' for v in violations)
     assert not found
+
+def test_hardcoded_password():
+    code = """
+def connect():
+    password = "my_super_secret_password"
+    print(password)
+"""
+    violations = detect_violations(code, "test.py", "python")
+    found = any(v['id'] == 'hardcoded_secret' for v in violations)
+    assert found
+
+def test_hardcoded_api_key():
+    code = """
+API_KEY = "12345abcdef12345"
+"""
+    violations = detect_violations(code, "test.py", "python")
+    found = any(v['id'] == 'hardcoded_secret' for v in violations)
+    assert found
+
+def test_safe_variable_name():
+    code = """
+def check():
+    my_key = "os.getenv('KEY')"
+"""
+    # Should check if we filter out os.getenv string literals
+    violations = detect_violations(code, "test.py", "python")
+    found = any(v['id'] == 'hardcoded_secret' for v in violations)
+    assert not found
+
+def test_aws_key_detection():
+    code = """
+aws_id = "AKIAIOSFODNN7EXAMPLE"
+"""
+    violations = detect_violations(code, "test.py", "python")
+    found = any(v['id'] == 'exposed_aws_key' for v in violations)
+    assert found
