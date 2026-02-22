@@ -1,0 +1,120 @@
+{
+  "$defs": {
+    "LlmConfig": {
+      "properties": {
+        "provider": {
+          "default": "openai",
+          "description": "LLM provider (openai, anthropic, etc.)",
+          "title": "Provider",
+          "type": "string"
+        },
+        "rate_limit": {
+          "$ref": "#/$defs/RateLimitConfig",
+          "description": "Rate limiting settings"
+        }
+      },
+      "title": "LlmConfig",
+      "type": "object"
+    },
+    "RateLimitConfig": {
+      "properties": {
+        "tpm": {
+          "default": 10000,
+          "description": "Tokens per minute",
+          "title": "Tpm",
+          "type": "integer"
+        },
+        "rpm": {
+          "default": 500,
+          "description": "Requests per minute",
+          "title": "Rpm",
+          "type": "integer"
+        }
+      },
+      "title": "RateLimitConfig",
+      "type": "object"
+    },
+    "RulesConfig": {
+      "properties": {
+        "enabled": {
+          "description": "List of explicitly enabled rule IDs",
+          "items": {
+            "type": "string"
+          },
+          "title": "Enabled",
+          "type": "array"
+        },
+        "disabled": {
+          "description": "List of explicitly disabled rule IDs",
+          "items": {
+            "type": "string"
+          },
+          "title": "Disabled",
+          "type": "array"
+        },
+        "severity": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Severity"
+          },
+          "description": "Override severity for specific rules",
+          "title": "Severity",
+          "type": "object"
+        }
+      },
+      "title": "RulesConfig",
+      "type": "object"
+    },
+    "Severity": {
+      "enum": [
+        "info",
+        "minor",
+        "major",
+        "critical"
+      ],
+      "title": "Severity",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "languages": {
+      "description": "List of enabled languages",
+      "items": {
+        "type": "string"
+      },
+      "title": "Languages",
+      "type": "array"
+    },
+    "rules": {
+      "$ref": "#/$defs/RulesConfig",
+      "description": "Rule configuration"
+    },
+    "standards": {
+      "description": "Compliance standards to check against",
+      "items": {
+        "type": "string"
+      },
+      "title": "Standards",
+      "type": "array"
+    },
+    "ignore_files": {
+      "description": "Glob patterns for files/directories to ignore",
+      "items": {
+        "type": "string"
+      },
+      "title": "Ignore Files",
+      "type": "array"
+    },
+    "auto_fix": {
+      "default": false,
+      "description": "Whether to auto-apply fixes",
+      "title": "Auto Fix",
+      "type": "boolean"
+    },
+    "llm": {
+      "$ref": "#/$defs/LlmConfig",
+      "description": "LLM integration settings"
+    }
+  },
+  "title": "GreenAIConfig",
+  "type": "object"
+}

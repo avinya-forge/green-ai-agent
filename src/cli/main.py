@@ -32,6 +32,9 @@ try:
     from src.cli.commands.fix_ai import fix_ai
     cli.add_command(fix_ai)
 
+    from src.cli.commands.init import init
+    cli.add_command(init)
+
 except ImportError as e:
     # Fail fast during development
     raise e
