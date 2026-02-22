@@ -1,4 +1,5 @@
 from typing import Dict, Optional
+import re
 
 class PromptManager:
     """
@@ -82,9 +83,28 @@ class PromptManager:
         """
         Sanitize input text to prevent prompt injection.
         Removes or escapes characters that might interfere with the prompt structure.
+        Also attempts to neutralize common prompt injection patterns.
         """
-        # Prevent breaking out of code blocks
-        return text.replace("```", "'''")
+        if not text:
+            return ""
+
+        # 1. Prevent breaking out of code blocks
+        # Replace backticks to prevent markdown injection
+        sanitized = text.replace("```", "'''")
+
+        # 2. Heuristic defense against prompt injection
+        injection_patterns = [
+            "ignore previous instructions",
+            "ignore all previous instructions",
+            "system prompt",
+            "override instructions"
+        ]
+
+        for pattern in injection_patterns:
+            if re.search(re.escape(pattern), sanitized, re.IGNORECASE):
+                sanitized = re.sub(re.escape(pattern), "[REDACTED]", sanitized, flags=re.IGNORECASE)
+
+        return sanitized
 
     @classmethod
     def get_fix_prompt(cls, language: str, violation_description: str, code_snippet: str) -> str:

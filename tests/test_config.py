@@ -175,6 +175,53 @@ languages: "not_a_list"
             os.unlink(temp_path)
 
 
+    def test_global_config_loading(self):
+        """Test loading global configuration."""
+        from unittest.mock import patch
+
+        # Create a temporary directory to simulate home
+        with tempfile.TemporaryDirectory() as temp_home:
+            home_path = Path(temp_home)
+            global_config_path = home_path / '.green-ai.yaml'
+
+            # Write global config
+            global_yaml = """
+languages:
+  - java
+rules:
+  enabled:
+    - global_rule
+"""
+            with open(global_config_path, 'w') as f:
+                f.write(global_yaml)
+
+            # Create local config (overrides global)
+            local_yaml = """
+rules:
+  enabled:
+    - local_rule
+"""
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f_local:
+                f_local.write(local_yaml)
+                local_path = f_local.name
+
+            try:
+                # Patch Path.home to return temp_home
+                with patch('pathlib.Path.home', return_value=home_path):
+                    loader = ConfigLoader(local_path)
+                    config = loader.load()
+
+                    # Languages: from global (overwrites default, local doesn't specify)
+                    assert config['languages'] == ['java']
+
+                    # Rules enabled: from local (overwrites global)
+                    assert config['rules']['enabled'] == ['local_rule']
+
+            finally:
+                if os.path.exists(local_path):
+                    os.unlink(local_path)
+
+
 class TestConfigIntegration:
     """Test config integration with scanner."""
     
