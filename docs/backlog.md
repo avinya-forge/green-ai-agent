@@ -34,9 +34,9 @@
 - [REP-005] | CSV Export: Add violation line number | INDEPENDENT | DONE
 - [REP-006] | CSV Export: Add violation snippet | INDEPENDENT | DONE
 - [REP-007] | CSV Export: Add remediation suggestion | INDEPENDENT | DONE
-- [REP-008] | HTML Report: Add interactive chart (Chart.js integration) | INDEPENDENT | TODO
-- [REP-009] | HTML Report: Add filtering (JS) | INDEPENDENT | TODO
-- [REP-010] | HTML Report: Add search (JS) | INDEPENDENT | TODO
+- [REP-008] | HTML Report: Add interactive chart (Chart.js integration) | INDEPENDENT | DONE
+- [REP-009] | HTML Report: Add filtering (JS) | INDEPENDENT | DONE
+- [REP-010] | HTML Report: Add search (JS) | INDEPENDENT | DONE
 - [REP-011] | JSON Export: Schema definition (Pydantic) | INDEPENDENT | DONE
 - [REP-012] | JSON Export: Validation logic | BLOCKS-REP-011 | DONE
 - [REP-013] | JSON Export: Metadata fields (version, timestamp) | BLOCKS-REP-011 | DONE

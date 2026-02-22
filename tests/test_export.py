@@ -418,6 +418,33 @@ class TestHTMLReporter:
         assert HTMLReporter._get_color_for_severity('info') == '#8b5cf6'
         assert HTMLReporter._get_color_for_severity('unknown') == '#6b7280'
 
+    def test_html_export_interactive_features(self, sample_results):
+        """Test that HTML contains interactive features like search, filters, and charts."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_path = os.path.join(tmpdir, 'test_report.html')
+            reporter = HTMLReporter(output_path)
+            reporter.export(sample_results)
+
+            with open(output_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            # Check for Chart.js
+            assert 'cdn.jsdelivr.net/npm/chart.js' in content
+            assert 'new Chart(' in content
+            assert 'severityChart' in content
+
+            # Check for Search
+            assert 'searchInput' in content
+            assert 'Search files, rules, or messages' in content
+
+            # Check for Filter
+            assert 'severityFilter' in content
+            assert 'Filter by Severity' in content
+
+            # Check for JS logic
+            assert 'function filterViolations()' in content
+            assert 'searchInput.addEventListener' in content
+
 
 if __name__ == '__main__':
     pytest.main([__file__, '-v'])
