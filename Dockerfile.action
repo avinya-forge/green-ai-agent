@@ -1,0 +1,32 @@
+# Green-AI GitHub Action Dockerfile
+FROM python:3.12-slim
+
+# Install system dependencies
+# git: for cloning repositories
+# build-essential: for compiling tree-sitter bindings if needed
+# weasyprint dependencies: libpango-1.0-0, libpangoft2-1.0-0, libharfbuzz-subset0, libjpeg62-turbo, libopenjp2-7, libxcb1
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    build-essential \
+    libpango-1.0-0 \
+    libpangoft2-1.0-0 \
+    libharfbuzz-subset0 \
+    libjpeg62-turbo \
+    libopenjp2-7 \
+    libxcb1 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY . .
+
+# Make entrypoint executable (will be created in next step, but must exist for build)
+RUN chmod +x /app/entrypoint.sh
+
+# Entrypoint
+ENTRYPOINT ["/app/entrypoint.sh"]

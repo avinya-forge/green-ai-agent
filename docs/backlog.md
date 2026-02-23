@@ -45,10 +45,10 @@
 
 ### [EPIC-05] CI/CD GitHub Action V2
 *Goal: Deepen CI/CD integration with a robust GitHub Action.*
-- [CI-001] | Docker Action: Dockerfile creation | INDEPENDENT | TODO
-- [CI-002] | Docker Action: Entrypoint script | BLOCKS-CI-001 | TODO
-- [CI-003] | GitHub Action: `action.yml` metadata | INDEPENDENT | TODO
-- [CI-004] | GitHub Action: Inputs definition | BLOCKS-CI-003 | TODO
+- [CI-001] | Docker Action: Dockerfile creation | INDEPENDENT | DONE
+- [CI-002] | Docker Action: Entrypoint script | BLOCKS-CI-001 | DONE
+- [CI-003] | GitHub Action: `action.yml` metadata | INDEPENDENT | DONE
+- [CI-004] | GitHub Action: Inputs definition | BLOCKS-CI-003 | DONE
 - [CI-005] | PR Comment Bot: GitHub API integration | INDEPENDENT | TODO
 - [CI-006] | PR Comment Bot: Diff parsing | INDEPENDENT | TODO
 - [CI-007] | PR Comment Bot: Comment posting logic | BLOCKS-CI-005 | TODO
@@ -85,13 +85,13 @@
 
 ### [EPIC-08] Telemetry & Metrics
 *Goal: Provide transparent metrics on tool usage and impact.*
-- [TEL-001] | Telemetry System: Data schema design | INDEPENDENT | TODO
+- [TEL-001] | Telemetry System: Data schema design | INDEPENDENT | DONE
 - [TEL-002] | Telemetry System: Local storage logic | BLOCKS-TEL-001 | TODO
 - [TEL-003] | Opt-in Mechanism: CLI flag | INDEPENDENT | TODO
 - [TEL-004] | Opt-in Mechanism: Config file setting | BLOCKS-TEL-003 | TODO
-- [TEL-005] | Metric Collection: Rule hit counters | INDEPENDENT | TODO
-- [TEL-006] | Metric Collection: Scan duration timer | INDEPENDENT | TODO
-- [TEL-007] | Metric Collection: Error tracking | INDEPENDENT | TODO
+- [TEL-005] | Metric Collection: Rule hit counters | INDEPENDENT | DONE
+- [TEL-006] | Metric Collection: Scan duration timer | INDEPENDENT | DONE
+- [TEL-007] | Metric Collection: Error tracking | INDEPENDENT | DONE
 - [TEL-008] | Dashboard View: Telemetry tab UI | BLOCKS-TEL-002 | TODO
 - [TEL-009] | Dashboard View: Telemetry charts | BLOCKS-TEL-008 | TODO
 - [TEL-010] | Anonymization: Data scrubbing logic | BLOCKS-TEL-001 | TODO
