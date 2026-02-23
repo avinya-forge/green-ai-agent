@@ -1,0 +1,33 @@
+name: 'Green-AI Code Scanner'
+description: 'Scan your code for energy inefficiency and sustainability debt.'
+branding:
+  icon: 'zap'
+  color: 'green'
+
+inputs:
+  target:
+    description: 'Path(s) to scan. Space-separated.'
+    required: false
+    default: '.'
+  output:
+    description: 'Path to output file.'
+    required: false
+  format:
+    description: 'Output format (csv, json, html, pdf).'
+    required: false
+  config:
+    description: 'Path to .green-ai.yaml config file.'
+    required: false
+  fail-on:
+    description: 'Fail the action if violations of this severity or higher are found (critical, high, medium, low).'
+    required: false
+  git-url:
+    description: 'Git repository URL to scan.'
+    required: false
+  branch:
+    description: 'Specific branch to checkout (for git-url).'
+    required: false
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile.action'

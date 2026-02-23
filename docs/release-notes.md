@@ -1,5 +1,12 @@
 # Release Notes
 
+## [v0.8.0-alpha] - CI/CD & Telemetry
+
+### Added
+- **GitHub Action**: Implemented a Docker-based GitHub Action (`action.yml`) to run Green-AI in CI/CD pipelines (CI-001, CI-002, CI-003, CI-004).
+- **Telemetry Core**: Implemented `TelemetryService` and data schemas (`ScanMetrics`) to collect usage and performance metrics (TEL-001, TEL-005, TEL-006, TEL-007).
+- **Telemetry Export**: Added functionality to export telemetry events to JSON files for debugging and analysis.
+
 ## [v0.7.0] - Consolidation & Quality
 
 ### Vaulted Epics
