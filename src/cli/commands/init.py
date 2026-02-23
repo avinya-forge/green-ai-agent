@@ -4,6 +4,8 @@ CLI command to initialize configuration.
 
 import click
 import yaml
+import shutil
+import os
 from pathlib import Path
 from src.core.config import ConfigLoader
 
@@ -23,16 +25,21 @@ def init(path):
     if not target_dir.exists():
         target_dir.mkdir(parents=True, exist_ok=True)
 
-    # Use default config from ConfigLoader which has the enabled rules list
-    config = ConfigLoader.DEFAULT_CONFIG.copy()
+    # Try to copy from template
+    # Assuming init.py is in src/cli/commands/
+    template_path = Path(__file__).parent.parent / 'templates' / 'default_config.yaml'
 
-    # Dump to yaml
     try:
-        with open(target_path, 'w') as f:
-            f.write("# Green-AI Configuration\n")
-            f.write("# Generated via 'green-ai init'\n")
-            f.write("# Customize this file to configure rules, languages, and thresholds.\n\n")
-            yaml.dump(config, f, default_flow_style=False, sort_keys=False)
+        if template_path.exists():
+             shutil.copy(template_path, target_path)
+        else:
+            # Fallback to ConfigLoader defaults if template is missing
+            config = ConfigLoader.DEFAULT_CONFIG.copy()
+            with open(target_path, 'w') as f:
+                f.write("# Green-AI Configuration\n")
+                f.write("# Generated via 'green-ai init'\n")
+                f.write("# Customize this file to configure rules, languages, and thresholds.\n\n")
+                yaml.dump(config, f, default_flow_style=False, sort_keys=False)
 
         click.echo(f"✅ Initialized configuration at {target_path}")
     except Exception as e:

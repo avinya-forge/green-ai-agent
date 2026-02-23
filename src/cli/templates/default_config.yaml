@@ -1,0 +1,108 @@
+# Green-AI Configuration File
+# ----------------------------
+# This file controls the behavior of the Green-AI scanner.
+# It allows you to enable/disable rules, configure languages, set thresholds,
+# and manage LLM integration for auto-remediation.
+
+# List of languages to scan.
+# Supported: python, javascript, typescript, java, go
+languages:
+  - python
+  - javascript
+  - typescript
+  - java
+  - go
+
+# Rule Configuration
+rules:
+  # List of rules to explicitly enable.
+  # If a rule is not listed here but not in disabled, it is enabled by default.
+  enabled:
+    - excessive_nesting_depth
+    - unnecessary_computation
+    - inefficient_memory_operation
+    - io_in_loop
+    - unused_variables
+    - unused_imports
+    - proper_resource_cleanup
+    - quadratic_algorithm
+    - dead_code_block
+    - blocking_io
+    - high_cyclomatic_complexity
+    - string_concatenation_in_loop
+    - exceptions_in_loop
+    - inefficient_data_structure
+    - large_constant_allocation
+    - no_infinite_loops
+    - inefficient_loop
+    - excessive_logging
+    - magic_numbers
+    - no_n2_algorithms
+    - synchronous_io
+    - excessive_console_logging
+    - heavy_object_copy
+    - process_spawning
+    - inefficient_file_read
+    - global_variable_mutation
+    - pandas_iterrows
+    - string_concatenation
+    - unnecessary_dom_manipulation
+    - eval_usage
+    - setInterval_animation
+    - momentjs_deprecated
+    - document_write
+    - alert_usage
+    - formatted_print
+    # Security rules
+    - hardcoded_secret
+    - sql_injection_risk
+    - exposed_aws_key
+    - weak_cryptography
+
+  # List of rules to explicitly disable.
+  # Example:
+  # disabled:
+  #   - magic_numbers
+  disabled: []
+
+  # Override severity for specific rules.
+  # Options: minor, major, critical, blocker
+  # Example:
+  # severity:
+  #   io_in_loop: critical
+  severity: {}
+
+# Coding Standards to enforce (optional)
+# - gsf_principles: Green Software Foundation principles
+# - ecocode_python: EcoCode standard for Python
+standards: []
+
+# Files and directories to ignore during scan.
+# Supports glob patterns.
+ignore_files:
+  - "*.pyc"
+  - "__pycache__"
+  - ".git"
+  - ".venv"
+  - "node_modules"
+  - "dist"
+  - "build"
+  - ".idea"
+  - ".vscode"
+  - "coverage"
+
+# LLM Integration for Auto-Remediation (fix-ai command)
+llm:
+  # Provider to use: 'openai' or 'mock' (for testing without costs)
+  provider: openai
+
+  # API Key can be set here or via env var OPENAI_API_KEY
+  # api_key: "sk-..."
+
+  # Rate limiting configuration to control costs.
+  rate_limit:
+    tpm: 10000  # Tokens per minute
+    rpm: 500    # Requests per minute
+
+# Auto-fix behavior
+auto_fix: false

@@ -4,6 +4,7 @@ Python-specific detection strategies for green software violations.
 
 import ast
 from typing import List, Dict
+from src.utils.entropy import calculate_shannon_entropy
 
 class PythonViolationDetector(ast.NodeVisitor):
     """AST visitor to detect green software violations in Python code."""
@@ -702,6 +703,25 @@ class PythonViolationDetector(ast.NodeVisitor):
                                 'message': f'Potential hardcoded secret in variable "{target.id}". Use environment variables.',
                                 'pattern_match': 'hardcoded_secret_var'
                             })
+
+                # Check for high entropy strings regardless of variable name
+                # Only if the variable name isn't clearly safe (e.g. hash, checksum, uuid)
+                safe_patterns = ['hash', 'checksum', 'md5', 'sha', 'signature', 'id', 'uuid']
+                if not any(p in var_name for p in safe_patterns):
+                    if isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
+                        val = node.value.value
+                        if len(val) > 20 and ' ' not in val:
+                            entropy = calculate_shannon_entropy(val)
+                            # Threshold 4.0 is heuristic for base64/random strings
+                            # Max entropy for hex is 4.0, alphanumeric is ~6.0
+                            if entropy > 4.0:
+                                 self.violations.append({
+                                    'id': 'high_entropy_string',
+                                    'line': node.lineno,
+                                    'severity': 'critical',
+                                    'message': f'High entropy string detected (entropy: {entropy:.2f}). Potential API key or secret.',
+                                    'pattern_match': 'high_entropy'
+                                })
 
     def visit_Name(self, node: ast.Name) -> None:
         """Track variable usage."""
