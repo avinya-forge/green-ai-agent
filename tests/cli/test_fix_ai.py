@@ -29,7 +29,7 @@ def test_fix_ai_command(mock_config_loader, mock_llm_factory, mock_scanner_cls):
 
     # Mock LLM
     mock_llm = MagicMock()
-    mock_llm.generate_fix.return_value = "Fixed code snippet"
+    mock_llm.generate_fix.return_value = "fixed_code = True"
     mock_llm.get_total_usage.return_value = MagicMock(total_tokens=100, cost=0.01)
     mock_llm_factory.get_provider.return_value = mock_llm
 
@@ -48,7 +48,7 @@ def test_fix_ai_command(mock_config_loader, mock_llm_factory, mock_scanner_cls):
         assert "Found 1 violations" in result.output
         assert "Starting AI fix process" in result.output
         assert "Proposed Fix (Diff):" in result.output
-        assert "Fixed code snippet" in result.output
+        assert "fixed_code = True" in result.output
         assert "Fix applied successfully" in result.output
         assert "Token Usage: 100 tokens" in result.output
 

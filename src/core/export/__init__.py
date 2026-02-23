@@ -15,6 +15,7 @@ from typing import List, Dict, Any, Optional
 # Default output directory for all exports
 OUTPUT_DIR = Path(__file__).parent.parent.parent.parent / 'output'
 
+from src.utils.security import sanitize_path
 from .xml_exporter import JUnitXMLExporter
 from .schemas import ScanResultSchema
 from src.core.remediation.engine import RemediationEngine
@@ -44,7 +45,7 @@ class JSONExporter:
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
         if output_path:
-            self.output_path = output_path
+            self.output_path = str(sanitize_path(output_path, allow_absolute=True))
         else:
             self.output_path = str(OUTPUT_DIR / 'green-ai-report.json')
 
@@ -93,7 +94,7 @@ class CSVExporter:
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         
         if output_path:
-            self.output_path = output_path
+            self.output_path = str(sanitize_path(output_path, allow_absolute=True))
         else:
             self.output_path = str(OUTPUT_DIR / 'green-ai-report.csv')
     
@@ -300,7 +301,7 @@ class HTMLReporter:
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         
         if output_path:
-            self.output_path = output_path
+            self.output_path = str(sanitize_path(output_path, allow_absolute=True))
         else:
             self.output_path = str(OUTPUT_DIR / 'green-ai-report.html')
     

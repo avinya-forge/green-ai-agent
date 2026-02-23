@@ -7,6 +7,8 @@ from src.core.project_manager import ProjectManager
 from src.core.export import CSVExporter, HTMLReporter, JSONExporter, \
     JUnitXMLExporter
 from src.ui.state import set_last_scan_results
+from src.utils.security import sanitize_path, sanitize_project_name, \
+    is_safe_git_url
 
 
 @click.command()
@@ -93,6 +95,17 @@ def scan(
                 err=True
             )
             sys.exit(1)
+
+        # Sanitize inputs
+        if git_url and not is_safe_git_url(git_url):
+            click.echo(
+                f"Error: Invalid or unsafe git URL: {git_url}",
+                err=True
+            )
+            sys.exit(1)
+
+        if project_name:
+            project_name = sanitize_project_name(project_name)
 
         # Determine scan location
         if git_url:
@@ -298,6 +311,16 @@ def scan(
                 # Parse export format
                 if ':' in export:
                     export_format, export_path = export.split(':', 1)
+                    # Sanitize export_path
+                    try:
+                        # Allow absolute paths, but ensure validity
+                        sanitized_path = sanitize_path(
+                            export_path, allow_absolute=True
+                        )
+                        export_path = str(sanitized_path)
+                    except ValueError as e:
+                        click.echo(f"Error: Invalid export path: {e}", err=True)
+                        sys.exit(1)
                 else:
                     export_format = export
                     export_path = None

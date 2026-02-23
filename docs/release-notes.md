@@ -62,6 +62,7 @@
 - **Rate Limiting**: Implemented `TokenBucketRateLimiter` to enforce TPM and RPM limits for LLM API calls.
 - **Cost Tracking**: Added `TokenUsage` tracking to estimate costs of LLM operations.
 - **Configuration**: Added `llm` section to `.green-ai.yaml` for provider selection and rate limit configuration.
+- **Input Sanitization**: Implemented strict validation for CLI arguments including file paths, project names, and Git URLs to prevent injection and traversal attacks (SEC-003).
 
 ### Changed
 - **Scanner Refactor**: Refactored `src/core/scanner.py` into a modular package `src/core/scanner/` with `main.py`, `worker.py`, and `discovery.py`.
