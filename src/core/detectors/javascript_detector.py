@@ -7,6 +7,7 @@ from typing import List, Dict
 from tree_sitter import Language, Parser, Query, QueryCursor
 import tree_sitter_javascript
 from src.utils.logger import logger
+from src.utils.entropy import calculate_shannon_entropy
 from .base_detector import BaseTreeSitterDetector
 
 class JavaScriptASTDetector(BaseTreeSitterDetector):
@@ -81,6 +82,21 @@ class JavaScriptASTDetector(BaseTreeSitterDetector):
                                 'message': f'Potential hardcoded secret in variable "{name_text}". Use environment variables.',
                                 'pattern_match': 'hardcoded_secret_js'
                             })
+
+                    # Check for high entropy strings regardless of variable name
+                    # Only if the variable name isn't clearly safe
+                    safe_patterns = ['hash', 'checksum', 'md5', 'sha', 'signature', 'id', 'uuid', 'class', 'style', 'color', 'url', 'path']
+                    if not any(p in name_text.lower() for p in safe_patterns):
+                        if len(clean_val) > 20 and ' ' not in clean_val and not clean_val.startswith('<'):
+                             entropy = calculate_shannon_entropy(clean_val)
+                             if entropy > 4.0:
+                                 self.violations.append({
+                                    'id': 'high_entropy_string',
+                                    'line': val_node[0].start_point[0] + 1,
+                                    'severity': 'critical',
+                                    'message': f'High entropy string detected (entropy: {entropy:.2f}). Potential API key or secret.',
+                                    'pattern_match': 'high_entropy_js'
+                                })
         except Exception as e:
             logger.error(f"Error in secrets detection: {e}")
 

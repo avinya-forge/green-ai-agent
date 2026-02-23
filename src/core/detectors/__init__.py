@@ -12,6 +12,7 @@ from .typescript_detector import TypeScriptASTDetector
 from .java_detector import JavaASTDetector
 from .go_detector import GoASTDetector
 from .pattern_detector import PatternBasedDetector
+from src.core.detectors.cache import detection_cache
 
 def detect_violations(content: str, file_path: str, language: str = 'python') -> List[Dict]:
     """
@@ -19,6 +20,11 @@ def detect_violations(content: str, file_path: str, language: str = 'python') ->
 
     Returns a list of violations with id, line, severity, message, pattern_match.
     """
+    # Check cache
+    cached_violations = detection_cache.get(content, language)
+    if cached_violations is not None:
+        return cached_violations
+
     violations = []
 
     if language == 'python':
@@ -53,5 +59,8 @@ def detect_violations(content: str, file_path: str, language: str = 'python') ->
         # AST-based detection
         go_ast_detector = GoASTDetector(content, file_path)
         violations.extend(go_ast_detector.detect_all())
+
+    # Update cache
+    detection_cache.set(content, language, violations)
 
     return violations

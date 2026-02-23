@@ -51,10 +51,16 @@ def scan_file_worker(
                     is_enabled = True
 
                 if is_enabled:
+                    # Apply severity override
+                    severity = rule.get('severity', 'medium')
+                    severity_overrides = config.get('rules', {}).get('severity', {})
+                    if rule_id in severity_overrides:
+                        severity = severity_overrides[rule_id]
+
                     issue = {
                         'id': rule_id,
                         'type': 'green_violation',
-                        'severity': rule.get('severity', 'medium'),
+                        'severity': severity,
                         'message': violation.get('message', 'N/A'),
                         'file': file_path,
                         'line': violation.get('line', 0),
