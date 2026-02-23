@@ -74,7 +74,7 @@
 *Goal: Meet DoD security requirements.*
 - [SEC-001] | Dependency Audit: Run `pip-audit` | INDEPENDENT | TODO
 - [SEC-002] | Dependency Upgrade: Bump versions | BLOCKS-SEC-001 | TODO
-- [SEC-003] | Input Sanitization: CLI args review | INDEPENDENT | TODO
+- [SEC-003] | Input Sanitization: CLI args review | INDEPENDENT | DONE
 - [SEC-004] | Input Sanitization: API payload validation | INDEPENDENT | TODO
 - [SEC-005] | Secrets Detection: Rule implementation (Regex) | INDEPENDENT | TODO
 - [SEC-006] | Secrets Detection: Rule implementation (Entropy) | BLOCKS-SEC-005 | TODO

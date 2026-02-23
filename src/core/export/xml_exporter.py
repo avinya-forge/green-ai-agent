@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Dict, Any, Optional
 from datetime import datetime, timezone
+from src.utils.security import sanitize_path
 
 # Default output directory for all exports
 OUTPUT_DIR = Path(__file__).parent.parent.parent.parent / 'output'
@@ -22,7 +23,7 @@ class JUnitXMLExporter:
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
         if output_path:
-            self.output_path = output_path
+            self.output_path = str(sanitize_path(output_path, allow_absolute=True))
         else:
             self.output_path = str(OUTPUT_DIR / 'green-ai-report.xml')
 
