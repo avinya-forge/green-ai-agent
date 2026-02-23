@@ -23,6 +23,8 @@
 - [GO-011] | Implement `string_concatenation_in_loop` Rule | INDEPENDENT | DONE
 
 ### Added
+- **PDF Export**: Added support for exporting scan results to PDF using WeasyPrint (`--export pdf`) (REP-001, REP-002, REP-004).
+- **JS Secrets Detection**: Added `hardcoded_secret` rule for JavaScript/TypeScript to detect potential sensitive data in code (SEC-005).
 - **Configuration Init**: Added `green-ai init` CLI command to easily generate configuration files (CFG-009).
 - **Deep Merge Utility**: Implemented robust recursive dictionary merging for configuration layering (CFG-007).
 - **Config Validation**: Migrated configuration validation to Pydantic models for stricter type safety and schema enforcement (CFG-005, CFG-006).

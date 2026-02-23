@@ -27,10 +27,10 @@
 
 ### [EPIC-04] Advanced Reporting
 *Goal: Enhance reporting capabilities with HTML/CSV improvements and PDF support.*
-- [REP-001] | PDF Export: Install WeasyPrint | INDEPENDENT | TODO
-- [REP-002] | PDF Export: Report Template (HTML/CSS) | BLOCKS-REP-001 | TODO
+- [REP-001] | PDF Export: Install WeasyPrint | INDEPENDENT | DONE
+- [REP-002] | PDF Export: Report Template (HTML/CSS) | BLOCKS-REP-001 | DONE
 - [REP-003] | PDF Export: Chart rendering (static image gen) | BLOCKS-REP-002 | TODO
-- [REP-004] | PDF Export: Layout logic | BLOCKS-REP-003 | TODO
+- [REP-004] | PDF Export: Layout logic | BLOCKS-REP-003 | DONE
 - [REP-005] | CSV Export: Add violation line number | INDEPENDENT | DONE
 - [REP-006] | CSV Export: Add violation snippet | INDEPENDENT | DONE
 - [REP-007] | CSV Export: Add remediation suggestion | INDEPENDENT | DONE
@@ -41,7 +41,7 @@
 - [REP-012] | JSON Export: Validation logic | BLOCKS-REP-011 | DONE
 - [REP-013] | JSON Export: Metadata fields (version, timestamp) | BLOCKS-REP-011 | DONE
 - [REP-014] | JSON Export: Unit Tests | BLOCKS-REP-011 | DONE
-- [REP-015] | PDF Export: Integration Test | BLOCKS-REP-004 | TODO
+- [REP-015] | PDF Export: Integration Test | BLOCKS-REP-004 | DONE
 
 ### [EPIC-05] CI/CD GitHub Action V2
 *Goal: Deepen CI/CD integration with a robust GitHub Action.*
@@ -76,9 +76,9 @@
 - [SEC-002] | Dependency Upgrade: Bump versions | BLOCKS-SEC-001 | TODO
 - [SEC-003] | Input Sanitization: CLI args review | INDEPENDENT | DONE
 - [SEC-004] | Input Sanitization: API payload validation | INDEPENDENT | TODO
-- [SEC-005] | Secrets Detection: Rule implementation (Regex) | INDEPENDENT | TODO
+- [SEC-005] | Secrets Detection: Rule implementation (AST/Regex) | INDEPENDENT | DONE
 - [SEC-006] | Secrets Detection: Rule implementation (Entropy) | BLOCKS-SEC-005 | TODO
-- [SEC-007] | Hardcoded Password: Rule implementation | INDEPENDENT | TODO
+- [SEC-007] | Hardcoded Password: Rule implementation | INDEPENDENT | DONE
 - [SEC-008] | OWASP Top 10: Mapping review | INDEPENDENT | TODO
 - [SEC-009] | Security Headers: API middleware | INDEPENDENT | TODO
 - [SEC-010] | Rate Limiting: API middleware | INDEPENDENT | TODO
@@ -118,6 +118,6 @@
 - [CFG-005] | JSON Schema: Define schema.json | INDEPENDENT | DONE
 - [CFG-006] | JSON Schema: Validate config on load | BLOCKS-CFG-005 | DONE
 - [CFG-007] | Merge Configs: Deep merge utility | INDEPENDENT | DONE
-- [CFG-008] | Merge Configs: Precedence logic (CLI > Local > Global) | BLOCKS-CFG-007 | TODO
+- [CFG-008] | Merge Configs: Precedence logic (CLI > Local > Global) | BLOCKS-CFG-007 | DONE
 - [CFG-009] | CLI Generator: `init` command logic | INDEPENDENT | DONE
 - [CFG-010] | CLI Generator: Template creation | BLOCKS-CFG-009 | TODO

@@ -32,8 +32,57 @@ class JavaScriptASTDetector(BaseTreeSitterDetector):
         self._detect_inner_html()
         self._detect_string_concatenation()
         self._detect_empty_blocks()
+        self._detect_hardcoded_secrets()
 
         return self.violations
+
+    def _detect_hardcoded_secrets(self) -> None:
+        """Detect hardcoded secrets."""
+        # Query for variable declarations, assignments, and object properties
+        query_scm = """
+        (variable_declarator
+          name: (identifier) @name
+          value: [(string) (template_string)] @val)
+
+        (assignment_expression
+          left: (identifier) @name
+          right: [(string) (template_string)] @val)
+
+        (pair
+          key: (property_identifier) @name
+          value: [(string) (template_string)] @val)
+        """
+
+        try:
+            query = Query(self.language, query_scm)
+            cursor = QueryCursor(query)
+            matches = cursor.matches(self.tree.root_node)
+
+            secret_patterns = ['password', 'secret', 'key', 'token', 'auth', 'credential', 'api_key']
+
+            for _, captures in matches:
+                name_node = captures.get('name', [])
+                val_node = captures.get('val', [])
+
+                if name_node and val_node:
+                    name_text = name_node[0].text.decode('utf8')
+                    val_text = val_node[0].text.decode('utf8')
+
+                    # Remove quotes
+                    clean_val = val_text.strip('"\'`')
+
+                    if any(p in name_text.lower() for p in secret_patterns):
+                        # Filter out empty strings, short strings, placeholders
+                        if len(clean_val) > 8 and ' ' not in clean_val and not clean_val.startswith('<') and 'YOUR_' not in clean_val and not clean_val.startswith('process.env'):
+                             self.violations.append({
+                                'id': 'hardcoded_secret',
+                                'line': name_node[0].start_point[0] + 1,
+                                'severity': 'critical',
+                                'message': f'Potential hardcoded secret in variable "{name_text}". Use environment variables.',
+                                'pattern_match': 'hardcoded_secret_js'
+                            })
+        except Exception as e:
+            logger.error(f"Error in secrets detection: {e}")
 
     def _detect_empty_blocks(self) -> None:
         """Detect empty blocks."""
