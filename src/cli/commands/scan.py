@@ -5,7 +5,7 @@ from src.core.config import ConfigLoader
 from src.core.git_operations import GitOperations, GitException
 from src.core.project_manager import ProjectManager
 from src.core.export import CSVExporter, HTMLReporter, JSONExporter, \
-    JUnitXMLExporter
+    JUnitXMLExporter, PDFExporter
 from src.ui.state import set_last_scan_results
 from src.utils.security import sanitize_path, sanitize_project_name, \
     is_safe_git_url
@@ -326,10 +326,10 @@ def scan(
                     export_path = None
 
                 # Validate format
-                if export_format not in ['csv', 'html', 'json', 'xml']:
+                if export_format not in ['csv', 'html', 'json', 'xml', 'pdf']:
                     click.echo(
                         f"Error: Invalid export format '{export_format}'. "
-                        "Use 'csv', 'html', 'json', or 'xml'.",
+                        "Use 'csv', 'html', 'json', 'xml', or 'pdf'.",
                         err=True
                     )
                     sys.exit(1)
@@ -343,6 +343,22 @@ def scan(
                         f"[OK] JUnit XML report exported: {output_file}",
                         err=True
                     )
+
+                elif export_format == 'pdf':
+                    exporter = PDFExporter(export_path)
+                    p_name = project_name or 'Scan'
+                    output_file = exporter.export(results, p_name)
+                    if output_file:
+                        click.echo(
+                            f"[OK] PDF report exported: {output_file}",
+                            err=True
+                        )
+                    else:
+                        click.echo(
+                            "Error: PDF export failed (check logs, possibly WeasyPrint missing).",
+                            err=True
+                        )
+                        sys.exit(1)
 
                 elif export_format == 'csv':
                     exporter = CSVExporter(export_path)

@@ -17,6 +17,7 @@ OUTPUT_DIR = Path(__file__).parent.parent.parent.parent / 'output'
 
 from src.utils.security import sanitize_path
 from .xml_exporter import JUnitXMLExporter
+from .pdf_exporter import PDFExporter
 from .schemas import ScanResultSchema
 from src.core.remediation.engine import RemediationEngine
 
