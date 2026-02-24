@@ -106,3 +106,16 @@ llm:
 
 # Auto-fix behavior
 auto_fix: false
+
+# Telemetry & Usage Metrics
+# -------------------------
+# Green-AI collects anonymous usage data to improve the tool and track carbon savings.
+# You can opt-out by setting enabled: false.
+telemetry:
+  enabled: true
+
+  # Storage mode: 'local' (JSON file) or 'remote' (future API integration)
+  storage: local
+
+  # Anonymize project paths and names in metrics.
+  anonymize: true

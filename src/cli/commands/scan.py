@@ -70,10 +70,14 @@ from src.utils.security import sanitize_path, sanitize_project_name, \
 )
 @click.option('--format', default=None, help='[Deprecated] Output format')
 @click.option('--output', default=None, help='[Deprecated] Output file path')
+@click.option(
+    '--telemetry/--no-telemetry', default=True,
+    help='Enable/Disable telemetry collection'
+)
 def scan(
     paths, git_url, branch, project_name, language, config, disable_rule,
     enable_rule, runtime, profile, perf_profile, fix_all, fix_specific,
-    manual, export, format, output
+    manual, export, format, output, telemetry
 ):
     """Scan a codebase for green software violations.
 
@@ -139,6 +143,12 @@ def scan(
         # Load configuration
         config_loader = ConfigLoader(config)
         cfg = config_loader.load()
+
+        # Override telemetry setting if flag is explicitly set
+        import os
+        if telemetry is False:
+             os.environ['GREEN_AI_TELEMETRY'] = 'false'
+        # Note: If telemetry is True (default), we don't force it to allow config/env var to disable it.
 
         # Determine language
         if language is None:

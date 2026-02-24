@@ -122,3 +122,4 @@ Dockerfile.bak
 !README.md
 !requirements.txt
 output/**/*.xml
+output/telemetry.jsonl

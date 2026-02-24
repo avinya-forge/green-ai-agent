@@ -9,6 +9,7 @@ def test_telemetry_service_singleton():
 
 def test_track_scan():
     service = TelemetryService()
+    service.anonymize = False # Disable anonymization for test
     # Reset events for test
     service.events = []
 
