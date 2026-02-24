@@ -3,6 +3,11 @@ import ast
 from src.core.remediation.engine import RemediationEngine
 from src.core.analyzer import EmissionAnalyzer
 from src.core.detectors import detect_violations
+from src.core.cache import DiskCache
+import os
+
+# Global cache instance for worker reuse
+_disk_cache_instance = None
 
 
 def scan_file_worker(
@@ -12,9 +17,27 @@ def scan_file_worker(
     Worker function to scan and analyze a single file.
     Running in a separate process.
     """
+    global _disk_cache_instance
+
     # Initialize analyzer
     analyzer = EmissionAnalyzer()
     remediation_engine = RemediationEngine()
+
+    # Initialize cache
+    cache_config = config.get('cache', {})
+    cache_enabled = cache_config.get('enabled', True)
+    cache_path = cache_config.get('path', '.green-ai/cache')
+
+    disk_cache = None
+    if cache_enabled:
+        # Check if we can reuse the global instance
+        # Compare resolved paths to ensure we are using the correct cache directory
+        expanded_path = os.path.expanduser(cache_path)
+
+        if _disk_cache_instance is None or _disk_cache_instance.cache_dir != expanded_path:
+            _disk_cache_instance = DiskCache(cache_dir=cache_path)
+
+        disk_cache = _disk_cache_instance
 
     issues = []
     emissions = 0.0
@@ -27,8 +50,15 @@ def scan_file_worker(
         if language == 'python':
             ast.parse(content)
 
-        # Scan for violations
-        violations = detect_violations(content, file_path, language=language)
+        # Scan for violations (with caching)
+        violations = None
+        if disk_cache:
+            violations = disk_cache.get(content, language)
+
+        if violations is None:
+            violations = detect_violations(content, file_path, language=language)
+            if disk_cache:
+                disk_cache.set(content, language, violations)
 
         # Convert violations to full issue format
         for violation in violations:
