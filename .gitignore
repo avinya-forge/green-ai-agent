@@ -52,6 +52,7 @@ openai_cache/
 .ollama/
 *.pkl
 *.pickle
+.green-ai/
 
 # Temporary & Generated Files
 *.tmp

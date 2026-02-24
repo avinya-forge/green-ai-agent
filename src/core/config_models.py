@@ -25,6 +25,11 @@ class LlmConfig(BaseModel):
     provider: str = Field(default="openai", description="LLM provider (openai, anthropic, etc.)")
     rate_limit: RateLimitConfig = Field(default_factory=RateLimitConfig, description="Rate limiting settings")
 
+class CacheConfig(BaseModel):
+    enabled: bool = Field(default=True, description="Enable disk caching")
+    path: str = Field(default=".green-ai/cache", description="Path to cache directory")
+    ttl: int = Field(default=86400, description="Cache TTL in seconds")
+
 class GreenAIConfig(BaseModel):
     languages: List[str] = Field(
         default_factory=lambda: ['python', 'javascript', 'typescript', 'java', 'go'],
@@ -38,3 +43,5 @@ class GreenAIConfig(BaseModel):
     )
     auto_fix: bool = Field(default=False, description="Whether to auto-apply fixes")
     llm: LlmConfig = Field(default_factory=LlmConfig, description="LLM integration settings")
+    concurrency: Optional[int] = Field(default=None, description="Number of parallel workers")
+    cache: CacheConfig = Field(default_factory=CacheConfig, description="Cache settings")

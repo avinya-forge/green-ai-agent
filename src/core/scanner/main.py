@@ -97,7 +97,11 @@ class Scanner:
         total_codebase_emissions = 0.0
 
         # Determine number of workers
-        num_workers = min(32, (cpu_count() or 1) + 4)
+        config_concurrency = self.config.get('concurrency')
+        if config_concurrency:
+            num_workers = int(config_concurrency)
+        else:
+            num_workers = min(32, (cpu_count() or 1) + 4)
 
         if progress_callback:
             progress_callback("Scanning files...", 10)
