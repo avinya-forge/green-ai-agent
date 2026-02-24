@@ -35,6 +35,9 @@ try:
     from src.cli.commands.init import init
     cli.add_command(init)
 
+    from src.cli.commands.ci import ci
+    cli.add_command(ci)
+
 except ImportError as e:
     # Fail fast during development
     raise e
