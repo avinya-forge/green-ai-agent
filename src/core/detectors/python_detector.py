@@ -641,6 +641,16 @@ class PythonViolationDetector(ast.NodeVisitor):
         # Check for hardcoded secrets
         self._check_hardcoded_secrets(node)
 
+        # Check for high entropy in complex structures
+        for target in node.targets:
+            context_name = "unknown"
+            if isinstance(target, ast.Name):
+                context_name = target.id
+            elif isinstance(target, ast.Attribute):
+                context_name = target.attr
+
+            self._check_recursive_entropy(node.value, context_name)
+
         # Check for string accumulation in loop: s = s + ...
         if self.in_loop and isinstance(node.value, ast.BinOp) and isinstance(node.value.op, ast.Add):
             for target in node.targets:
@@ -704,24 +714,42 @@ class PythonViolationDetector(ast.NodeVisitor):
                                 'pattern_match': 'hardcoded_secret_var'
                             })
 
-                # Check for high entropy strings regardless of variable name
-                # Only if the variable name isn't clearly safe (e.g. hash, checksum, uuid)
-                safe_patterns = ['hash', 'checksum', 'md5', 'sha', 'signature', 'id', 'uuid']
-                if not any(p in var_name for p in safe_patterns):
-                    if isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
-                        val = node.value.value
-                        if len(val) > 20 and ' ' not in val:
-                            entropy = calculate_shannon_entropy(val)
-                            # Threshold 4.0 is heuristic for base64/random strings
-                            # Max entropy for hex is 4.0, alphanumeric is ~6.0
-                            if entropy > 4.0:
-                                 self.violations.append({
-                                    'id': 'high_entropy_string',
-                                    'line': node.lineno,
-                                    'severity': 'critical',
-                                    'message': f'High entropy string detected (entropy: {entropy:.2f}). Potential API key or secret.',
-                                    'pattern_match': 'high_entropy'
-                                })
+    def _check_recursive_entropy(self, node, context_name: str, depth: int = 0) -> None:
+        """Recursively check for high entropy strings in data structures."""
+        if depth > 5:
+            return
+
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            val = node.value
+            if len(val) > 20 and ' ' not in val:
+                # Whitelist context
+                safe_patterns = ['hash', 'checksum', 'md5', 'sha', 'signature', 'id', 'uuid', 'image', 'file', 'content']
+                if any(p in context_name.lower() for p in safe_patterns):
+                    return
+
+                entropy = calculate_shannon_entropy(val)
+                # Threshold 4.0 is heuristic for base64/random strings
+                if entropy > 4.0:
+                        self.violations.append({
+                        'id': 'high_entropy_string',
+                        'line': node.lineno,
+                        'severity': 'critical',
+                        'message': f'High entropy string detected (entropy: {entropy:.2f}). Potential API key or secret.',
+                        'pattern_match': 'high_entropy'
+                    })
+
+        elif isinstance(node, (ast.List, ast.Tuple)):
+            for elt in node.elts:
+                self._check_recursive_entropy(elt, context_name, depth + 1)
+
+        elif isinstance(node, ast.Dict):
+            for key, value in zip(node.keys, node.values):
+                new_context = context_name
+                # If key is string literal, use it as context
+                if isinstance(key, ast.Constant) and isinstance(key.value, str):
+                    new_context = key.value
+
+                self._check_recursive_entropy(value, new_context, depth + 1)
 
     def visit_Name(self, node: ast.Name) -> None:
         """Track variable usage."""

@@ -6,6 +6,11 @@
 - **GitHub Action**: Implemented a Docker-based GitHub Action (`action.yml`) to run Green-AI in CI/CD pipelines (CI-001, CI-002, CI-003, CI-004).
 - **Telemetry Core**: Implemented `TelemetryService` and data schemas (`ScanMetrics`) to collect usage and performance metrics (TEL-001, TEL-005, TEL-006, TEL-007).
 - **Telemetry Export**: Added functionality to export telemetry events to JSON files for debugging and analysis.
+- **Telemetry Persistence**: Implemented local storage for telemetry events (`output/telemetry.jsonl`) with anonymization support (TEL-002, TEL-010).
+- **Telemetry CLI**: Added `--telemetry` flag to `scan` command and configuration support for opting out (TEL-003, TEL-004).
+- **Enhanced Entropy Detection**: Improved secrets detection to recursively scan lists, dictionaries, and tuples for high-entropy strings (SEC-006).
+- **Severity Overrides**: Verified and ensured configuration-based severity overrides are correctly applied during scans (CFG-004).
+- **Config Templates**: Enhanced `green-ai init` with a comprehensive configuration template including telemetry settings (CFG-010).
 
 ## [v0.7.0] - Consolidation & Quality
 

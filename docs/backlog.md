@@ -77,7 +77,7 @@
 - [SEC-003] | Input Sanitization: CLI args review | INDEPENDENT | DONE
 - [SEC-004] | Input Sanitization: API payload validation | INDEPENDENT | TODO
 - [SEC-005] | Secrets Detection: Rule implementation (AST/Regex) | INDEPENDENT | DONE
-- [SEC-006] | Secrets Detection: Rule implementation (Entropy) | BLOCKS-SEC-005 | TODO
+- [SEC-006] | Secrets Detection: Rule implementation (Entropy) | BLOCKS-SEC-005 | DONE
 - [SEC-007] | Hardcoded Password: Rule implementation | INDEPENDENT | DONE
 - [SEC-008] | OWASP Top 10: Mapping review | INDEPENDENT | TODO
 - [SEC-009] | Security Headers: API middleware | INDEPENDENT | TODO
@@ -86,15 +86,15 @@
 ### [EPIC-08] Telemetry & Metrics
 *Goal: Provide transparent metrics on tool usage and impact.*
 - [TEL-001] | Telemetry System: Data schema design | INDEPENDENT | DONE
-- [TEL-002] | Telemetry System: Local storage logic | BLOCKS-TEL-001 | TODO
-- [TEL-003] | Opt-in Mechanism: CLI flag | INDEPENDENT | TODO
-- [TEL-004] | Opt-in Mechanism: Config file setting | BLOCKS-TEL-003 | TODO
+- [TEL-002] | Telemetry System: Local storage logic | BLOCKS-TEL-001 | DONE
+- [TEL-003] | Opt-in Mechanism: CLI flag | INDEPENDENT | DONE
+- [TEL-004] | Opt-in Mechanism: Config file setting | BLOCKS-TEL-003 | DONE
 - [TEL-005] | Metric Collection: Rule hit counters | INDEPENDENT | DONE
 - [TEL-006] | Metric Collection: Scan duration timer | INDEPENDENT | DONE
 - [TEL-007] | Metric Collection: Error tracking | INDEPENDENT | DONE
 - [TEL-008] | Dashboard View: Telemetry tab UI | BLOCKS-TEL-002 | TODO
 - [TEL-009] | Dashboard View: Telemetry charts | BLOCKS-TEL-008 | TODO
-- [TEL-010] | Anonymization: Data scrubbing logic | BLOCKS-TEL-001 | TODO
+- [TEL-010] | Anonymization: Data scrubbing logic | BLOCKS-TEL-001 | DONE
 
 ### [EPIC-09] IDE Plugins (Prep)
 *Goal: Prepare for Phase 3 IDE integration.*
@@ -114,10 +114,10 @@
 - [CFG-001] | Remote Config: URL fetcher | INDEPENDENT | TODO
 - [CFG-002] | Remote Config: Caching logic | BLOCKS-CFG-001 | TODO
 - [CFG-003] | Severity Override: Config parsing logic | INDEPENDENT | DONE
-- [CFG-004] | Severity Override: Rule application logic | BLOCKS-CFG-003 | TODO
+- [CFG-004] | Severity Override: Rule application logic | BLOCKS-CFG-003 | DONE
 - [CFG-005] | JSON Schema: Define schema.json | INDEPENDENT | DONE
 - [CFG-006] | JSON Schema: Validate config on load | BLOCKS-CFG-005 | DONE
 - [CFG-007] | Merge Configs: Deep merge utility | INDEPENDENT | DONE
 - [CFG-008] | Merge Configs: Precedence logic (CLI > Local > Global) | BLOCKS-CFG-007 | DONE
 - [CFG-009] | CLI Generator: `init` command logic | INDEPENDENT | DONE
-- [CFG-010] | CLI Generator: Template creation | BLOCKS-CFG-009 | TODO
+- [CFG-010] | CLI Generator: Template creation | BLOCKS-CFG-009 | DONE
