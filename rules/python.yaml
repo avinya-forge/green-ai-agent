@@ -9,7 +9,7 @@ rules:
     severity: critical
     languages: [python]
     pattern: |
-      while\s*\(\s*[Tt]rue\s*\)
+      while\s*\(?\s*[Tt]rue\s*\)?
     remediation: Add loop termination conditions or use break/return statements
     source: GSF
     tags: [performance, energy, cpu]

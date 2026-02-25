@@ -107,9 +107,6 @@ class PythonViolationDetector(ast.NodeVisitor):
             is_infinite = True
             
         if is_infinite:
-             is_infinite = True
-        
-        if is_infinite:
              self.violations.append({
                 'id': 'no_infinite_loops',
                 'line': node.lineno,
