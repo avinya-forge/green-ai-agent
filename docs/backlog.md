@@ -67,7 +67,7 @@
 - [PERF-006] | Parallel Processing: Chunk size tuning | BLOCKS-PERF-005 | TODO
 - [PERF-007] | Memory Reduction: Generator usage review | INDEPENDENT | TODO
 - [PERF-008] | Memory Reduction: Tree-sitter tree disposal | INDEPENDENT | TODO
-- [PERF-009] | Result Caching: Disk cache implementation | INDEPENDENT | TODO
+- [PERF-009] | Result Caching: Disk cache implementation | INDEPENDENT | DONE
 - [PERF-010] | Result Caching: In-memory LRU cache | INDEPENDENT | TODO
 
 ### [EPIC-07] Security Hardening
@@ -80,8 +80,8 @@
 - [SEC-006] | Secrets Detection: Rule implementation (Entropy) | BLOCKS-SEC-005 | DONE
 - [SEC-007] | Hardcoded Password: Rule implementation | INDEPENDENT | DONE
 - [SEC-008] | OWASP Top 10: Mapping review | INDEPENDENT | TODO
-- [SEC-009] | Security Headers: API middleware | INDEPENDENT | TODO
-- [SEC-010] | Rate Limiting: API middleware | INDEPENDENT | TODO
+- [SEC-009] | Security Headers: API middleware | INDEPENDENT | DONE
+- [SEC-010] | Rate Limiting: API middleware | INDEPENDENT | DONE
 
 ### [EPIC-08] Telemetry & Metrics
 *Goal: Provide transparent metrics on tool usage and impact.*

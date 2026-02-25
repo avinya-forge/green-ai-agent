@@ -23,8 +23,19 @@ from src.core.calibration import CalibrationAgent
 from src.core.export import OUTPUT_DIR, CSVExporter, HTMLReporter
 import src.ui.state as state
 
+from src.ui.middleware.security import SecurityHeadersMiddleware
+from src.ui.middleware.rate_limit import RateLimitMiddleware
+
 # Initialize FastAPI app
 app = FastAPI(title="Green-AI Agent Dashboard")
+
+# Add middleware
+# Note: Middleware is added in reverse order (LIFO).
+# The last middleware added is the first one to handle the request.
+# We want SecurityHeaders to be outermost (first to handle request, last to handle response)
+# so it can add headers to all responses, including 429s from RateLimit.
+app.add_middleware(RateLimitMiddleware, limit=100, window=60)
+app.add_middleware(SecurityHeadersMiddleware)
 
 @app.on_event("startup")
 async def startup_event():

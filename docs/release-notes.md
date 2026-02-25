@@ -11,6 +11,8 @@
 - **Enhanced Entropy Detection**: Improved secrets detection to recursively scan lists, dictionaries, and tuples for high-entropy strings (SEC-006).
 - **Severity Overrides**: Verified and ensured configuration-based severity overrides are correctly applied during scans (CFG-004).
 - **Config Templates**: Enhanced `green-ai init` with a comprehensive configuration template including telemetry settings (CFG-010).
+- **API Security**: Implemented Security Headers (CSP, HSTS, X-Frame-Options) and Rate Limiting middleware for the dashboard API (SEC-009, SEC-010).
+- **Cache Verification**: Verified and tested Disk Cache implementation for scan results, ensuring faster re-scans (PERF-009).
 
 ## [v0.7.0] - Consolidation & Quality
 
