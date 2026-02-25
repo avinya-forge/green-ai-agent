@@ -13,6 +13,10 @@
 - **Config Templates**: Enhanced `green-ai init` with a comprehensive configuration template including telemetry settings (CFG-010).
 - **API Security**: Implemented Security Headers (CSP, HSTS, X-Frame-Options) and Rate Limiting middleware for the dashboard API (SEC-009, SEC-010).
 - **Cache Verification**: Verified and tested Disk Cache implementation for scan results, ensuring faster re-scans (PERF-009).
+- **CI/CD Thresholds**: Added `--fail-on` flag to `scan` command to exit with error code if violations of specific severity are found (CI-008, CI-009).
+- **PR Comment Bot**: Added `ci report` command to post scan results as comments on GitHub Pull Requests, including diff-aware filtering (CI-005, CI-006, CI-007).
+- **LLM Security**: Added comprehensive security tests for prompt injection and code sandbox verification (LLM-018, LLM-019).
+- **Telemetry Dashboard**: Verified and finalized the Telemetry Dashboard UI and API integration (TEL-008, TEL-009).
 
 ## [v0.7.0] - Consolidation & Quality
 

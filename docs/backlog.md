@@ -22,8 +22,8 @@
 - [LLM-015] | Integration Test: OpenAI Mock | INDEPENDENT | DONE
 - [LLM-016] | Integration Test: Token Logic | BLOCKS-LLM-004 | DONE
 - [LLM-017] | Integration Test: Rate Limit Logic | BLOCKS-LLM-005 | DONE
-- [LLM-018] | Security Review: Prompt Injection | INDEPENDENT | TODO
-- [LLM-019] | Security Review: Generated Code Sandbox | INDEPENDENT | TODO
+- [LLM-018] | Security Review: Prompt Injection | INDEPENDENT | DONE
+- [LLM-019] | Security Review: Generated Code Sandbox | INDEPENDENT | DONE
 
 ### [EPIC-04] Advanced Reporting
 *Goal: Enhance reporting capabilities with HTML/CSV improvements and PDF support.*
@@ -49,11 +49,11 @@
 - [CI-002] | Docker Action: Entrypoint script | BLOCKS-CI-001 | DONE
 - [CI-003] | GitHub Action: `action.yml` metadata | INDEPENDENT | DONE
 - [CI-004] | GitHub Action: Inputs definition | BLOCKS-CI-003 | DONE
-- [CI-005] | PR Comment Bot: GitHub API integration | INDEPENDENT | TODO
-- [CI-006] | PR Comment Bot: Diff parsing | INDEPENDENT | TODO
-- [CI-007] | PR Comment Bot: Comment posting logic | BLOCKS-CI-005 | TODO
-- [CI-008] | Fail Logic: Threshold config | INDEPENDENT | TODO
-- [CI-009] | Fail Logic: Exit code handling | BLOCKS-CI-008 | TODO
+- [CI-005] | PR Comment Bot: GitHub API integration | INDEPENDENT | DONE
+- [CI-006] | PR Comment Bot: Diff parsing | INDEPENDENT | DONE
+- [CI-007] | PR Comment Bot: Comment posting logic | BLOCKS-CI-005 | DONE
+- [CI-008] | Fail Logic: Threshold config | INDEPENDENT | DONE
+- [CI-009] | Fail Logic: Exit code handling | BLOCKS-CI-008 | DONE
 - [CI-010] | Marketplace prep: Documentation | INDEPENDENT | TODO
 
 ### [EPIC-06] Performance Optimization
@@ -92,8 +92,8 @@
 - [TEL-005] | Metric Collection: Rule hit counters | INDEPENDENT | DONE
 - [TEL-006] | Metric Collection: Scan duration timer | INDEPENDENT | DONE
 - [TEL-007] | Metric Collection: Error tracking | INDEPENDENT | DONE
-- [TEL-008] | Dashboard View: Telemetry tab UI | BLOCKS-TEL-002 | TODO
-- [TEL-009] | Dashboard View: Telemetry charts | BLOCKS-TEL-008 | TODO
+- [TEL-008] | Dashboard View: Telemetry tab UI | BLOCKS-TEL-002 | DONE
+- [TEL-009] | Dashboard View: Telemetry charts | BLOCKS-TEL-008 | DONE
 - [TEL-010] | Anonymization: Data scrubbing logic | BLOCKS-TEL-001 | DONE
 
 ### [EPIC-09] IDE Plugins (Prep)
