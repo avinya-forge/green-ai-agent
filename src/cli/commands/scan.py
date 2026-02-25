@@ -74,10 +74,15 @@ from src.utils.security import sanitize_path, sanitize_project_name, \
     '--telemetry/--no-telemetry', default=True,
     help='Enable/Disable telemetry collection'
 )
+@click.option(
+    '--fail-on',
+    type=click.Choice(['critical', 'high', 'medium', 'low'], case_sensitive=False),
+    help='Exit with error code 1 if issues of this severity or higher are found.'
+)
 def scan(
     paths, git_url, branch, project_name, language, config, disable_rule,
     enable_rule, runtime, profile, perf_profile, fix_all, fix_specific,
-    manual, export, format, output, telemetry
+    manual, export, format, output, telemetry, fail_on
 ):
     """Scan a codebase for green software violations.
 
@@ -456,7 +461,13 @@ def scan(
 
             # Sort by severity
             severity_order = {
-                'critical': 0, 'high': 1, 'medium': 2, 'low': 3
+                'critical': 0,
+                'major': 1,
+                'high': 1,
+                'medium': 2,
+                'minor': 3,
+                'low': 3,
+                'info': 4
             }
             sorted_issues = sorted(
                 results['issues'],
@@ -468,7 +479,7 @@ def scan(
 
                 if severity == 'critical':
                     severity_display = '[!!!] CRITICAL'
-                elif severity == 'high':
+                elif severity in ('high', 'major'):
                     severity_display = '[!! ] HIGH'
                 elif severity == 'medium':
                     severity_display = '[!  ] MEDIUM'
@@ -589,6 +600,36 @@ def scan(
                 "or --manual.",
                 err=True
             )
+
+        # Check for failure threshold
+        if fail_on:
+            severity_map = {
+                'critical': 4,
+                'major': 3,
+                'high': 3,
+                'medium': 2,
+                'minor': 1,
+                'low': 1,
+                'info': 0
+            }
+            threshold_val = severity_map.get(fail_on.lower(), 0)
+
+            failed = False
+            for issue in results['issues']:
+                sev = issue.get('severity', 'low').lower()
+                if severity_map.get(sev, 1) >= threshold_val:
+                    failed = True
+                    break
+
+            if failed:
+                click.echo(
+                    f"\n[FAILURE] Scan failed due to violations of severity "
+                    f"'{fail_on}' or higher.",
+                    err=True
+                )
+                if cleanup_after and git_url:
+                    GitOperations.cleanup_repo(scan_path)
+                sys.exit(1)
 
         # Cleanup Git repo if cloned
         if cleanup_after and git_url:
