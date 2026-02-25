@@ -139,3 +139,24 @@ class TelemetryService:
             logger.info(f"Telemetry: Exported {len(data)} events to {path}")
         except Exception as e:
             logger.error(f"Telemetry: Failed to export events: {e}")
+
+    def get_all_events(self) -> List[Dict[str, Any]]:
+        """Retrieve all persisted telemetry events."""
+        if not self.storage_path.exists():
+            return []
+
+        events = []
+        try:
+            with open(self.storage_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    if not line.strip():
+                        continue
+                    try:
+                        events.append(json.loads(line))
+                    except json.JSONDecodeError:
+                        continue
+        except Exception as e:
+            logger.error(f"Telemetry: Failed to read events: {e}")
+            return []
+
+        return events

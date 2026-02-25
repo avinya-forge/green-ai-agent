@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Green AI Agent Dashboard</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             /* Premium Modern Colorscheme - Inspired by Stripe, GitHub, Linear */
@@ -1207,6 +1208,7 @@
             Results</button>
         <button class="tab-button" onclick="switchTab('projects')" title="View all projects">🗂️ Projects</button>
         <button class="tab-button" onclick="switchTab('comparison')" title="Compare projects">📈 Comparison</button>
+        <button class="tab-button" onclick="switchTab('telemetry')" title="View telemetry">📡 Telemetry</button>
     </div>
 
     <!-- Tab 1: Scan Results (Default) -->
@@ -1461,6 +1463,45 @@
         </div>
     </div> <!-- End comparison tab -->
 
+    <!-- Tab 4: Telemetry -->
+    <div id="telemetry" class="tab-content">
+        <h2 style="font-size: 24px; font-weight: 700; color: var(--text-light); margin-bottom: 20px;">📡 Telemetry & Metrics</h2>
+
+        <div class="metrics-container">
+            <div class="metric-card">
+                <h3>Total Scans</h3>
+                <div class="metric-value" id="telemetry-total-scans">0</div>
+                <div class="metric-label">All Time</div>
+            </div>
+            <div class="metric-card">
+                <h3>Scan Frequency</h3>
+                <div class="metric-value" id="telemetry-scan-frequency">0.0</div>
+                <div class="metric-label">Scans / Day</div>
+            </div>
+             <div class="metric-card">
+                <h3>Unique Projects</h3>
+                <div class="metric-value" id="telemetry-unique-projects">0</div>
+                <div class="metric-label">Tracked</div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; margin-bottom: 40px;">
+            <div style="background: var(--card-light); padding: 20px; border-radius: 12px; border: 1px solid var(--border-light); box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                <h3 style="margin-bottom: 15px; color: var(--text-light); font-size: 16px;">Scan Activity (Last 30 Days)</h3>
+                <canvas id="scanActivityChart"></canvas>
+            </div>
+            <div style="background: var(--card-light); padding: 20px; border-radius: 12px; border: 1px solid var(--border-light); box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                <h3 style="margin-bottom: 15px; color: var(--text-light); font-size: 16px;">Violations by Severity</h3>
+                <canvas id="violationsSeverityChart"></canvas>
+            </div>
+        </div>
+
+        <div style="background: var(--card-light); padding: 20px; border-radius: 12px; border: 1px solid var(--border-light); box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+            <h3 style="margin-bottom: 15px; color: var(--text-light); font-size: 16px;">Top Rules Violated</h3>
+            <canvas id="topRulesChart" style="max-height: 400px;"></canvas>
+        </div>
+    </div> <!-- End telemetry tab -->
+
     <script>
         // Security: Escape HTML to prevent XSS
         function escapeHTML(str) {
@@ -1492,6 +1533,8 @@
             // Load data for Projects tab
             if (tabName === 'projects') {
                 loadProjects();
+            } else if (tabName === 'telemetry') {
+                loadTelemetry();
             }
         }
 
@@ -1940,7 +1983,7 @@
         }
 
         function refreshCurrentProject() {
-            alert('Refreshing project data...\\n\\nThis will reload the current project\\'s scan results and metrics.');
+            alert('Refreshing project data...\\n\\nThis will reload the current project\'s scan results and metrics.');
             location.reload();
         }
 
@@ -2085,6 +2128,137 @@
 
         function closeRemediationModal() {
             document.getElementById('remediationModal').style.display = 'none';
+        }
+
+        // --- Telemetry Logic ---
+        async function loadTelemetry() {
+            try {
+                const response = await fetch('/api/telemetry');
+                const data = await response.json();
+
+                if (data.status === 'ok') {
+                    renderTelemetry(data.events);
+                } else {
+                    console.error('Failed to load telemetry:', data);
+                }
+            } catch (error) {
+                console.error('Error loading telemetry:', error);
+            }
+        }
+
+        let telemetryCharts = {};
+
+        function renderTelemetry(events) {
+            // Filter only scan_complete events
+            const scans = events
+                .filter(e => e.event_type === 'scan_complete')
+                .map(e => {
+                     // e.payload is a dict. e.timestamp is a string.
+                     // We merge them for easier access.
+                     return Object.assign({}, e.payload, { timestamp: e.timestamp });
+                });
+
+            // Update Metrics
+            const totalScansEl = document.getElementById('telemetry-total-scans');
+            if(totalScansEl) totalScansEl.textContent = scans.length;
+
+            const uniqueProjects = new Set(scans.map(s => s.project_id)).size;
+            const uniqueProjectsEl = document.getElementById('telemetry-unique-projects');
+            if(uniqueProjectsEl) uniqueProjectsEl.textContent = uniqueProjects;
+
+            // Calculate daily frequency
+            const dailyScans = {};
+            scans.forEach(scan => {
+                const date = new Date(scan.timestamp).toLocaleDateString();
+                dailyScans[date] = (dailyScans[date] || 0) + 1;
+            });
+
+            // Frequency calculation (scans / unique days with scans)
+            const daysWithScans = Object.keys(dailyScans).length;
+            const freq = daysWithScans > 0 ? (scans.length / daysWithScans).toFixed(1) : 0;
+            const freqEl = document.getElementById('telemetry-scan-frequency');
+            if(freqEl) freqEl.textContent = freq;
+
+            // Prepare Chart Data
+            const severityCounts = { critical: 0, high: 0, medium: 0, low: 0 };
+            const ruleCounts = {};
+
+            scans.forEach(scan => {
+                // Severity
+                if (scan.violations_by_severity) {
+                    Object.entries(scan.violations_by_severity).forEach(([sev, count]) => {
+                        const normalizedSev = sev.toLowerCase();
+                        if (severityCounts[normalizedSev] !== undefined) {
+                            severityCounts[normalizedSev] += count;
+                        }
+                    });
+                }
+
+                // Rules
+                if (scan.violations_by_rule) {
+                    Object.entries(scan.violations_by_rule).forEach(([rule, count]) => {
+                        ruleCounts[rule] = (ruleCounts[rule] || 0) + count;
+                    });
+                }
+            });
+
+            // Destroy existing charts to prevent canvas reuse error
+            if (telemetryCharts.scanFreq) telemetryCharts.scanFreq.destroy();
+            if (telemetryCharts.severity) telemetryCharts.severity.destroy();
+            if (telemetryCharts.rules) telemetryCharts.rules.destroy();
+
+            // 1. Scan Activity Chart
+            const ctxFreq = document.getElementById('scanActivityChart').getContext('2d');
+            telemetryCharts.scanFreq = new Chart(ctxFreq, {
+                type: 'line',
+                data: {
+                    labels: Object.keys(dailyScans),
+                    datasets: [{
+                        label: 'Scans per Day',
+                        data: Object.values(dailyScans),
+                        borderColor: '#0ea5e9',
+                        backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+
+            // 2. Severity Chart
+            const ctxSev = document.getElementById('violationsSeverityChart').getContext('2d');
+            telemetryCharts.severity = new Chart(ctxSev, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Critical', 'High', 'Medium', 'Low'],
+                    datasets: [{
+                        data: [severityCounts.critical, severityCounts.high, severityCounts.medium, severityCounts.low],
+                        backgroundColor: ['#ef4444', '#f97316', '#f59e0b', '#3b82f6']
+                    }]
+                },
+                options: { responsive: true }
+            });
+
+            // 3. Top Rules Chart
+            const sortedRules = Object.entries(ruleCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+
+            const ctxRules = document.getElementById('topRulesChart').getContext('2d');
+            telemetryCharts.rules = new Chart(ctxRules, {
+                type: 'bar',
+                data: {
+                    labels: sortedRules.map(r => r[0]),
+                    datasets: [{
+                        label: 'Violations',
+                        data: sortedRules.map(r => r[1]),
+                        backgroundColor: '#10b981'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    indexAxis: 'y',
+                    plugins: { legend: { display: false } }
+                }
+            });
         }
 
         // --- Socket.IO Progress Logic ---
