@@ -21,6 +21,7 @@ from src.utils.metrics import calculate_projects_grade
 from src.core.scanner import Scanner
 from src.core.calibration import CalibrationAgent
 from src.core.export import OUTPUT_DIR, CSVExporter, HTMLReporter
+from src.core.telemetry.service import TelemetryService
 import src.ui.state as state
 
 from src.ui.middleware.security import SecurityHeadersMiddleware
@@ -162,6 +163,17 @@ async def api_charts() -> Any:
 @app.get("/api/results")
 async def api_results() -> Any:
     return state.last_scan_results or {}
+
+@app.get("/api/telemetry")
+async def api_telemetry() -> Any:
+    try:
+        service = TelemetryService()
+        return {
+            'status': 'ok',
+            'events': service.get_all_events()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/standards")
 async def api_standards_list() -> Any:
