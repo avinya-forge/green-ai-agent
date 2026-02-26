@@ -21,21 +21,198 @@ class JavaScriptASTDetector(BaseTreeSitterDetector):
         if not self.tree:
             return []
 
-        self._detect_excessive_logging()
-        self._detect_console_time()
-        self._detect_eval()
+        self._detect_simple_patterns()
         self._detect_magic_numbers()
-        self._detect_deprecated_apis()
-        self._detect_inefficient_browser_apis()
-        self._detect_sync_io()
         self._detect_loops()
-        self._detect_dom_manipulation()
-        self._detect_inner_html()
+        self._detect_dom_in_loops()
         self._detect_string_concatenation()
         self._detect_empty_blocks()
         self._detect_hardcoded_secrets()
 
         return self.violations
+
+    def _detect_simple_patterns(self) -> None:
+        """Detect simple patterns using a combined query."""
+        query_scm = """
+        ; console.time
+        (call_expression
+          function: (member_expression
+            object: (identifier) @console_obj
+            property: (property_identifier) @console_prop)
+          (#eq? @console_obj "console")
+          (#match? @console_prop "^(time|timeEnd)$")) @console_time
+
+        ; console.log
+        (call_expression
+          function: (member_expression
+            object: (identifier) @console_obj_log
+            property: (property_identifier) @console_prop_log)
+          (#eq? @console_obj_log "console")
+          (#match? @console_prop_log "^(log|debug|info)$")) @console_log
+
+        ; eval
+        (call_expression
+          function: (identifier) @eval_func
+          (#eq? @eval_func "eval")) @eval_usage
+
+        ; document.write
+        (call_expression
+          function: (member_expression
+            object: (identifier) @doc_obj
+            property: (property_identifier) @doc_prop)
+          (#eq? @doc_obj "document")
+          (#eq? @doc_prop "write")) @document_write
+
+        ; innerHTML assignment
+        (assignment_expression
+          left: (member_expression
+            property: (property_identifier) @inner_prop)
+          (#eq? @inner_prop "innerHTML")) @inner_html
+
+        ; momentjs require
+        (call_expression
+          function: (identifier) @req_func
+          arguments: (arguments (string (string_fragment) @req_arg))
+          (#eq? @req_func "require")
+          (#match? @req_arg "moment")) @moment_require
+
+        ; momentjs import
+        (import_statement
+            source: (string (string_fragment) @imp_source)
+            (#match? @imp_source "moment")) @moment_import
+
+        ; setInterval
+        (call_expression
+          function: (identifier) @interval_func
+          (#eq? @interval_func "setInterval")) @set_interval
+
+        ; alert/prompt/confirm (global)
+        (call_expression
+          function: (identifier) @alert_func
+          (#match? @alert_func "^(alert|prompt|confirm)$")) @alert_global
+
+        ; window.alert/prompt/confirm
+        (call_expression
+          function: (member_expression
+            object: (identifier) @win_obj
+            property: (property_identifier) @win_prop)
+          (#eq? @win_obj "window")
+          (#match? @win_prop "^(alert|prompt|confirm)$")) @alert_window
+
+        ; readFileSync
+        (call_expression
+          function: (member_expression
+            property: (property_identifier) @read_prop)
+          (#match? @read_prop "readFileSync")) @read_sync
+
+        ; XMLHttpRequest
+        (new_expression
+            constructor: (identifier) @xhr_cons
+            (#eq? @xhr_cons "XMLHttpRequest")) @xhr
+
+        ; Direct DOM query
+        (call_expression
+           function: (member_expression
+             object: (identifier) @dom_obj
+             property: (property_identifier) @dom_prop)
+           (#eq? @dom_obj "document")
+           (#match? @dom_prop "^(querySelector|getElementById)$")) @dom_query
+        """
+
+        try:
+            query = Query(self.language, query_scm)
+            cursor = QueryCursor(query)
+            matches = cursor.matches(self.tree.root_node)
+
+            reported_lines = set()
+
+            for _, captures in matches:
+                if not captures:
+                    continue
+
+                # Determine which rule matched
+                rule_id = None
+                severity = None
+                message = None
+                pattern_match = None
+                node = None
+
+                if 'console_time' in captures:
+                    rule_id = 'console_time'
+                    severity = 'minor'
+                    message = 'console.time/timeEnd detected. Remove in production.'
+                    pattern_match = 'console_time'
+                    node = captures['console_time'][0]
+                elif 'console_log' in captures:
+                    rule_id = 'excessive_console_logging'
+                    severity = 'minor'
+                    message = 'Console logging detected. Remove in production.'
+                    pattern_match = 'console_log'
+                    node = captures['console_log'][0]
+                elif 'eval_usage' in captures:
+                    rule_id = 'eval_usage'
+                    severity = 'critical'
+                    message = 'Eval is a security risk and slow.'
+                    pattern_match = 'eval_usage'
+                    node = captures['eval_usage'][0]
+                elif 'document_write' in captures:
+                    rule_id = 'document_write'
+                    severity = 'critical'
+                    message = 'document.write blocks rendering.'
+                    pattern_match = 'document_write'
+                    node = captures['document_write'][0]
+                elif 'inner_html' in captures:
+                    rule_id = 'inner_html'
+                    severity = 'major'
+                    message = 'Avoid innerHTML. Use textContent or DOM methods.'
+                    pattern_match = 'inner_html'
+                    node = captures['inner_html'][0]
+                elif 'moment_require' in captures or 'moment_import' in captures:
+                    rule_id = 'momentjs_deprecated'
+                    severity = 'major'
+                    message = 'Moment.js is heavy. Use Day.js or Date.'
+                    pattern_match = 'momentjs_deprecated'
+                    node = captures.get('moment_require', captures.get('moment_import'))[0]
+                elif 'set_interval' in captures:
+                    rule_id = 'setInterval_animation'
+                    severity = 'major'
+                    message = 'Use requestAnimationFrame instead of setInterval.'
+                    pattern_match = 'setInterval_animation'
+                    node = captures['set_interval'][0]
+                elif 'alert_global' in captures or 'alert_window' in captures:
+                    rule_id = 'alert_usage'
+                    severity = 'minor'
+                    message = 'Native dialogs block the main thread.'
+                    pattern_match = 'alert_usage'
+                    node = captures.get('alert_global', captures.get('alert_window'))[0]
+                elif 'read_sync' in captures or 'xhr' in captures:
+                    rule_id = 'synchronous_io'
+                    severity = 'major'
+                    message = 'Synchronous I/O blocks the main thread. Use async APIs.'
+                    pattern_match = 'sync_io_js'
+                    node = captures.get('read_sync', captures.get('xhr'))[0]
+                elif 'dom_query' in captures:
+                    rule_id = 'unnecessary_dom_manipulation'
+                    severity = 'major'
+                    message = 'Direct DOM query/manipulation. Cache references.'
+                    pattern_match = 'dom_query'
+                    node = captures['dom_query'][0]
+
+                if node:
+                    line = node.start_point[0] + 1
+                    # Simple deduplication by line and rule
+                    key = f"{line}:{rule_id}"
+                    if key not in reported_lines:
+                        self.violations.append({
+                            'id': rule_id,
+                            'line': line,
+                            'severity': severity,
+                            'message': message,
+                            'pattern_match': pattern_match
+                        })
+                        reported_lines.add(key)
+        except Exception as e:
+            logger.error(f"Error in combined pattern detection: {e}")
 
     def _detect_hardcoded_secrets(self) -> None:
         """Detect hardcoded secrets."""
@@ -104,53 +281,6 @@ class JavaScriptASTDetector(BaseTreeSitterDetector):
         """Detect empty blocks."""
         self._detect_empty_blocks_generic("(statement_block) @block")
 
-    def _detect_console_time(self) -> None:
-        """Detect console.time usage."""
-        query_scm = """
-        (call_expression
-          function: (member_expression
-            object: (identifier) @obj
-            property: (property_identifier) @prop)
-          (#eq? @obj "console")
-          (#match? @prop "^(time|timeEnd)$"))
-        """
-        self._run_query(query_scm, 'console_time', 'minor',
-                       'console.time/timeEnd detected. Remove in production.', 'console_time')
-
-    def _detect_inner_html(self) -> None:
-        """Detect innerHTML usage."""
-        query_scm = """
-        (assignment_expression
-          left: (member_expression
-            property: (property_identifier) @prop)
-          (#eq? @prop "innerHTML"))
-        """
-        self._run_query(query_scm, 'inner_html', 'major',
-                       'Avoid innerHTML. Use textContent or DOM methods.', 'inner_html')
-
-    def _detect_excessive_logging(self) -> None:
-        """Detect console.log usage."""
-        query_scm = """
-        (call_expression
-          function: (member_expression
-            object: (identifier) @obj
-            property: (property_identifier) @prop)
-          (#eq? @obj "console")
-          (#match? @prop "^(log|debug|info)$"))
-        """
-        self._run_query(query_scm, 'excessive_console_logging', 'minor',
-                       'Console logging detected. Remove in production.', 'console_log')
-
-    def _detect_eval(self) -> None:
-        """Detect eval usage."""
-        query_scm = """
-        (call_expression
-          function: (identifier) @func
-          (#eq? @func "eval"))
-        """
-        self._run_query(query_scm, 'eval_usage', 'critical',
-                       'Eval is a security risk and slow.', 'eval_usage')
-
     def _detect_magic_numbers(self) -> None:
         """Detect magic numbers."""
         query_scm = """
@@ -182,95 +312,7 @@ class JavaScriptASTDetector(BaseTreeSitterDetector):
         except Exception as e:
             logger.error(f"Query error (magic_numbers): {e}")
 
-    def _detect_deprecated_apis(self) -> None:
-        """Detect deprecated or heavy libraries/APIs."""
-        # 1. document.write
-        query_doc_write = """
-        (call_expression
-          function: (member_expression
-            object: (identifier) @obj
-            property: (property_identifier) @prop)
-          (#eq? @obj "document")
-          (#eq? @prop "write"))
-        """
-        self._run_query(query_doc_write, 'document_write', 'critical',
-                        'document.write blocks rendering.', 'document_write')
-
-        # 2. moment.js (require or import)
-        # require('moment')
-        query_require_moment = """
-        (call_expression
-          function: (identifier) @func
-          arguments: (arguments (string (string_fragment) @arg))
-          (#eq? @func "require")
-          (#match? @arg "moment"))
-        """
-        self._run_query(query_require_moment, 'momentjs_deprecated', 'major',
-                        'Moment.js is heavy. Use Day.js or Date.', 'momentjs_deprecated')
-
-        # import ... from 'moment'
-        query_import_moment = """
-        (import_statement
-            source: (string (string_fragment) @source)
-            (#match? @source "moment"))
-        """
-        self._run_query(query_import_moment, 'momentjs_deprecated', 'major',
-                        'Moment.js is heavy. Use Day.js or Date.', 'momentjs_deprecated')
-
-    def _detect_inefficient_browser_apis(self) -> None:
-        """Detect inefficient browser APIs."""
-        # setInterval
-        query_set_interval = """
-        (call_expression
-          function: (identifier) @func
-          (#eq? @func "setInterval"))
-        """
-        self._run_query(query_set_interval, 'setInterval_animation', 'major',
-                        'Use requestAnimationFrame instead of setInterval.', 'setInterval_animation')
-
-        # window.alert/prompt/confirm
-        # Can be called as alert() or window.alert()
-        # Case 1: alert()
-        query_alert_global = """
-        (call_expression
-          function: (identifier) @func
-          (#match? @func "^(alert|prompt|confirm)$"))
-        """
-        self._run_query(query_alert_global, 'alert_usage', 'minor',
-                        'Native dialogs block the main thread.', 'alert_usage')
-
-        # Case 2: window.alert()
-        query_alert_window = """
-        (call_expression
-          function: (member_expression
-            object: (identifier) @obj
-            property: (property_identifier) @prop)
-          (#eq? @obj "window")
-          (#match? @prop "^(alert|prompt|confirm)$"))
-        """
-        self._run_query(query_alert_window, 'alert_usage', 'minor',
-                        'Native dialogs block the main thread.', 'alert_usage')
-
-    def _detect_sync_io(self) -> None:
-        """Detect synchronous I/O."""
-        # readFileSync
-        query_read_file_sync = """
-        (call_expression
-          function: (member_expression
-            property: (property_identifier) @prop)
-          (#match? @prop "readFileSync"))
-        """
-        self._run_query(query_read_file_sync, 'synchronous_io', 'major',
-                        'Synchronous I/O blocks the main thread. Use async APIs.', 'sync_io_js')
-
-        # XMLHttpRequest
-        query_xhr = """
-        (new_expression
-            constructor: (identifier) @cons
-            (#eq? @cons "XMLHttpRequest"))
-        """
-        self._run_query(query_xhr, 'synchronous_io', 'major',
-                        'Synchronous I/O blocks the main thread. Use fetch().', 'sync_io_js')
+    # _detect_deprecated_apis, _detect_inefficient_browser_apis, _detect_sync_io merged into _detect_simple_patterns
 
     def _detect_loops(self) -> None:
         """Detect loop related violations (infinite, nested, inefficient)."""
@@ -340,21 +382,10 @@ class JavaScriptASTDetector(BaseTreeSitterDetector):
         except Exception as e:
             logger.error(f"Error in nested loop detection: {e}")
 
-    def _detect_dom_manipulation(self) -> None:
-        """Detect DOM manipulation."""
-        # Direct DOM query
-        query_dom = """
-        (call_expression
-           function: (member_expression
-             object: (identifier) @obj
-             property: (property_identifier) @prop)
-           (#eq? @obj "document")
-           (#match? @prop "^(querySelector|getElementById)$"))
-        """
-        self._run_query(query_dom, 'unnecessary_dom_manipulation', 'major',
-                        'Direct DOM query/manipulation. Cache references.', 'dom_query')
+    def _detect_dom_in_loops(self) -> None:
+        """Detect DOM manipulation inside loops."""
+        # Note: Direct DOM query detection moved to _detect_simple_patterns
 
-        # DOM in loop
         # Find DOM methods inside loops
         dom_methods = ["appendChild", "innerHTML", "textContent", "setAttribute", "classList", "write"]
         dom_methods_regex = "^(" + "|".join(dom_methods) + ")$"

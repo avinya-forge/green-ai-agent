@@ -82,13 +82,12 @@ class PythonViolationDetector(ast.NodeVisitor):
             })
         
         # Rule: Inefficient Lookup (item in list in loop)
-        self._check_inefficient_lookups(node)
+        # Moved to visit_Compare
         
         # Check for I/O and redundant computations in loop
         prev_in_loop = self.in_loop
         self.in_loop = True
-        self._check_io_in_loop(node)
-        self._check_unnecessary_computation(node)
+        # Moved checks to visit_Call and visit_Compare to avoid re-traversal
         
         self.generic_visit(node)
         self.in_loop = prev_in_loop
@@ -126,8 +125,7 @@ class PythonViolationDetector(ast.NodeVisitor):
         
         prev_in_loop = self.in_loop
         self.in_loop = True
-        self._check_io_in_loop(node)
-        self._check_unnecessary_computation(node)
+        # Moved checks to visit_Call and visit_Compare to avoid re-traversal
         
         self.generic_visit(node)
         self.in_loop = prev_in_loop
@@ -140,75 +138,25 @@ class PythonViolationDetector(ast.NodeVisitor):
         self.generic_visit(node)
         self.current_depth -= 1
     
-    def _check_io_in_loop(self, loop_node) -> None:
-        """Check if loop contains I/O operations."""
-        io_patterns = ['open', 'read', 'write', 'requests', 'urlopen']
-        
-        for child in ast.walk(loop_node):
-            if isinstance(child, ast.Call):
-                if isinstance(child.func, ast.Name):
-                    if child.func.id in io_patterns:
+    def visit_Compare(self, node: ast.Compare) -> None:
+        """Detect inefficient lookups in loops."""
+        if self.in_loop:
+            for op in node.ops:
+                if isinstance(op, (ast.In, ast.NotIn)):
+                    # If the right side is a Name, it might be a list
+                    if isinstance(node.comparators[0], ast.Name):
+                        var_name = node.comparators[0].id
+                        if self.var_types.get(var_name) == 'efficient':
+                            continue
+
                         self.violations.append({
-                            'id': 'io_in_loop',
-                            'line': child.lineno,
-                            'severity': 'critical',
-                            'message': f'I/O operation "{child.func.id}()" in loop. Each call costs 100-1000x more energy.',
-                            'pattern_match': 'io_operation_in_loop'
+                            'id': 'inefficient_lookup',
+                            'line': node.lineno,
+                            'severity': 'medium',
+                            'message': f'Membership test on "{var_name}" inside loop. If it is a list, consider converting to a set for O(1) lookup.',
+                            'pattern_match': 'list_lookup_loop'
                         })
-    
-    def _check_unnecessary_computation(self, loop_node) -> None:
-        """
-        Check for redundant computations in loop that could be moved outside.
-        E.g., len(s), range(n) if n is constant, re.compile, etc.
-        """
-        redundant_funcs = ['len', 'range', 're.compile', 'datetime.now', 'time.time', 'count']
-        
-        for child in ast.walk(loop_node):
-            if isinstance(child, ast.Call):
-                func_name = None
-                if isinstance(child.func, ast.Name):
-                    func_name = child.func.id
-                elif isinstance(child.func, ast.Attribute):
-                    # Handle re.compile or similar
-                    if isinstance(child.func.value, ast.Name):
-                        func_name = f"{child.func.value.id}.{child.func.attr}"
-
-                    # Also match .count() regardless of caller
-                    if child.func.attr == 'count':
-                        func_name = 'count'
-                
-                if func_name in redundant_funcs:
-                    # Heuristic: Check if arguments are actually dependent on loop variables
-                    # For simplicity in this version, we flag common ones that are often static
-                    self.violations.append({
-                        'id': 'unnecessary_computation',
-                        'line': child.lineno,
-                        'severity': 'critical',
-                        'message': f'Redundant computation "{func_name}()" in loop. Move outside for O(1) impact.',
-                        'pattern_match': 'computation_outside_loop'
-                    })
-    
-    def _check_inefficient_lookups(self, loop_node) -> None:
-        """Check for membership tests on lists inside loops (O(n) vs O(1))."""
-        for child in ast.walk(loop_node):
-            if isinstance(child, ast.Compare):
-                for op in child.ops:
-                    if isinstance(op, (ast.In, ast.NotIn)):
-                        # If the right side is a Name, it might be a list
-                        # This is a heuristic - in real tool we'd track types
-                        if isinstance(child.comparators[0], ast.Name):
-                            var_name = child.comparators[0].id
-                            # If we know it's efficient, skip violation
-                            if self.var_types.get(var_name) == 'efficient':
-                                continue
-
-                            self.violations.append({
-                                'id': 'inefficient_lookup',
-                                'line': child.lineno,
-                                'severity': 'medium',
-                                'message': f'Membership test on "{var_name}" inside loop. If it is a list, consider converting to a set for O(1) lookup.',
-                                'pattern_match': 'list_lookup_loop'
-                            })
+        self.generic_visit(node)
     
     def visit_BinOp(self, node: ast.BinOp) -> None:
         """Detect string concatenation in loops."""
@@ -249,6 +197,48 @@ class PythonViolationDetector(ast.NodeVisitor):
             func_name = f"{node.func.value.id}.{node.func.attr}"
 
         if func_name:
+            # Rule: IO in Loop
+            if self.in_loop:
+                 io_patterns = ['open', 'read', 'write', 'requests', 'urlopen']
+                 is_io = False
+
+                 # Check exact match
+                 if func_name in io_patterns:
+                     is_io = True
+                 # Check suffix match (e.g. f.read, requests.get)
+                 elif any(func_name.endswith(f'.{p}') for p in io_patterns) or func_name.startswith('requests.'):
+                     is_io = True
+
+                 if is_io:
+                      self.violations.append({
+                            'id': 'io_in_loop',
+                            'line': node.lineno,
+                            'severity': 'critical',
+                            'message': f'I/O operation "{func_name}()" in loop. Each call costs 100-1000x more energy.',
+                            'pattern_match': 'io_operation_in_loop'
+                        })
+
+            # Rule: Unnecessary computation
+            if self.in_loop:
+                redundant_funcs = ['len', 'range', 're.compile', 'datetime.now', 'time.time', 'count']
+                is_redundant = False
+
+                if func_name in redundant_funcs:
+                    is_redundant = True
+                elif isinstance(node.func, ast.Attribute) and node.func.attr == 'count':
+                     is_redundant = True
+                elif func_name and func_name.endswith('.compile') and func_name.startswith('re.'):
+                     is_redundant = True
+
+                if is_redundant:
+                     self.violations.append({
+                            'id': 'unnecessary_computation',
+                            'line': node.lineno,
+                            'severity': 'critical',
+                            'message': f'Redundant computation "{func_name}()" in loop. Move outside for O(1) impact.',
+                            'pattern_match': 'computation_outside_loop'
+                        })
+
             # Rule: Blocking I/O
             blocking_io = ['requests.get', 'urlopen', 'time.sleep']
             if func_name in blocking_io or any(func_name.endswith(f'.{b}') for b in blocking_io):
