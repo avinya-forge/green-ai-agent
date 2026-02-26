@@ -1,8 +1,11 @@
 # Release Notes
 
-## [v0.8.0-alpha] - CI/CD & Telemetry
+## [v0.8.0-alpha] - CI/CD, Telemetry & Performance
 
 ### Added
+- **Python Optimization**: Refactored `PythonViolationDetector` to remove redundant AST traversals (O(N) instead of O(N*Depth)) and fixed `io_in_loop` detection for method calls (PERF-003).
+- **JavaScript Optimization**: Combined 10+ Tree-sitter queries into a single pass in `JavaScriptASTDetector`, significantly reducing overhead (PERF-004).
+- **Security Audit**: Integrated and ran `pip-audit`, resolving critical vulnerability in `pip` (SEC-001).
 - **GitHub Action**: Implemented a Docker-based GitHub Action (`action.yml`) to run Green-AI in CI/CD pipelines (CI-001, CI-002, CI-003, CI-004).
 - **Telemetry Core**: Implemented `TelemetryService` and data schemas (`ScanMetrics`) to collect usage and performance metrics (TEL-001, TEL-005, TEL-006, TEL-007).
 - **Telemetry Export**: Added functionality to export telemetry events to JSON files for debugging and analysis.

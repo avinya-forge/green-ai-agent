@@ -61,8 +61,8 @@
 - [GO-009] | Go Performance Benchmark | INDEPENDENT | TODO
 - [PERF-001] | Profile Scanner: cProfile setup | INDEPENDENT | DONE
 - [PERF-002] | Profile Scanner: Identify bottlenecks | BLOCKS-PERF-001 | DONE
-- [PERF-003] | Optimize Query: Review Python queries | INDEPENDENT | TODO
-- [PERF-004] | Optimize Query: Review JS queries | INDEPENDENT | TODO
+- [PERF-003] | Optimize Query: Review Python queries | INDEPENDENT | DONE
+- [PERF-004] | Optimize Query: Review JS queries | INDEPENDENT | DONE
 - [PERF-005] | Parallel Processing: Multiprocessing pool tuning | INDEPENDENT | TODO
 - [PERF-006] | Parallel Processing: Chunk size tuning | BLOCKS-PERF-005 | TODO
 - [PERF-007] | Memory Reduction: Generator usage review | INDEPENDENT | TODO
@@ -72,7 +72,7 @@
 
 ### [EPIC-07] Security Hardening
 *Goal: Meet DoD security requirements.*
-- [SEC-001] | Dependency Audit: Run `pip-audit` | INDEPENDENT | TODO
+- [SEC-001] | Dependency Audit: Run `pip-audit` | INDEPENDENT | DONE
 - [SEC-002] | Dependency Upgrade: Bump versions | BLOCKS-SEC-001 | TODO
 - [SEC-003] | Input Sanitization: CLI args review | INDEPENDENT | DONE
 - [SEC-004] | Input Sanitization: API payload validation | INDEPENDENT | DONE
