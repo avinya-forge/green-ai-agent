@@ -11,6 +11,12 @@ import os
 import sys
 from pathlib import Path
 from typing import Dict, List, Any, Optional
+import hashlib
+
+try:
+    import httpx
+except ImportError:
+    httpx = None
 
 
 class ConfigError(Exception):
@@ -126,6 +132,50 @@ class ConfigLoader:
         
         return None
 
+    def _is_url(self, path: str) -> bool:
+        """Check if path is a URL."""
+        return path.startswith('http://') or path.startswith('https://')
+
+    def _fetch_remote_config(self, url: str) -> str:
+        """
+        Fetch remote config from URL and cache it.
+
+        Args:
+            url: URL to fetch
+
+        Returns:
+            Path to cached config file
+
+        Raises:
+            ConfigError: If fetch fails
+        """
+        if not httpx:
+             raise ConfigError("httpx not installed. Cannot fetch remote config.")
+
+        # Create cache directory
+        cache_dir = Path.home() / '.green-ai' / 'remote_configs'
+        cache_dir.mkdir(parents=True, exist_ok=True)
+
+        # Hash URL for filename
+        url_hash = hashlib.md5(url.encode('utf-8')).hexdigest()
+        cache_file = cache_dir / f"{url_hash}.yaml"
+
+        # Check cache (simple check: if exists, use it)
+        # TODO: Implement TTL or ETag check for smarter caching
+        if cache_file.exists():
+            return str(cache_file)
+
+        try:
+            response = httpx.get(url, timeout=10.0, follow_redirects=True)
+            response.raise_for_status()
+
+            with open(cache_file, 'w') as f:
+                f.write(response.text)
+
+            return str(cache_file)
+        except Exception as e:
+            raise ConfigError(f"Failed to fetch remote config from {url}: {e}")
+
     def _find_global_config_file(self) -> Optional[str]:
         """Find global configuration file in home or XDG directory."""
         home = Path.home()
@@ -177,15 +227,24 @@ class ConfigLoader:
                 pass
 
         # 2. Load Local Config (merged into defaults+global)
-        if self.config_path and os.path.exists(self.config_path):
+        local_config_path = self.config_path
+
+        if local_config_path and self._is_url(local_config_path):
             try:
-                with open(self.config_path, 'r') as f:
+                local_config_path = self._fetch_remote_config(local_config_path)
+            except ConfigError as e:
+                # If remote fetch fails, we re-raise it
+                raise e
+
+        if local_config_path and os.path.exists(local_config_path):
+            try:
+                with open(local_config_path, 'r') as f:
                     file_config = yaml.safe_load(f) or {}
                 config = self._merge_config(config, file_config)
             except yaml.YAMLError as e:
-                raise ConfigError(f"Invalid YAML in {self.config_path}: {e}")
+                raise ConfigError(f"Invalid YAML in {local_config_path}: {e}")
             except IOError as e:
-                raise ConfigError(f"Cannot read {self.config_path}: {e}")
+                raise ConfigError(f"Cannot read {local_config_path}: {e}")
         
         # Validate using Pydantic
         self.config = self._validate_config(config)

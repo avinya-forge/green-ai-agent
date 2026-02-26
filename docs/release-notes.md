@@ -17,6 +17,9 @@
 - **PR Comment Bot**: Added `ci report` command to post scan results as comments on GitHub Pull Requests, including diff-aware filtering (CI-005, CI-006, CI-007).
 - **LLM Security**: Added comprehensive security tests for prompt injection and code sandbox verification (LLM-018, LLM-019).
 - **Telemetry Dashboard**: Verified and finalized the Telemetry Dashboard UI and API integration (TEL-008, TEL-009).
+- **Result Caching**: Optimized detection cache to use O(1) LRU implementation (PERF-010).
+- **Remote Config**: Added support for fetching and caching configuration from URLs (CFG-001, CFG-002).
+- **API Security**: Implemented strict input validation for `ScanRequest` API using Pydantic validators (SEC-004).
 
 ## [v0.7.0] - Consolidation & Quality
 
