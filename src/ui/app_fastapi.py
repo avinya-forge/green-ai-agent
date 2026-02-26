@@ -13,6 +13,8 @@ from pydantic import BaseModel
 from typing import Any, List, Optional
 import os
 import sys
+
+from src.ui.schemas import ScanRequest
 import threading
 import asyncio
 
@@ -110,12 +112,6 @@ app_asgi = socketio.ASGIApp(sio, other_asgi_app=app)
 templates_dir = os.path.join(os.path.dirname(__file__), "templates")
 templates = Jinja2Templates(directory=templates_dir)
 
-# Models
-class ScanRequest(BaseModel):
-    project_name: str
-    language: str
-    git_url: Optional[str] = None
-    path: Optional[str] = None
 
 # Helpers
 async def broadcast_progress(message: str, percentage: int):

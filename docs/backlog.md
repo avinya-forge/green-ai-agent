@@ -68,14 +68,14 @@
 - [PERF-007] | Memory Reduction: Generator usage review | INDEPENDENT | TODO
 - [PERF-008] | Memory Reduction: Tree-sitter tree disposal | INDEPENDENT | TODO
 - [PERF-009] | Result Caching: Disk cache implementation | INDEPENDENT | DONE
-- [PERF-010] | Result Caching: In-memory LRU cache | INDEPENDENT | TODO
+- [PERF-010] | Result Caching: In-memory LRU cache | INDEPENDENT | DONE
 
 ### [EPIC-07] Security Hardening
 *Goal: Meet DoD security requirements.*
 - [SEC-001] | Dependency Audit: Run `pip-audit` | INDEPENDENT | TODO
 - [SEC-002] | Dependency Upgrade: Bump versions | BLOCKS-SEC-001 | TODO
 - [SEC-003] | Input Sanitization: CLI args review | INDEPENDENT | DONE
-- [SEC-004] | Input Sanitization: API payload validation | INDEPENDENT | TODO
+- [SEC-004] | Input Sanitization: API payload validation | INDEPENDENT | DONE
 - [SEC-005] | Secrets Detection: Rule implementation (AST/Regex) | INDEPENDENT | DONE
 - [SEC-006] | Secrets Detection: Rule implementation (Entropy) | BLOCKS-SEC-005 | DONE
 - [SEC-007] | Hardcoded Password: Rule implementation | INDEPENDENT | DONE
@@ -111,8 +111,8 @@
 
 ### [EPIC-10] Configuration Management
 *Goal: Enhance dynamic configuration capabilities.*
-- [CFG-001] | Remote Config: URL fetcher | INDEPENDENT | TODO
-- [CFG-002] | Remote Config: Caching logic | BLOCKS-CFG-001 | TODO
+- [CFG-001] | Remote Config: URL fetcher | INDEPENDENT | DONE
+- [CFG-002] | Remote Config: Caching logic | BLOCKS-CFG-001 | DONE
 - [CFG-003] | Severity Override: Config parsing logic | INDEPENDENT | DONE
 - [CFG-004] | Severity Override: Rule application logic | BLOCKS-CFG-003 | DONE
 - [CFG-005] | JSON Schema: Define schema.json | INDEPENDENT | DONE

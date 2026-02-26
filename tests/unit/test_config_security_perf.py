@@ -77,7 +77,7 @@ def test_severity_override():
             os.remove('test_override.py')
 
 def test_caching():
-    detection_cache.cache = {}
+    detection_cache.cache.clear()
     content = "x = 1"
     detect_violations(content, "test.py", "python")
     assert len(detection_cache.cache) == 1
