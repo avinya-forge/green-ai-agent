@@ -65,6 +65,16 @@
             color: #718096;
             letter-spacing: 0.5px;
         }
+        .charts-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+        }
+        .chart-box {
+            width: 48%;
+            text-align: center;
+        }
         h2 {
             font-size: 18pt;
             color: #2d3748;
@@ -178,6 +188,19 @@
                 <div class="summary-label">CO₂ Impact</div>
             </div>
         </div>
+    </div>
+
+    <div class="charts-container">
+        {% if severity_chart %}
+        <div class="chart-box">
+            {{ severity_chart|safe }}
+        </div>
+        {% endif %}
+        {% if top_files_chart %}
+        <div class="chart-box">
+            {{ top_files_chart|safe }}
+        </div>
+        {% endif %}
     </div>
 
     <h2>Detailed Violations</h2>
