@@ -34,6 +34,10 @@ Before entering the backlog or being marked as Done, tasks undergo a rigorous re
 2. **HARDENER**: Challenges for security vulnerabilities and 95% test coverage.
 3. **PRAGMATIST**: Enforces 1-2hr atomicity and the "99% Utility Rule" (eliminate 1% edge-case bloat).
 
+
+### 4. Recursive Density Logic
+All backlogs and workflows must be planned iteratively maintaining a minimum of 100 Work Units (WU) of high-fidelity work ready per session, expanding Epics as needed when density drops below this threshold. (1 Task = 1 WU, 1 Epic = 10 WU, 1 Strategic Proposal = 10 WU).
+
 ## ✅ Definition of Done (DoD)
 
 Every atomic task must meet the following criteria before being marked as "Done":
