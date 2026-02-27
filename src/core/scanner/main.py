@@ -97,11 +97,15 @@ class Scanner:
         total_codebase_emissions = 0.0
 
         # Determine number of workers
+        # Use os.cpu_count() explicitly if config not set
         config_concurrency = self.config.get('concurrency')
         if config_concurrency:
             num_workers = int(config_concurrency)
         else:
-            num_workers = min(32, (cpu_count() or 1) + 4)
+            # Default to CPU count, capped at 32 for safety
+            # Reserve 1 core for the main process if possible
+            cpus = os.cpu_count() or 1
+            num_workers = max(1, min(32, cpus - 1)) if cpus > 1 else 1
 
         if progress_callback:
             progress_callback("Scanning files...", 10)
@@ -111,40 +115,76 @@ class Scanner:
         # Get rules for the language
         language_rules = self.rule_repo.get_rules(self.language)
 
+        # Calculate chunksize for executor.map
+        # A simple heuristic: ensure each worker gets a reasonable batch
+        # to minimize IPC overhead.
+        # If total files is small, chunksize=1 is fine.
+        # If large, try to give each worker at least 4 items per chunk,
+        # but balance load.
+        chunksize = max(1, total_files // (num_workers * 4))
+
         # Use 'spawn' context
         mp_context = multiprocessing.get_context('spawn')
-        with concurrent.futures.ProcessPoolExecutor(
-            max_workers=num_workers, mp_context=mp_context
-        ) as executor:
-            future_to_file = {
-                executor.submit(
+
+        # Helper for map
+        scan_args = [
+            (f, self.language, self.config, language_rules)
+            for f in files if self._is_supported_file(f)
+        ]
+
+        # We need a wrapper function that unpacks arguments for map
+        # since scan_file_worker takes multiple args
+        # But wait, we can't pickle a local lambda easily.
+        # So we define a partial or use starmap if available (ProcessPoolExecutor doesn't support starmap directly until 3.11+ maybe?)
+        # Actually executor.map takes *iterables.
+        # So we can pass iterables for each argument.
+
+        files_to_scan = [f for f in files if self._is_supported_file(f)]
+        total_scan_files = len(files_to_scan)
+
+        if total_scan_files > 0:
+            with concurrent.futures.ProcessPoolExecutor(
+                max_workers=num_workers, mp_context=mp_context
+            ) as executor:
+                # Use executor.map with chunksize
+                # We need to pass constant arguments as repeated iterables
+                # OR better: make scan_file_worker take a single tuple/dict and unpack it?
+                # Changing worker signature might break tests or other calls if any.
+                # Let's check worker.py. It's a top level function.
+                # We can wrap it here locally? No, pickling issues.
+                # We can use a list comprehension with submit as before but that doesn't support chunksize directly in submit.
+                # executor.map supports chunksize.
+
+                # To use executor.map with multiple arguments, we pass multiple iterables.
+                # itertools.repeat can be used for constant arguments.
+                import itertools
+
+                results_iterator = executor.map(
                     scan_file_worker,
-                    f,
-                    self.language,
-                    self.config,
-                    language_rules
-                ): f for f in files if self._is_supported_file(f)
-            }
+                    files_to_scan,
+                    itertools.repeat(self.language),
+                    itertools.repeat(self.config),
+                    itertools.repeat(language_rules),
+                    chunksize=chunksize
+                )
 
-            for future in concurrent.futures.as_completed(future_to_file):
-                file_path = future_to_file[future]
-                try:
-                    file_result = future.result()
-                    issues.extend(file_result['issues'])
-                    per_file_emissions[file_path] = file_result['emissions']
-                    total_codebase_emissions += file_result['emissions']
+                for file_path, file_result in zip(files_to_scan, results_iterator):
+                    try:
+                        issues.extend(file_result['issues'])
+                        per_file_emissions[file_path] = file_result['emissions']
+                        total_codebase_emissions += file_result['emissions']
 
-                    processed_count += 1
-                    if progress_callback and total_files > 0:
-                        percentage = 10 + int(
-                            (processed_count / total_files) * 80
-                        )
-                        progress_callback(
-                            f"Processing {os.path.basename(file_path)}",
-                            percentage
-                        )
-                except Exception as exc:
-                    logger.error(f"{file_path} generated an exception: {exc}")
+                        processed_count += 1
+                        if progress_callback and total_files > 0:
+                            percentage = 10 + int(
+                                (processed_count / total_files) * 80
+                            )
+                            progress_callback(
+                                f"Processing {os.path.basename(file_path)}",
+                                percentage
+                            )
+                    except Exception as exc:
+                        logger.error(f"{file_path} generated an exception: {exc}")
 
         if progress_callback:
             progress_callback("Finalizing scan results...", 95)

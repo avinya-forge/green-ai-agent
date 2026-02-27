@@ -1,0 +1,54 @@
+{
+  "name": "green-ai-vscode",
+  "displayName": "Green AI",
+  "description": "Green-AI Software Analyzer VS Code Extension",
+  "version": "0.1.0",
+  "publisher": "Green-Software-Foundation",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Linters",
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:python",
+    "onLanguage:javascript",
+    "onLanguage:typescript",
+    "onLanguage:java",
+    "onLanguage:go"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "green-ai.scan",
+        "title": "Green AI: Scan File"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Green AI",
+      "properties": {
+        "green-ai.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable Green AI analysis."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "test": "npm run compile && node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.90.0",
+    "@types/node": "20.x",
+    "typescript": "^5.4.5",
+    "vsce": "^2.15.0"
+  }
+}
