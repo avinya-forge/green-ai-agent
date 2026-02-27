@@ -10,6 +10,7 @@ from typing import Dict, Any, Optional
 from jinja2 import Environment, FileSystemLoader
 from src.utils.logger import logger
 from src.utils.security import sanitize_path
+from src.core.export.charts import ChartGenerator
 
 # Default output directory
 OUTPUT_DIR = Path(__file__).parent.parent.parent.parent / 'output'
@@ -72,6 +73,14 @@ class PDFExporter:
         # Sort files by violation count
         sorted_files = dict(sorted(by_file.items(), key=lambda x: len(x[1]), reverse=True))
 
+        # Prepare Top 5 files for chart
+        top_files = dict(list(sorted_files.items())[:5])
+        top_files_data = {k: len(v) for k, v in top_files.items()}
+
+        # Generate Charts
+        severity_chart = ChartGenerator.generate_pie_chart(severity_counts, "Severity Distribution")
+        top_files_chart = ChartGenerator.generate_bar_chart(top_files_data, "Top Violations by File")
+
         # Emissions
         codebase_emissions = results.get('codebase_emissions', 0)
         scanning_emissions = results.get('scanning_emissions', 0)
@@ -87,7 +96,9 @@ class PDFExporter:
             'codebase_emissions': codebase_emissions,
             'scanning_emissions': scanning_emissions,
             'total_emissions': total_emissions,
-            'files': sorted_files
+            'files': sorted_files,
+            'severity_chart': severity_chart,
+            'top_files_chart': top_files_chart
         }
 
         # Render HTML
