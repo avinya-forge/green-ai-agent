@@ -27,7 +27,7 @@
 ### [EPIC-09] IDE Plugins (Prep)
 *Goal: Prepare for Phase 3 IDE integration.*
 - [IDE-001] | VS Code Ext: Project scaffold | INDEPENDENT | TODO
-- [IDE-002] | LSP Server: Basic protocol implementation | INDEPENDENT | TODO
+- [IDE-002] | LSP Server: Basic protocol implementation | INDEPENDENT | Done
 - [IDE-003] | LSP Server: Initialize handshake | BLOCKS-IDE-002 | TODO
 - [IDE-004] | LSP Server: Text document sync | BLOCKS-IDE-003 | TODO
 - [IDE-005] | LSP Server: Diagnostics publishing | BLOCKS-IDE-004 | TODO
