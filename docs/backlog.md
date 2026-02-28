@@ -5,7 +5,7 @@
 
 ### [EPIC-04] Advanced Reporting
 *Goal: Enhance reporting capabilities with HTML/CSV improvements and PDF support.*
-- [REP-003] | PDF Export: Chart rendering (static image gen) | BLOCKS-REP-002 | TODO
+- [REP-003] | PDF Export: Chart rendering (static image gen) | BLOCKS-REP-002 | Done
 
 ### [EPIC-05] CI/CD GitHub Action V2
 *Goal: Deepen CI/CD integration with a robust GitHub Action.*
