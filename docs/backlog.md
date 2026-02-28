@@ -31,7 +31,7 @@
 - [IDE-003] | LSP Server: Initialize handshake | BLOCKS-IDE-002 | TODO
 - [IDE-004] | LSP Server: Text document sync | BLOCKS-IDE-003 | TODO
 - [IDE-005] | LSP Server: Diagnostics publishing | BLOCKS-IDE-004 | TODO
-- [IDE-006] | Connect Scanner: CLI wrapper for LSP | BLOCKS-IDE-005 | TODO
+- [IDE-006] | Connect Scanner: CLI wrapper for LSP | BLOCKS-IDE-005 | Done
 - [IDE-007] | Syntax Highlighting: Grammar definition | INDEPENDENT | TODO
 - [IDE-008] | Quick Fix: Code action provider | BLOCKS-IDE-005 | TODO
 - [IDE-009] | VS Code Ext: Settings page | BLOCKS-IDE-001 | TODO

@@ -38,6 +38,9 @@ try:
     from src.cli.commands.ci import ci
     cli.add_command(ci)
 
+    from src.cli.commands.lsp import lsp
+    cli.add_command(lsp)
+
 except ImportError as e:
     # Fail fast during development
     raise e
