@@ -3,98 +3,26 @@
 ## Phase 2: Action & Expansion (Current)
 
 
-### [EPIC-03] LLM Integration (Autonomous Fixer)
-*Goal: Implement autonomous fixer using LLM integration.*
-- [LLM-001] | Design LLM Interface & Provider Abstraction | INDEPENDENT | DONE
-- [LLM-002] | Implement Mock LLM Provider for Testing | BLOCKS-LLM-003 | DONE
-- [LLM-003] | Implement OpenAI API Provider | INDEPENDENT | DONE
-- [LLM-004] | Implement Token Usage Logic (Cost estimation per model) | INDEPENDENT | DONE
-- [LLM-005] | Implement Rate Limiting Logic (Token bucket) | INDEPENDENT | DONE
-- [LLM-006] | Implement Rate Limiting Config | BLOCKS-LLM-005 | DONE
-- [LLM-007] | LLM CLI command `fix-ai` (Core logic) | INDEPENDENT | DONE
-- [LLM-008] | LLM CLI command `fix-ai` (Prompt integration) | BLOCKS-LLM-007 | DONE
-- [LLM-009] | LLM CLI command `fix-ai` (Diff output) | BLOCKS-LLM-008 | DONE
-- [LLM-010] | Prompt Engineering for Python Loop Fix | INDEPENDENT | DONE
-- [LLM-011] | Prompt Engineering for Python IO Fix | INDEPENDENT | DONE
-- [LLM-012] | Prompt Engineering for Python Logic Fix | INDEPENDENT | DONE
-- [LLM-013] | Prompt Engineering for JS Loop Fix | INDEPENDENT | DONE
-- [LLM-014] | Prompt Engineering for JS DOM Fix | INDEPENDENT | DONE
-- [LLM-015] | Integration Test: OpenAI Mock | INDEPENDENT | DONE
-- [LLM-016] | Integration Test: Token Logic | BLOCKS-LLM-004 | DONE
-- [LLM-017] | Integration Test: Rate Limit Logic | BLOCKS-LLM-005 | DONE
-- [LLM-018] | Security Review: Prompt Injection | INDEPENDENT | DONE
-- [LLM-019] | Security Review: Generated Code Sandbox | INDEPENDENT | DONE
-
 ### [EPIC-04] Advanced Reporting
 *Goal: Enhance reporting capabilities with HTML/CSV improvements and PDF support.*
-- [REP-001] | PDF Export: Install WeasyPrint | INDEPENDENT | DONE
-- [REP-002] | PDF Export: Report Template (HTML/CSS) | BLOCKS-REP-001 | DONE
 - [REP-003] | PDF Export: Chart rendering (static image gen) | BLOCKS-REP-002 | TODO
-- [REP-004] | PDF Export: Layout logic | BLOCKS-REP-003 | DONE
-- [REP-005] | CSV Export: Add violation line number | INDEPENDENT | DONE
-- [REP-006] | CSV Export: Add violation snippet | INDEPENDENT | DONE
-- [REP-007] | CSV Export: Add remediation suggestion | INDEPENDENT | DONE
-- [REP-008] | HTML Report: Add interactive chart (Chart.js integration) | INDEPENDENT | DONE
-- [REP-009] | HTML Report: Add filtering (JS) | INDEPENDENT | DONE
-- [REP-010] | HTML Report: Add search (JS) | INDEPENDENT | DONE
-- [REP-011] | JSON Export: Schema definition (Pydantic) | INDEPENDENT | DONE
-- [REP-012] | JSON Export: Validation logic | BLOCKS-REP-011 | DONE
-- [REP-013] | JSON Export: Metadata fields (version, timestamp) | BLOCKS-REP-011 | DONE
-- [REP-014] | JSON Export: Unit Tests | BLOCKS-REP-011 | DONE
-- [REP-015] | PDF Export: Integration Test | BLOCKS-REP-004 | DONE
 
 ### [EPIC-05] CI/CD GitHub Action V2
 *Goal: Deepen CI/CD integration with a robust GitHub Action.*
-- [CI-001] | Docker Action: Dockerfile creation | INDEPENDENT | DONE
-- [CI-002] | Docker Action: Entrypoint script | BLOCKS-CI-001 | DONE
-- [CI-003] | GitHub Action: `action.yml` metadata | INDEPENDENT | DONE
-- [CI-004] | GitHub Action: Inputs definition | BLOCKS-CI-003 | DONE
-- [CI-005] | PR Comment Bot: GitHub API integration | INDEPENDENT | DONE
-- [CI-006] | PR Comment Bot: Diff parsing | INDEPENDENT | DONE
-- [CI-007] | PR Comment Bot: Comment posting logic | BLOCKS-CI-005 | DONE
-- [CI-008] | Fail Logic: Threshold config | INDEPENDENT | DONE
-- [CI-009] | Fail Logic: Exit code handling | BLOCKS-CI-008 | DONE
 - [CI-010] | Marketplace prep: Documentation | INDEPENDENT | TODO
 
 ### [EPIC-06] Performance Optimization
 *Goal: Ensure the tool remains lightweight and fast.*
 - [GO-009] | Go Performance Benchmark | INDEPENDENT | TODO
-- [PERF-001] | Profile Scanner: cProfile setup | INDEPENDENT | DONE
-- [PERF-002] | Profile Scanner: Identify bottlenecks | BLOCKS-PERF-001 | DONE
-- [PERF-003] | Optimize Query: Review Python queries | INDEPENDENT | DONE
-- [PERF-004] | Optimize Query: Review JS queries | INDEPENDENT | DONE
 - [PERF-005] | Parallel Processing: Multiprocessing pool tuning | INDEPENDENT | TODO
 - [PERF-006] | Parallel Processing: Chunk size tuning | BLOCKS-PERF-005 | TODO
 - [PERF-007] | Memory Reduction: Generator usage review | INDEPENDENT | TODO
 - [PERF-008] | Memory Reduction: Tree-sitter tree disposal | INDEPENDENT | TODO
-- [PERF-009] | Result Caching: Disk cache implementation | INDEPENDENT | DONE
-- [PERF-010] | Result Caching: In-memory LRU cache | INDEPENDENT | DONE
 
 ### [EPIC-07] Security Hardening
 *Goal: Meet DoD security requirements.*
-- [SEC-001] | Dependency Audit: Run `pip-audit` | INDEPENDENT | DONE
 - [SEC-002] | Dependency Upgrade: Bump versions | BLOCKS-SEC-001 | TODO
-- [SEC-003] | Input Sanitization: CLI args review | INDEPENDENT | DONE
-- [SEC-004] | Input Sanitization: API payload validation | INDEPENDENT | DONE
-- [SEC-005] | Secrets Detection: Rule implementation (AST/Regex) | INDEPENDENT | DONE
-- [SEC-006] | Secrets Detection: Rule implementation (Entropy) | BLOCKS-SEC-005 | DONE
-- [SEC-007] | Hardcoded Password: Rule implementation | INDEPENDENT | DONE
 - [SEC-008] | OWASP Top 10: Mapping review | INDEPENDENT | TODO
-- [SEC-009] | Security Headers: API middleware | INDEPENDENT | DONE
-- [SEC-010] | Rate Limiting: API middleware | INDEPENDENT | DONE
-
-### [EPIC-08] Telemetry & Metrics
-*Goal: Provide transparent metrics on tool usage and impact.*
-- [TEL-001] | Telemetry System: Data schema design | INDEPENDENT | DONE
-- [TEL-002] | Telemetry System: Local storage logic | BLOCKS-TEL-001 | DONE
-- [TEL-003] | Opt-in Mechanism: CLI flag | INDEPENDENT | DONE
-- [TEL-004] | Opt-in Mechanism: Config file setting | BLOCKS-TEL-003 | DONE
-- [TEL-005] | Metric Collection: Rule hit counters | INDEPENDENT | DONE
-- [TEL-006] | Metric Collection: Scan duration timer | INDEPENDENT | DONE
-- [TEL-007] | Metric Collection: Error tracking | INDEPENDENT | DONE
-- [TEL-008] | Dashboard View: Telemetry tab UI | BLOCKS-TEL-002 | DONE
-- [TEL-009] | Dashboard View: Telemetry charts | BLOCKS-TEL-008 | DONE
-- [TEL-010] | Anonymization: Data scrubbing logic | BLOCKS-TEL-001 | DONE
 
 ### [EPIC-09] IDE Plugins (Prep)
 *Goal: Prepare for Phase 3 IDE integration.*
@@ -109,15 +37,68 @@
 - [IDE-009] | VS Code Ext: Settings page | BLOCKS-IDE-001 | TODO
 - [IDE-010] | VS Code Ext: Output channel logging | BLOCKS-IDE-001 | TODO
 
-### [EPIC-10] Configuration Management
-*Goal: Enhance dynamic configuration capabilities.*
-- [CFG-001] | Remote Config: URL fetcher | INDEPENDENT | DONE
-- [CFG-002] | Remote Config: Caching logic | BLOCKS-CFG-001 | DONE
-- [CFG-003] | Severity Override: Config parsing logic | INDEPENDENT | DONE
-- [CFG-004] | Severity Override: Rule application logic | BLOCKS-CFG-003 | DONE
-- [CFG-005] | JSON Schema: Define schema.json | INDEPENDENT | DONE
-- [CFG-006] | JSON Schema: Validate config on load | BLOCKS-CFG-005 | DONE
-- [CFG-007] | Merge Configs: Deep merge utility | INDEPENDENT | DONE
-- [CFG-008] | Merge Configs: Precedence logic (CLI > Local > Global) | BLOCKS-CFG-007 | DONE
-- [CFG-009] | CLI Generator: `init` command logic | INDEPENDENT | DONE
-- [CFG-010] | CLI Generator: Template creation | BLOCKS-CFG-009 | DONE
+
+### [EPIC-11] Cloud Native Deployment
+*Goal: Enable scalable cloud deployment via Kubernetes and Docker Swarm.*
+- [CLD-001] | Create Helm Chart for Green-AI | INDEPENDENT | TODO
+- [CLD-002] | Implement Kubernetes Deployment manifests | BLOCKS-CLD-001 | TODO
+- [CLD-003] | Implement Kubernetes Service manifests | BLOCKS-CLD-002 | TODO
+- [CLD-004] | Implement Kubernetes Ingress configurations | BLOCKS-CLD-003 | TODO
+- [CLD-005] | Create Docker Compose file for local cloud testing | INDEPENDENT | TODO
+- [CLD-006] | Write CI/CD pipeline for automated Docker image push | INDEPENDENT | TODO
+- [CLD-007] | Configure horizontal pod autoscaling for scanner | BLOCKS-CLD-002 | TODO
+- [CLD-008] | Implement readiness and liveness probes | BLOCKS-CLD-002 | TODO
+- [CLD-009] | Document cloud deployment steps | INDEPENDENT | TODO
+- [CLD-010] | Integration tests for Kubernetes deployment | BLOCKS-CLD-009 | TODO
+
+### [EPIC-12] Team Collaboration Dashboard
+*Goal: Provide team-based aggregation and historical reporting.*
+- [TEAM-001] | Design database schema for team analytics | INDEPENDENT | TODO
+- [TEAM-002] | Implement API for creating and managing teams | BLOCKS-TEAM-001 | TODO
+- [TEAM-003] | Implement RBAC (Role-Based Access Control) for teams | BLOCKS-TEAM-002 | TODO
+- [TEAM-004] | Build team dashboard frontend views | INDEPENDENT | TODO
+- [TEAM-005] | Implement aggregation logic for team scan metrics | BLOCKS-TEAM-001 | TODO
+- [TEAM-006] | Add historical trend charts to team dashboard | BLOCKS-TEAM-005 | TODO
+- [TEAM-007] | Integrate authentication system with team API | BLOCKS-TEAM-003 | TODO
+- [TEAM-008] | Implement email notifications for team summaries | INDEPENDENT | TODO
+- [TEAM-009] | Write unit tests for team analytics API | BLOCKS-TEAM-005 | TODO
+- [TEAM-010] | Document team collaboration features | INDEPENDENT | TODO
+
+### [EPIC-13] Machine Learning Pattern Recognition
+*Goal: Use advanced ML models to predict and detect complex code inefficiencies.*
+- [ML-001] | Collect and clean training dataset of code inefficiencies | INDEPENDENT | TODO
+- [ML-002] | Design neural network architecture for code sequence classification | BLOCKS-ML-001 | TODO
+- [ML-003] | Implement model training pipeline | BLOCKS-ML-002 | TODO
+- [ML-004] | Evaluate model accuracy and tune hyperparameters | BLOCKS-ML-003 | TODO
+- [ML-005] | Export trained model to ONNX format | BLOCKS-ML-004 | TODO
+- [ML-006] | Integrate ONNX runtime into Green-AI scanner | BLOCKS-ML-005 | TODO
+- [ML-007] | Implement fallback logic for ML model predictions | BLOCKS-ML-006 | TODO
+- [ML-008] | Add CLI flag to enable/disable ML scanner | BLOCKS-ML-006 | TODO
+- [ML-009] | Write integration tests for ML pattern recognition | BLOCKS-ML-006 | TODO
+- [ML-010] | Document ML pattern recognition capabilities | INDEPENDENT | TODO
+
+### [EPIC-14] Rust Language Support
+*Goal: Add support for analyzing Rust projects.*
+- [RUST-001] | Integrate `tree-sitter-rust` into the parser engine | INDEPENDENT | TODO
+- [RUST-002] | Implement Rust language detector class | BLOCKS-RUST-001 | TODO
+- [RUST-003] | Implement rule: excessive clone detection | BLOCKS-RUST-002 | TODO
+- [RUST-004] | Implement rule: unnecessary allocations in loops | BLOCKS-RUST-002 | TODO
+- [RUST-005] | Implement rule: inefficient unwrap inside loops | BLOCKS-RUST-002 | TODO
+- [RUST-006] | Write unit tests for Rust rules | BLOCKS-RUST-005 | TODO
+- [RUST-007] | Add CLI integration for scanning Rust projects | BLOCKS-RUST-002 | TODO
+- [RUST-008] | Implement end-to-end Rust project scanning test | BLOCKS-RUST-007 | TODO
+- [RUST-009] | Update documentation with Rust support details | INDEPENDENT | TODO
+- [RUST-010] | Release Rust Support Beta | BLOCKS-RUST-008 | TODO
+
+### [EPIC-15] C# Language Support
+*Goal: Add support for analyzing C# (.NET) projects.*
+- [CS-001] | Integrate `tree-sitter-c-sharp` into parser engine | INDEPENDENT | TODO
+- [CS-002] | Implement C# language detector class | BLOCKS-CS-001 | TODO
+- [CS-003] | Implement rule: blocking async calls (.Result/.Wait) | BLOCKS-CS-002 | TODO
+- [CS-004] | Implement rule: inefficient string concatenation in loops | BLOCKS-CS-002 | TODO
+- [CS-005] | Implement rule: multiple LINQ iterations (ToList inside loop) | BLOCKS-CS-002 | TODO
+- [CS-006] | Write unit tests for C# rules | BLOCKS-CS-005 | TODO
+- [CS-007] | Add CLI integration for scanning C# projects | BLOCKS-CS-002 | TODO
+- [CS-008] | Implement end-to-end C# project scanning test | BLOCKS-CS-007 | TODO
+- [CS-009] | Update documentation with C# support details | INDEPENDENT | TODO
+- [CS-010] | Release C# Support Beta | BLOCKS-CS-008 | TODO

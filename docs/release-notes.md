@@ -1,6 +1,104 @@
 # Release Notes
 
-## [v0.8.0-alpha] - CI/CD, Telemetry & Performance
+## [v0.8.0] - CI/CD, Telemetry & Performance
+
+### Vaulted Epics
+#### [EPIC-03] LLM Integration (Autonomous Fixer)
+*Goal: Implement autonomous fixer using LLM integration.*
+- [LLM-001] | Design LLM Interface & Provider Abstraction | INDEPENDENT | DONE
+- [LLM-002] | Implement Mock LLM Provider for Testing | BLOCKS-LLM-003 | DONE
+- [LLM-003] | Implement OpenAI API Provider | INDEPENDENT | DONE
+- [LLM-004] | Implement Token Usage Logic (Cost estimation per model) | INDEPENDENT | DONE
+- [LLM-005] | Implement Rate Limiting Logic (Token bucket) | INDEPENDENT | DONE
+- [LLM-006] | Implement Rate Limiting Config | BLOCKS-LLM-005 | DONE
+- [LLM-007] | LLM CLI command `fix-ai` (Core logic) | INDEPENDENT | DONE
+- [LLM-008] | LLM CLI command `fix-ai` (Prompt integration) | BLOCKS-LLM-007 | DONE
+- [LLM-009] | LLM CLI command `fix-ai` (Diff output) | BLOCKS-LLM-008 | DONE
+- [LLM-010] | Prompt Engineering for Python Loop Fix | INDEPENDENT | DONE
+- [LLM-011] | Prompt Engineering for Python IO Fix | INDEPENDENT | DONE
+- [LLM-012] | Prompt Engineering for Python Logic Fix | INDEPENDENT | DONE
+- [LLM-013] | Prompt Engineering for JS Loop Fix | INDEPENDENT | DONE
+- [LLM-014] | Prompt Engineering for JS DOM Fix | INDEPENDENT | DONE
+- [LLM-015] | Integration Test: OpenAI Mock | INDEPENDENT | DONE
+- [LLM-016] | Integration Test: Token Logic | BLOCKS-LLM-004 | DONE
+- [LLM-017] | Integration Test: Rate Limit Logic | BLOCKS-LLM-005 | DONE
+- [LLM-018] | Security Review: Prompt Injection | INDEPENDENT | DONE
+- [LLM-019] | Security Review: Generated Code Sandbox | INDEPENDENT | DONE
+
+#### [EPIC-04] Advanced Reporting
+*Goal: Enhance reporting capabilities with HTML/CSV improvements and PDF support.*
+- [REP-001] | PDF Export: Install WeasyPrint | INDEPENDENT | DONE
+- [REP-002] | PDF Export: Report Template (HTML/CSS) | BLOCKS-REP-001 | DONE
+- [REP-004] | PDF Export: Layout logic | BLOCKS-REP-003 | DONE
+- [REP-005] | CSV Export: Add violation line number | INDEPENDENT | DONE
+- [REP-006] | CSV Export: Add violation snippet | INDEPENDENT | DONE
+- [REP-007] | CSV Export: Add remediation suggestion | INDEPENDENT | DONE
+- [REP-008] | HTML Report: Add interactive chart (Chart.js integration) | INDEPENDENT | DONE
+- [REP-009] | HTML Report: Add filtering (JS) | INDEPENDENT | DONE
+- [REP-010] | HTML Report: Add search (JS) | INDEPENDENT | DONE
+- [REP-011] | JSON Export: Schema definition (Pydantic) | INDEPENDENT | DONE
+- [REP-012] | JSON Export: Validation logic | BLOCKS-REP-011 | DONE
+- [REP-013] | JSON Export: Metadata fields (version, timestamp) | BLOCKS-REP-011 | DONE
+- [REP-014] | JSON Export: Unit Tests | BLOCKS-REP-011 | DONE
+- [REP-015] | PDF Export: Integration Test | BLOCKS-REP-004 | DONE
+
+#### [EPIC-05] CI/CD GitHub Action V2
+*Goal: Deepen CI/CD integration with a robust GitHub Action.*
+- [CI-001] | Docker Action: Dockerfile creation | INDEPENDENT | DONE
+- [CI-002] | Docker Action: Entrypoint script | BLOCKS-CI-001 | DONE
+- [CI-003] | GitHub Action: `action.yml` metadata | INDEPENDENT | DONE
+- [CI-004] | GitHub Action: Inputs definition | BLOCKS-CI-003 | DONE
+- [CI-005] | PR Comment Bot: GitHub API integration | INDEPENDENT | DONE
+- [CI-006] | PR Comment Bot: Diff parsing | INDEPENDENT | DONE
+- [CI-007] | PR Comment Bot: Comment posting logic | BLOCKS-CI-005 | DONE
+- [CI-008] | Fail Logic: Threshold config | INDEPENDENT | DONE
+- [CI-009] | Fail Logic: Exit code handling | BLOCKS-CI-008 | DONE
+
+#### [EPIC-06] Performance Optimization
+*Goal: Ensure the tool remains lightweight and fast.*
+- [PERF-001] | Profile Scanner: cProfile setup | INDEPENDENT | DONE
+- [PERF-002] | Profile Scanner: Identify bottlenecks | BLOCKS-PERF-001 | DONE
+- [PERF-003] | Optimize Query: Review Python queries | INDEPENDENT | DONE
+- [PERF-004] | Optimize Query: Review JS queries | INDEPENDENT | DONE
+- [PERF-009] | Result Caching: Disk cache implementation | INDEPENDENT | DONE
+- [PERF-010] | Result Caching: In-memory LRU cache | INDEPENDENT | DONE
+
+#### [EPIC-07] Security Hardening
+*Goal: Meet DoD security requirements.*
+- [SEC-001] | Dependency Audit: Run `pip-audit` | INDEPENDENT | DONE
+- [SEC-003] | Input Sanitization: CLI args review | INDEPENDENT | DONE
+- [SEC-004] | Input Sanitization: API payload validation | INDEPENDENT | DONE
+- [SEC-005] | Secrets Detection: Rule implementation (AST/Regex) | INDEPENDENT | DONE
+- [SEC-006] | Secrets Detection: Rule implementation (Entropy) | BLOCKS-SEC-005 | DONE
+- [SEC-007] | Hardcoded Password: Rule implementation | INDEPENDENT | DONE
+- [SEC-009] | Security Headers: API middleware | INDEPENDENT | DONE
+- [SEC-010] | Rate Limiting: API middleware | INDEPENDENT | DONE
+
+#### [EPIC-08] Telemetry & Metrics
+*Goal: Provide transparent metrics on tool usage and impact.*
+- [TEL-001] | Telemetry System: Data schema design | INDEPENDENT | DONE
+- [TEL-002] | Telemetry System: Local storage logic | BLOCKS-TEL-001 | DONE
+- [TEL-003] | Opt-in Mechanism: CLI flag | INDEPENDENT | DONE
+- [TEL-004] | Opt-in Mechanism: Config file setting | BLOCKS-TEL-003 | DONE
+- [TEL-005] | Metric Collection: Rule hit counters | INDEPENDENT | DONE
+- [TEL-006] | Metric Collection: Scan duration timer | INDEPENDENT | DONE
+- [TEL-007] | Metric Collection: Error tracking | INDEPENDENT | DONE
+- [TEL-008] | Dashboard View: Telemetry tab UI | BLOCKS-TEL-002 | DONE
+- [TEL-009] | Dashboard View: Telemetry charts | BLOCKS-TEL-008 | DONE
+- [TEL-010] | Anonymization: Data scrubbing logic | BLOCKS-TEL-001 | DONE
+
+#### [EPIC-10] Configuration Management
+*Goal: Enhance dynamic configuration capabilities.*
+- [CFG-001] | Remote Config: URL fetcher | INDEPENDENT | DONE
+- [CFG-002] | Remote Config: Caching logic | BLOCKS-CFG-001 | DONE
+- [CFG-003] | Severity Override: Config parsing logic | INDEPENDENT | DONE
+- [CFG-004] | Severity Override: Rule application logic | BLOCKS-CFG-003 | DONE
+- [CFG-005] | JSON Schema: Define schema.json | INDEPENDENT | DONE
+- [CFG-006] | JSON Schema: Validate config on load | BLOCKS-CFG-005 | DONE
+- [CFG-007] | Merge Configs: Deep merge utility | INDEPENDENT | DONE
+- [CFG-008] | Merge Configs: Precedence logic (CLI > Local > Global) | BLOCKS-CFG-007 | DONE
+- [CFG-009] | CLI Generator: `init` command logic | INDEPENDENT | DONE
+- [CFG-010] | CLI Generator: Template creation | BLOCKS-CFG-009 | DONE
 
 ### Added
 - **Python Optimization**: Refactored `PythonViolationDetector` to remove redundant AST traversals (O(N) instead of O(N*Depth)) and fixed `io_in_loop` detection for method calls (PERF-003).

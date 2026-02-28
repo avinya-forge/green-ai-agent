@@ -14,7 +14,7 @@ Green-AI is a lightweight utility for detecting and fixing energy-inefficient co
 
 ---
 
-## ✨ Features (v0.7.0)
+## ✨ Features (v0.8.0)
 
 ### 📊 Code Scanning
 - **Multi-language support**: Python, JavaScript, Java, Go, TypeScript
@@ -125,7 +125,7 @@ green-ai-agent/
 
 ---
 
-## 📊 Current Status (v0.7.0)
+## 📊 Current Status (v0.8.0)
 
 | Aspect | Status |
 |--------|--------|
@@ -328,7 +328,7 @@ Green-AI contributes to the Green Software Foundation's mission of building a mo
 
 ---
 
-**Version**: 0.7.0
+**Version**: 0.8.0
 **Last Updated**: February 11, 2026
 **Status**: Active Development (Phase 2 Expansion)
 
