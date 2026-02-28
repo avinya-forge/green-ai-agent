@@ -9,9 +9,9 @@ from src.ide.lsp.server import server
 def lsp(tcp, host, port):
     """Start the Green AI Language Server."""
     if tcp:
-        click.echo(f"Starting Green AI LSP server on tcp://{host}:{port}")
+        click.echo(f"Starting Green AI LSP server on tcp://{host}:{port}", err=True)
         server.start_tcp(host, port)
     else:
         # Defaults to standard I/O
-        click.echo("Starting Green AI LSP server on stdio")
+        click.echo("Starting Green AI LSP server on stdio", err=True)
         server.start_io()

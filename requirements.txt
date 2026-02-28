@@ -20,4 +20,4 @@ tree-sitter-java
 tree-sitter-go
 weasyprint>=60.0
 matplotlib>=3.7.0
-pygls
+pygls==1.3.1
