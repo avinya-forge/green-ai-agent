@@ -79,7 +79,8 @@ class TestPDFExporter:
             # Check content for charts
             assert "Severity Distribution" in html_content
             assert "Top Violations by File" in html_content
-            assert "<svg" in html_content # Charts injected
+            assert "<img" in html_content # Charts injected as images
+            assert "data:image/png;base64," in html_content # Verify base64 PNG format
 
             # Verify write_pdf was called
             mock_html_instance.write_pdf.assert_called_once_with(str(output_file))
