@@ -3,9 +3,9 @@ import asyncio
 from typing import Optional
 from pygls.server import LanguageServer
 from lsprotocol.types import (
-    TEXT_document_did_open,
-    TEXT_document_did_change,
-    TEXT_document_did_save,
+    TEXT_DOCUMENT_DID_OPEN,
+    TEXT_DOCUMENT_DID_CHANGE,
+    TEXT_DOCUMENT_DID_SAVE,
     DidOpenTextDocumentParams,
     DidChangeTextDocumentParams,
     DidSaveTextDocumentParams,
@@ -63,18 +63,18 @@ def initialize(ls: GreenAILanguageServer, params: InitializeParams):
     logger.info("Green AI LSP Initialized")
     return None
 
-@server.feature(TEXT_document_did_open)
+@server.feature(TEXT_DOCUMENT_DID_OPEN)
 async def did_open(ls: GreenAILanguageServer, params: DidOpenTextDocumentParams):
     """Handle document open."""
     logger.info(f"Document opened: {params.text_document.uri}")
     _validate(ls, params)
 
-@server.feature(TEXT_document_did_change)
+@server.feature(TEXT_DOCUMENT_DID_CHANGE)
 async def did_change(ls: GreenAILanguageServer, params: DidChangeTextDocumentParams):
     """Handle document change."""
     _validate(ls, params)
 
-@server.feature(TEXT_document_did_save)
+@server.feature(TEXT_DOCUMENT_DID_SAVE)
 async def did_save(ls: GreenAILanguageServer, params: DidSaveTextDocumentParams):
     """Handle document save."""
     logger.info(f"Document saved: {params.text_document.uri}")
