@@ -46,6 +46,14 @@ class BaseTreeSitterDetector:
         except Exception as e:
             logger.error(f"Error initializing Tree-sitter for {file_path}: {e}")
 
+    def dispose(self):
+        """
+        Dispose of the tree and parser to free memory.
+        """
+        self.tree = None
+        self.parser = None
+        self.language = None
+
     def detect_all(self) -> List[Dict]:
         """
         Run all AST-based detectors.

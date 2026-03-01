@@ -11,18 +11,18 @@ class FileDiscoverer:
     def __init__(self, config_loader: ConfigLoader):
         self.config_loader = config_loader
 
-    def get_files(self, scan_path: str) -> List[str]:
+    def get_files(self, scan_path: str):
         """
-        Get all files to scan, respecting ignore patterns from config.
+        Yield all files to scan, respecting ignore patterns from config.
 
         Uses pathlib for efficiency and correct cross-platform path handling.
         """
         path = Path(scan_path)
         if path.is_file():
-            return [str(path)]
+            yield str(path)
+            return
 
         ignore_patterns = self.config_loader.get_ignored_files()
-        all_files = []
 
         logger.info(
             f"Discovering files in {scan_path} "
@@ -55,7 +55,4 @@ class FileDiscoverer:
                     break
 
             if not is_ignored:
-                all_files.append(str(file))
-
-        logger.info(f"Found {len(all_files)} files to scan.")
-        return all_files
+                yield str(file)

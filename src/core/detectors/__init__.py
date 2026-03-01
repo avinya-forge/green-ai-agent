@@ -40,6 +40,7 @@ def detect_violations(content: str, file_path: str, language: str = 'python') ->
         # AST-based detection
         js_ast_detector = JavaScriptASTDetector(content, file_path)
         violations.extend(js_ast_detector.detect_all())
+        js_ast_detector.dispose()
 
         # Regex-based detection (legacy/remaining rules)
         js_detector = JavaScriptViolationDetector(content, file_path)
@@ -49,16 +50,19 @@ def detect_violations(content: str, file_path: str, language: str = 'python') ->
         # AST-based detection
         ts_ast_detector = TypeScriptASTDetector(content, file_path)
         violations.extend(ts_ast_detector.detect_all())
+        ts_ast_detector.dispose()
 
     elif language == 'java':
         # AST-based detection
         java_ast_detector = JavaASTDetector(content, file_path)
         violations.extend(java_ast_detector.detect_all())
+        java_ast_detector.dispose()
 
     elif language == 'go':
         # AST-based detection
         go_ast_detector = GoASTDetector(content, file_path)
         violations.extend(go_ast_detector.detect_all())
+        go_ast_detector.dispose()
 
     # Update cache
     detection_cache.set(content, language, violations)
