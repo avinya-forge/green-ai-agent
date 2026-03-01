@@ -40,11 +40,11 @@
 
 ### [EPIC-11] Cloud Native Deployment
 *Goal: Enable scalable cloud deployment via Kubernetes and Docker Swarm.*
-- [CLD-001] | Create Helm Chart for Green-AI | INDEPENDENT | TODO
+- [CLD-001] | Create Helm Chart for Green-AI | INDEPENDENT | Done
 - [CLD-002] | Implement Kubernetes Deployment manifests | BLOCKS-CLD-001 | TODO
 - [CLD-003] | Implement Kubernetes Service manifests | BLOCKS-CLD-002 | TODO
 - [CLD-004] | Implement Kubernetes Ingress configurations | BLOCKS-CLD-003 | TODO
-- [CLD-005] | Create Docker Compose file for local cloud testing | INDEPENDENT | TODO
+- [CLD-005] | Create Docker Compose file for local cloud testing | INDEPENDENT | Done
 - [CLD-006] | Write CI/CD pipeline for automated Docker image push | INDEPENDENT | TODO
 - [CLD-007] | Configure horizontal pod autoscaling for scanner | BLOCKS-CLD-002 | TODO
 - [CLD-008] | Implement readiness and liveness probes | BLOCKS-CLD-002 | TODO

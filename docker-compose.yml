@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  green-ai-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: green-ai-agent:latest
+    container_name: green-ai-dashboard
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+      - ./rules:/app/rules
+      - ./docs:/app/docs
+      - ./output:/app/output
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+    command: ["python", "-m", "src.cli", "dashboard", "--host", "0.0.0.0", "--port", "5000"]
+    restart: unless-stopped
