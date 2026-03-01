@@ -15,9 +15,9 @@
 *Goal: Ensure the tool remains lightweight and fast.*
 - [GO-009] | Go Performance Benchmark | INDEPENDENT | TODO
 - [PERF-005] | Parallel Processing: Multiprocessing pool tuning | INDEPENDENT | TODO
-- [PERF-006] | Parallel Processing: Chunk size tuning | BLOCKS-PERF-005 | TODO
-- [PERF-007] | Memory Reduction: Generator usage review | INDEPENDENT | TODO
-- [PERF-008] | Memory Reduction: Tree-sitter tree disposal | INDEPENDENT | TODO
+- [PERF-006] | Parallel Processing: Chunk size tuning | BLOCKS-PERF-005 | Done
+- [PERF-007] | Memory Reduction: Generator usage review | INDEPENDENT | Done
+- [PERF-008] | Memory Reduction: Tree-sitter tree disposal | INDEPENDENT | Done
 
 ### [EPIC-07] Security Hardening
 *Goal: Meet DoD security requirements.*

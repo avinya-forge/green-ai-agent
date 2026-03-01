@@ -44,4 +44,5 @@ class GreenAIConfig(BaseModel):
     auto_fix: bool = Field(default=False, description="Whether to auto-apply fixes")
     llm: LlmConfig = Field(default_factory=LlmConfig, description="LLM integration settings")
     concurrency: Optional[int] = Field(default=None, description="Number of parallel workers")
+    chunk_size: Optional[int] = Field(default=None, description="Chunk size for parallel processing")
     cache: CacheConfig = Field(default_factory=CacheConfig, description="Cache settings")

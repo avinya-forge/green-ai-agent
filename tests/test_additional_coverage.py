@@ -71,7 +71,7 @@ class TestScannerAdvanced:
     def test_scanner_get_files(self):
         scanner = Scanner()
         # Updated to use the new FileDiscoverer component
-        files = scanner.file_discoverer.get_files('tests/')
+        files = list(scanner.file_discoverer.get_files('tests/'))
         assert isinstance(files, list)
         assert len(files) > 0
         # Should find Python test files

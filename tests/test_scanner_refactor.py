@@ -23,7 +23,7 @@ def test_file_discoverer(tmp_path):
             return ['*.me']
 
     discoverer = FileDiscoverer(MockConfigLoader())
-    files = discoverer.get_files(str(d))
+    files = list(discoverer.get_files(str(d)))
 
     assert len(files) == 1
     assert str(p1) in files[0]

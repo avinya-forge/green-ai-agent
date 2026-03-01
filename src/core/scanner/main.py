@@ -71,16 +71,23 @@ class Scanner:
         files = []
         scan_metadata_path = ""
 
+        import types
+
+        # Iterate over generator to find files, avoiding full list loading early on,
+        # but we do need the length for total_files and progress tracking.
+        # Actually, let's just use the generator to get supported files.
         if isinstance(path, str):
-            files = self.file_discoverer.get_files(path)
+            files_gen = self.file_discoverer.get_files(path)
             scan_metadata_path = path
         else:
-            files = []
-            for p in path:
-                files.extend(self.file_discoverer.get_files(p))
+            def chained_gen():
+                for p in path:
+                    yield from self.file_discoverer.get_files(p)
+            files_gen = chained_gen()
             scan_metadata_path = f"Multiple paths ({len(path)})"
 
-        total_files = len(files)
+        files_to_scan = [f for f in files_gen if self._is_supported_file(f)]
+        total_files = len(files_to_scan)
 
         if total_files == 0:
             tracker.stop()
@@ -121,17 +128,16 @@ class Scanner:
         # If total files is small, chunksize=1 is fine.
         # If large, try to give each worker at least 4 items per chunk,
         # but balance load.
-        chunksize = max(1, total_files // (num_workers * 4))
+        config_chunk_size = self.config.get('chunk_size')
+        if config_chunk_size:
+            chunksize = int(config_chunk_size)
+        else:
+            chunksize = max(1, total_files // (num_workers * 4))
 
         # Use 'spawn' context
         mp_context = multiprocessing.get_context('spawn')
 
         # Helper for map
-        scan_args = [
-            (f, self.language, self.config, language_rules)
-            for f in files if self._is_supported_file(f)
-        ]
-
         # We need a wrapper function that unpacks arguments for map
         # since scan_file_worker takes multiple args
         # But wait, we can't pickle a local lambda easily.
@@ -139,7 +145,6 @@ class Scanner:
         # Actually executor.map takes *iterables.
         # So we can pass iterables for each argument.
 
-        files_to_scan = [f for f in files if self._is_supported_file(f)]
         total_scan_files = len(files_to_scan)
 
         if total_scan_files > 0:
