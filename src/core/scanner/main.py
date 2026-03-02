@@ -301,6 +301,8 @@ class Scanner:
             return ['java', path]
         elif self.language == 'go':
             return ['go', 'run', path]
+        elif self.language == 'csharp':
+            return ['dotnet', 'script', path]
         else:
             return None
 
@@ -315,4 +317,6 @@ class Scanner:
             return file_path.endswith('.java')
         elif self.language == 'go':
             return file_path.endswith('.go')
+        elif self.language == 'csharp':
+            return file_path.endswith('.cs')
         return False

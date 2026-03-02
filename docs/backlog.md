@@ -92,12 +92,12 @@
 
 ### [EPIC-15] C# Language Support
 *Goal: Add support for analyzing C# (.NET) projects.*
-- [CS-001] | Integrate `tree-sitter-c-sharp` into parser engine | INDEPENDENT | TODO
-- [CS-002] | Implement C# language detector class | BLOCKS-CS-001 | TODO
-- [CS-003] | Implement rule: blocking async calls (.Result/.Wait) | BLOCKS-CS-002 | TODO
-- [CS-004] | Implement rule: inefficient string concatenation in loops | BLOCKS-CS-002 | TODO
-- [CS-005] | Implement rule: multiple LINQ iterations (ToList inside loop) | BLOCKS-CS-002 | TODO
-- [CS-006] | Write unit tests for C# rules | BLOCKS-CS-005 | TODO
+- [CS-001] | Integrate `tree-sitter-c-sharp` into parser engine | INDEPENDENT | Done
+- [CS-002] | Implement C# language detector class | BLOCKS-CS-001 | Done
+- [CS-003] | Implement rule: blocking async calls (.Result/.Wait) | BLOCKS-CS-002 | Done
+- [CS-004] | Implement rule: inefficient string concatenation in loops | BLOCKS-CS-002 | Done
+- [CS-005] | Implement rule: multiple LINQ iterations (ToList inside loop) | BLOCKS-CS-002 | Done
+- [CS-006] | Write unit tests for C# rules | BLOCKS-CS-005 | Done
 - [CS-007] | Add CLI integration for scanning C# projects | BLOCKS-CS-002 | TODO
 - [CS-008] | Implement end-to-end C# project scanning test | BLOCKS-CS-007 | TODO
 - [CS-009] | Update documentation with C# support details | INDEPENDENT | TODO
