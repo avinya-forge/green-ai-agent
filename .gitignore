@@ -124,3 +124,4 @@ Dockerfile.bak
 !requirements.txt
 output/**/*.xml
 output/telemetry.jsonl
+.memory/

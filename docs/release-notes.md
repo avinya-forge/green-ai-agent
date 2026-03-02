@@ -1,5 +1,32 @@
 # Release Notes
 
+## [v0.9.0] - Backlog Provisioning
+### Vaulted
+
+#### [EPIC-04] Advanced Reporting
+- [REP-003] | PDF Export: Chart rendering (static image gen) | BLOCKS-REP-002 | Done
+
+#### [EPIC-06] Performance Optimization
+- [PERF-006] | Parallel Processing: Chunk size tuning | BLOCKS-PERF-005 | Done
+- [PERF-007] | Memory Reduction: Generator usage review | INDEPENDENT | Done
+- [PERF-008] | Memory Reduction: Tree-sitter tree disposal | INDEPENDENT | Done
+
+#### [EPIC-09] IDE Plugins (Prep)
+- [IDE-006] | Connect Scanner: CLI wrapper for LSP | BLOCKS-IDE-005 | Done
+
+#### [EPIC-11] Cloud Native Deployment
+- [CLD-001] | Create Helm Chart for Green-AI | INDEPENDENT | Done
+- [CLD-005] | Create Docker Compose file for local cloud testing | INDEPENDENT | Done
+
+#### [EPIC-15] C# Language Support
+- [CS-001] | Integrate `tree-sitter-c-sharp` into parser engine | INDEPENDENT | Done
+- [CS-002] | Implement C# language detector class | BLOCKS-CS-001 | Done
+- [CS-003] | Implement rule: blocking async calls (.Result/.Wait) | BLOCKS-CS-002 | Done
+- [CS-004] | Implement rule: inefficient string concatenation in loops | BLOCKS-CS-002 | Done
+- [CS-005] | Implement rule: multiple LINQ iterations (ToList inside loop) | BLOCKS-CS-002 | Done
+- [CS-006] | Write unit tests for C# rules | BLOCKS-CS-005 | Done
+
+
 ## [v0.8.0] - CI/CD, Telemetry & Performance
 
 ### Vaulted Epics
