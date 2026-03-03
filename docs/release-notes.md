@@ -1,5 +1,11 @@
 # Release Notes
 
+## [v0.9.1] - Stability & Quality Pass
+### Vaulted
+
+*(No new completed items vaulted in this pass)*
+
+
 ## [v0.9.0] - Backlog Provisioning
 ### Vaulted
 

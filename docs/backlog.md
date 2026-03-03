@@ -1,22 +1,48 @@
 # Product Backlog
-
 ## Phase 2: Action & Expansion (Current)
 
-
+### [EPIC-00] STABILITY GATE
+*Goal: Resolve all known bugs, deprecations, and outdated dependencies before feature work resumes.*
+- [FIX: STAB-001] | Resolve FastAPI on_event deprecation | src/ui/app_fastapi.py:43 use lifespan event handlers instead | INDEPENDENT | TODO
+- [CHORE: STAB-002] | Update greenlet dependency | Upgrade from 3.3.0 to 3.3.2 | INDEPENDENT | TODO
+- [CHORE: STAB-003] | Update lsprotocol dependency | Upgrade from 2023.0.1 to 2025.0.0 | INDEPENDENT | TODO
+- [CHORE: STAB-004] | Update playwright dependency | Upgrade from 1.57.0 to 1.58.0 | INDEPENDENT | TODO
+- [CHORE: STAB-005] | Update pydantic_core dependency | Upgrade from 2.41.5 to 2.42.0 | INDEPENDENT | TODO
+- [CHORE: STAB-006] | Update pyee dependency | Upgrade from 13.0.0 to 13.0.1 | INDEPENDENT | TODO
+- [CHORE: STAB-007] | Update pygls dependency | Upgrade from 1.3.1 to 2.0.1 | INDEPENDENT | TODO
+- [CHORE: STAB-008] | Update pip dependency | Upgrade from 25.3 to 26.0.1 | INDEPENDENT | TODO
 
 ### [EPIC-05] CI/CD GitHub Action V2
 *Goal: Deepen CI/CD integration with a robust GitHub Action.*
 - [CI-010] | Marketplace prep: Documentation | INDEPENDENT | TODO
+- [CHORE: EXP-05-002] | Expand test and sec coverage atom 2 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-05-003] | Expand test and sec coverage atom 3 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-05-004] | Expand test and sec coverage atom 4 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-05-005] | Expand test and sec coverage atom 5 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-05-006] | Expand test and sec coverage atom 6 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-05-007] | Expand test and sec coverage atom 7 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-06] Performance Optimization
 *Goal: Ensure the tool remains lightweight and fast.*
 - [GO-009] | Go Performance Benchmark | INDEPENDENT | TODO
 - [PERF-005] | Parallel Processing: Multiprocessing pool tuning | INDEPENDENT | TODO
+- [CHORE: EXP-06-003] | Expand test and sec coverage atom 3 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-06-004] | Expand test and sec coverage atom 4 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-06-005] | Expand test and sec coverage atom 5 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-06-006] | Expand test and sec coverage atom 6 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-06-007] | Expand test and sec coverage atom 7 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-06-008] | Expand test and sec coverage atom 8 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-07] Security Hardening
 *Goal: Meet DoD security requirements.*
 - [SEC-002] | Dependency Upgrade: Bump versions | BLOCKS-SEC-001 | TODO
 - [SEC-008] | OWASP Top 10: Mapping review | INDEPENDENT | TODO
+- [CHORE: EXP-07-003] | Expand test and sec coverage atom 3 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-07-004] | Expand test and sec coverage atom 4 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-07-005] | Expand test and sec coverage atom 5 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-07-006] | Expand test and sec coverage atom 6 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-07-007] | Expand test and sec coverage atom 7 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-07-008] | Expand test and sec coverage atom 8 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-09] IDE Plugins (Prep)
 *Goal: Prepare for Phase 3 IDE integration.*
@@ -29,7 +55,12 @@
 - [IDE-008] | Quick Fix: Code action provider | BLOCKS-IDE-005 | TODO
 - [IDE-009] | VS Code Ext: Settings page | BLOCKS-IDE-001 | TODO
 - [IDE-010] | VS Code Ext: Output channel logging | BLOCKS-IDE-001 | TODO
-
+- [CHORE: EXP-09-010] | Expand test and sec coverage atom 10 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-09-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-09-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-09-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-09-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-09-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-11] Cloud Native Deployment
 *Goal: Enable scalable cloud deployment via Kubernetes and Docker Swarm.*
@@ -41,6 +72,12 @@
 - [CLD-008] | Implement readiness and liveness probes | BLOCKS-CLD-002 | TODO
 - [CLD-009] | Document cloud deployment steps | INDEPENDENT | TODO
 - [CLD-010] | Integration tests for Kubernetes deployment | BLOCKS-CLD-009 | TODO
+- [CHORE: EXP-11-009] | Expand test and sec coverage atom 9 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-11-010] | Expand test and sec coverage atom 10 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-11-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-11-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-11-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-11-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-12] Team Collaboration Dashboard
 *Goal: Provide team-based aggregation and historical reporting.*
@@ -54,6 +91,12 @@
 - [TEAM-008] | Implement email notifications for team summaries | INDEPENDENT | TODO
 - [TEAM-009] | Write unit tests for team analytics API | BLOCKS-TEAM-005 | TODO
 - [TEAM-010] | Document team collaboration features | INDEPENDENT | TODO
+- [CHORE: EXP-12-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-12-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-12-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-12-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-12-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-12-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-13] Machine Learning Pattern Recognition
 *Goal: Use advanced ML models to predict and detect complex code inefficiencies.*
@@ -67,6 +110,12 @@
 - [ML-008] | Add CLI flag to enable/disable ML scanner | BLOCKS-ML-006 | TODO
 - [ML-009] | Write integration tests for ML pattern recognition | BLOCKS-ML-006 | TODO
 - [ML-010] | Document ML pattern recognition capabilities | INDEPENDENT | TODO
+- [CHORE: EXP-13-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-13-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-13-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-13-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-13-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-13-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-14] Rust Language Support
 *Goal: Add support for analyzing Rust projects.*
@@ -80,6 +129,12 @@
 - [RUST-008] | Implement end-to-end Rust project scanning test | BLOCKS-RUST-007 | TODO
 - [RUST-009] | Update documentation with Rust support details | INDEPENDENT | TODO
 - [RUST-010] | Release Rust Support Beta | BLOCKS-RUST-008 | TODO
+- [CHORE: EXP-14-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-14-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-14-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-14-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-14-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-14-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-15] C# Language Support
 *Goal: Add support for analyzing C# (.NET) projects.*
@@ -87,6 +142,12 @@
 - [CS-008] | Implement end-to-end C# project scanning test | BLOCKS-CS-007 | TODO
 - [CS-009] | Update documentation with C# support details | INDEPENDENT | TODO
 - [CS-010] | Release C# Support Beta | BLOCKS-CS-008 | TODO
+- [CHORE: EXP-15-005] | Expand test and sec coverage atom 5 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-15-006] | Expand test and sec coverage atom 6 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-15-007] | Expand test and sec coverage atom 7 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-15-008] | Expand test and sec coverage atom 8 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-15-009] | Expand test and sec coverage atom 9 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-15-010] | Expand test and sec coverage atom 10 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-16] Java Language Support
 *Goal: Add support for analyzing Java projects.*
@@ -100,6 +161,12 @@
 - [JAVA-008] | Implement component 8 for Java Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-JAVA-007 | TODO
 - [JAVA-009] | Implement component 9 for Java Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-JAVA-008 | TODO
 - [JAVA-010] | Implement component 10 for Java Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-JAVA-009 | TODO
+- [CHORE: EXP-16-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-16-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-16-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-16-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-16-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-16-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-17] TypeScript Language Support
 *Goal: Add support for analyzing TypeScript projects.*
@@ -113,6 +180,12 @@
 - [TS-008] | Implement component 8 for TypeScript Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-TS-007 | TODO
 - [TS-009] | Implement component 9 for TypeScript Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-TS-008 | TODO
 - [TS-010] | Implement component 10 for TypeScript Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-TS-009 | TODO
+- [CHORE: EXP-17-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-17-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-17-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-17-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-17-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-17-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-18] Go Language Support
 *Goal: Add support for analyzing Go projects.*
@@ -126,6 +199,12 @@
 - [GO-008] | Implement component 8 for Go Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-GO-007 | TODO
 - [GO-009] | Implement component 9 for Go Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-GO-008 | TODO
 - [GO-010] | Implement component 10 for Go Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-GO-009 | TODO
+- [CHORE: EXP-18-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-18-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-18-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-18-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-18-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-18-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-19] Ruby Language Support
 *Goal: Add support for analyzing Ruby projects.*
@@ -139,6 +218,12 @@
 - [RUBY-008] | Implement component 8 for Ruby Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-RUBY-007 | TODO
 - [RUBY-009] | Implement component 9 for Ruby Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-RUBY-008 | TODO
 - [RUBY-010] | Implement component 10 for Ruby Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-RUBY-009 | TODO
+- [CHORE: EXP-19-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-19-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-19-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-19-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-19-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-19-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-20] PHP Language Support
 *Goal: Add support for analyzing PHP projects.*
@@ -152,6 +237,12 @@
 - [PHP-008] | Implement component 8 for PHP Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-PHP-007 | TODO
 - [PHP-009] | Implement component 9 for PHP Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-PHP-008 | TODO
 - [PHP-010] | Implement component 10 for PHP Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-PHP-009 | TODO
+- [CHORE: EXP-20-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-20-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-20-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-20-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-20-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-20-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-21] C++ Language Support
 *Goal: Add support for analyzing C++ projects.*
@@ -165,6 +256,12 @@
 - [CPP-008] | Implement component 8 for C++ Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-CPP-007 | TODO
 - [CPP-009] | Implement component 9 for C++ Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-CPP-008 | TODO
 - [CPP-010] | Implement component 10 for C++ Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-CPP-009 | TODO
+- [CHORE: EXP-21-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-21-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-21-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-21-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-21-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-21-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-22] Swift Language Support
 *Goal: Add support for analyzing Swift projects.*
@@ -178,6 +275,12 @@
 - [SWIFT-008] | Implement component 8 for Swift Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-SWIFT-007 | TODO
 - [SWIFT-009] | Implement component 9 for Swift Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-SWIFT-008 | TODO
 - [SWIFT-010] | Implement component 10 for Swift Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-SWIFT-009 | TODO
+- [CHORE: EXP-22-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-22-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-22-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-22-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-22-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-22-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-23] Kotlin Language Support
 *Goal: Add support for analyzing Kotlin projects.*
@@ -191,6 +294,12 @@
 - [KOTLIN-008] | Implement component 8 for Kotlin Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-KOTLIN-007 | TODO
 - [KOTLIN-009] | Implement component 9 for Kotlin Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-KOTLIN-008 | TODO
 - [KOTLIN-010] | Implement component 10 for Kotlin Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-KOTLIN-009 | TODO
+- [CHORE: EXP-23-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-23-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-23-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-23-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-23-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-23-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-24] Scala Language Support
 *Goal: Add support for analyzing Scala projects.*
@@ -204,6 +313,12 @@
 - [SCALA-008] | Implement component 8 for Scala Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-SCALA-007 | TODO
 - [SCALA-009] | Implement component 9 for Scala Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-SCALA-008 | TODO
 - [SCALA-010] | Implement component 10 for Scala Language Support with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-SCALA-009 | TODO
+- [CHORE: EXP-24-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-24-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-24-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-24-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-24-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-24-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-25] Rust Language Expansion
 *Goal: Expand Rust language capabilities.*
@@ -217,6 +332,12 @@
 - [RUSTX-008] | Implement component 8 for Rust Language Expansion with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-RUSTX-007 | TODO
 - [RUSTX-009] | Implement component 9 for Rust Language Expansion with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-RUSTX-008 | TODO
 - [RUSTX-010] | Implement component 10 for Rust Language Expansion with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-RUSTX-009 | TODO
+- [CHORE: EXP-25-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-25-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-25-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-25-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-25-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-25-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-26] Advanced Caching
 *Goal: Improve caching mechanisms across the application.*
@@ -230,6 +351,12 @@
 - [CACHE-008] | Implement component 8 for Advanced Caching with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-CACHE-007 | TODO
 - [CACHE-009] | Implement component 9 for Advanced Caching with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-CACHE-008 | TODO
 - [CACHE-010] | Implement component 10 for Advanced Caching with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-CACHE-009 | TODO
+- [CHORE: EXP-26-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-26-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-26-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-26-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-26-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-26-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-27] Distributed Scanning
 *Goal: Support distributed scanning across nodes.*
@@ -243,6 +370,12 @@
 - [DIST-008] | Implement component 8 for Distributed Scanning with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-DIST-007 | TODO
 - [DIST-009] | Implement component 9 for Distributed Scanning with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-DIST-008 | TODO
 - [DIST-010] | Implement component 10 for Distributed Scanning with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-DIST-009 | TODO
+- [CHORE: EXP-27-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-27-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-27-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-27-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-27-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-27-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-28] Database Optimizations
 *Goal: Improve database query performance.*
@@ -256,6 +389,12 @@
 - [DB-008] | Implement component 8 for Database Optimizations with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-DB-007 | TODO
 - [DB-009] | Implement component 9 for Database Optimizations with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-DB-008 | TODO
 - [DB-010] | Implement component 10 for Database Optimizations with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-DB-009 | TODO
+- [CHORE: EXP-28-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-28-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-28-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-28-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-28-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-28-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-29] Security Auditing
 *Goal: Implement continuous security auditing.*
@@ -269,6 +408,12 @@
 - [SECAUD-008] | Implement component 8 for Security Auditing with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-SECAUD-007 | TODO
 - [SECAUD-009] | Implement component 9 for Security Auditing with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-SECAUD-008 | TODO
 - [SECAUD-010] | Implement component 10 for Security Auditing with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-SECAUD-009 | TODO
+- [CHORE: EXP-29-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-29-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-29-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-29-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-29-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-29-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-30] Advanced ML Models
 *Goal: Deploy advanced ML models for optimization.*
@@ -282,6 +427,12 @@
 - [MLX-008] | Implement component 8 for Advanced ML Models with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-MLX-007 | TODO
 - [MLX-009] | Implement component 9 for Advanced ML Models with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-MLX-008 | TODO
 - [MLX-010] | Implement component 10 for Advanced ML Models with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-MLX-009 | TODO
+- [CHORE: EXP-30-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-30-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-30-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-30-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-30-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-30-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-31] CI/CD Deep Integration
 *Goal: Deepen CI/CD integrations for major platforms.*
@@ -295,6 +446,12 @@
 - [CICDX-008] | Implement component 8 for CI/CD Deep Integration with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-CICDX-007 | TODO
 - [CICDX-009] | Implement component 9 for CI/CD Deep Integration with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-CICDX-008 | TODO
 - [CICDX-010] | Implement component 10 for CI/CD Deep Integration with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-CICDX-009 | TODO
+- [CHORE: EXP-31-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-31-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-31-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-31-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-31-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-31-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-32] Real-time Dashboarding
 *Goal: Implement real-time updates for the dashboard.*
@@ -308,6 +465,12 @@
 - [RTDASH-008] | Implement component 8 for Real-time Dashboarding with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-RTDASH-007 | TODO
 - [RTDASH-009] | Implement component 9 for Real-time Dashboarding with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-RTDASH-008 | TODO
 - [RTDASH-010] | Implement component 10 for Real-time Dashboarding with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-RTDASH-009 | TODO
+- [CHORE: EXP-32-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-32-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-32-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-32-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-32-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-32-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-33] Automated Refactoring
 *Goal: Enhance automated code refactoring capabilities.*
@@ -321,6 +484,12 @@
 - [REFACT-008] | Implement component 8 for Automated Refactoring with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-REFACT-007 | TODO
 - [REFACT-009] | Implement component 9 for Automated Refactoring with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-REFACT-008 | TODO
 - [REFACT-010] | Implement component 10 for Automated Refactoring with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-REFACT-009 | TODO
+- [CHORE: EXP-33-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-33-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-33-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-33-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-33-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-33-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-34] Cloud Cost Analysis
 *Goal: Provide cloud cost analysis based on code.*
@@ -334,6 +503,12 @@
 - [CLDCOST-008] | Implement component 8 for Cloud Cost Analysis with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-CLDCOST-007 | TODO
 - [CLDCOST-009] | Implement component 9 for Cloud Cost Analysis with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-CLDCOST-008 | TODO
 - [CLDCOST-010] | Implement component 10 for Cloud Cost Analysis with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-CLDCOST-009 | TODO
+- [CHORE: EXP-34-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-34-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-34-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-34-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-34-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-34-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
 
 ### [EPIC-35] Energy Profiling
 *Goal: Implement deep energy profiling for processes.*
@@ -347,3 +522,9 @@
 - [ENERGY-008] | Implement component 8 for Energy Profiling with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-ENERGY-007 | TODO
 - [ENERGY-009] | Implement component 9 for Energy Profiling with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-ENERGY-008 | TODO
 - [ENERGY-010] | Implement component 10 for Energy Profiling with Test (95%), Lint (0-err), Opt (O(1)/O(n)), and Sec (Sanitize) | BLOCKS-ENERGY-009 | TODO
+- [CHORE: EXP-35-011] | Expand test and sec coverage atom 11 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-35-012] | Expand test and sec coverage atom 12 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-35-013] | Expand test and sec coverage atom 13 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-35-014] | Expand test and sec coverage atom 14 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-35-015] | Expand test and sec coverage atom 15 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
+- [CHORE: EXP-35-016] | Expand test and sec coverage atom 16 | 1-2hr atom: Test (95%), Lint (0-err), Opt (O(1)/O(n)), Sec (Sanitize) | INDEPENDENT | TODO
