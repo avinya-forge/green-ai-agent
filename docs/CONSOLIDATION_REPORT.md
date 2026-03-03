@@ -1,0 +1,17 @@
+# Finalized Metric Summary
+
+- STATUS: ONLINE
+- PHASE: Phase 2
+- TOTAL LOC: TBD
+- PR DELTA: TBD
+- TASKS DONE: 0
+- IMPLEMENTED IDs: None
+- READY RATIO: TBD
+- SAY/DO: TBD
+- VELOCITY: TBD
+- TECH DEBT: TBD
+- COVERAGE: TBD
+- BLOCKERS: None
+- ETA: TBD
+- NEXT: Action
+- ACTION: Submit PR
