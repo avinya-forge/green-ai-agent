@@ -29,19 +29,10 @@ import src.ui.state as state
 from src.ui.middleware.security import SecurityHeadersMiddleware
 from src.ui.middleware.rate_limit import RateLimitMiddleware
 
-# Initialize FastAPI app
-app = FastAPI(title="Green-AI Agent Dashboard")
+from contextlib import asynccontextmanager
 
-# Add middleware
-# Note: Middleware is added in reverse order (LIFO).
-# The last middleware added is the first one to handle the request.
-# We want SecurityHeaders to be outermost (first to handle request, last to handle response)
-# so it can add headers to all responses, including 429s from RateLimit.
-app.add_middleware(RateLimitMiddleware, limit=100, window=60)
-app.add_middleware(SecurityHeadersMiddleware)
-
-@app.on_event("startup")
-async def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     """Initialize default project and trigger scan if needed."""
     print("Starting up Green-AI Agent Dashboard...", file=sys.stderr)
 
@@ -101,6 +92,19 @@ async def startup_event():
 
     except Exception as e:
         print(f"Warning: Could not initialize default project: {e}", file=sys.stderr)
+
+    yield
+
+# Initialize FastAPI app
+app = FastAPI(title="Green-AI Agent Dashboard", lifespan=lifespan)
+
+# Add middleware
+# Note: Middleware is added in reverse order (LIFO).
+# The last middleware added is the first one to handle the request.
+# We want SecurityHeaders to be outermost (first to handle request, last to handle response)
+# so it can add headers to all responses, including 429s from RateLimit.
+app.add_middleware(RateLimitMiddleware, limit=100, window=60)
+app.add_middleware(SecurityHeadersMiddleware)
 
 # Initialize Socket.IO server (ASGI mode)
 sio = socketio.AsyncServer(async_mode='asgi', cors_allowed_origins='*')

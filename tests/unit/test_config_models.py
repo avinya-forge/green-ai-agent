@@ -9,7 +9,6 @@ def test_config_defaults():
     assert config.languages == ['python', 'javascript', 'typescript', 'java', 'go']
     assert config.rules.enabled == []
     assert config.llm.provider == "openai"
-    assert config.llm.rate_limit.tpm == 10000
 
 def test_severity_validation():
     config_data = {

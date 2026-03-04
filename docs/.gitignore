@@ -11,5 +11,19 @@
 !development-standards.md
 !eventlet-migration.md
 
+# API Contracts
+!api/swagger.yaml
+!api/mock_data.json
+
+# Agents rules
+!agents/standards.md
+
+# System Metrics
+!system-health.md
+
+# Directories
+!api/
+!agents/
+
 # Allow .gitignore itself
 !.gitignore

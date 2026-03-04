@@ -3,7 +3,7 @@
 
 ### [EPIC-00] STABILITY GATE
 *Goal: Resolve all known bugs, deprecations, and outdated dependencies before feature work resumes.*
-- [FIX: STAB-001] | Resolve FastAPI on_event deprecation | src/ui/app_fastapi.py:43 use lifespan event handlers instead | INDEPENDENT | TODO
+- [FIX: STAB-001] | Resolve FastAPI on_event deprecation | src/ui/app_fastapi.py:43 use lifespan event handlers instead | INDEPENDENT | [Done]
 - [CHORE: STAB-002] | Update greenlet dependency | Upgrade from 3.3.0 to 3.3.2 | INDEPENDENT | TODO
 - [CHORE: STAB-003] | Update lsprotocol dependency | Upgrade from 2023.0.1 to 2025.0.0 | INDEPENDENT | TODO
 - [CHORE: STAB-004] | Update playwright dependency | Upgrade from 1.57.0 to 1.58.0 | INDEPENDENT | TODO
