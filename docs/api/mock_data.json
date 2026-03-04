@@ -1,0 +1,22 @@
+{
+  "HTTPValidationError": {
+    "detail": [
+      "item"
+    ]
+  },
+  "ScanRequest": {
+    "project_name": "string",
+    "language": "string",
+    "git_url": "string",
+    "path": "string"
+  },
+  "ValidationError": {
+    "loc": [
+      "item"
+    ],
+    "msg": "string",
+    "type": "string",
+    "input": "string",
+    "ctx": {}
+  }
+}
