@@ -8,6 +8,7 @@
 !backlog.md
 !release-notes.md
 !vision.md
+!github-action.md
 
 # API Contracts
 !api/swagger.yaml
@@ -16,6 +17,7 @@
 # Rules
 !rules/habits.md
 !rules/hygiene.md
+!rules/decisions.md
 
 # Standards
 !standards/ultra-lean.md

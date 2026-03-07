@@ -19,7 +19,7 @@
 **SPEC:** Upgrade from 25.3 to 26.0.1
 
 ### [EPIC-05] CI/CD GitHub Action V2
-**TASK CI-010: Marketplace prep: Documentation** | [TODO] | [PRAGMATIST]
+**TASK CI-010: Marketplace prep: Documentation** | [Done] | [PRAGMATIST]
 **SPEC:** Create docs/github-action.md detailing action.yml inputs, outputs, and example workflow usage for marketplace listing.
 
 ### [EPIC-06] Performance Optimization
@@ -61,7 +61,7 @@
 **SPEC:** Create deploy/kubernetes/service.yaml defining ClusterIP service exposing the FastAPI UI on port 80.
 **TASK CLD-004: Implement Kubernetes Ingress configurations** | [TODO] | [PRAGMATIST]
 **SPEC:** Create deploy/kubernetes/ingress.yaml defining routing rules for green-ai dashboard domain mapping.
-**TASK CLD-006: Write CI/CD pipeline for automated Docker image push** | [TODO] | [PRAGMATIST]
+**TASK CLD-006: Write CI/CD pipeline for automated Docker image push** | [Done] | [PRAGMATIST]
 **SPEC:** Update .github/workflows/ci.yml to build Docker image and push to ghcr.io on version tag pushes.
 **TASK CLD-007: Configure horizontal pod autoscaling for scanner** | [TODO] | [PRAGMATIST]
 **SPEC:** Create deploy/kubernetes/hpa.yaml targeting the deployment to scale between 1-5 pods based on 70% CPU utilization.

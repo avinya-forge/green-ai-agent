@@ -25,6 +25,6 @@ tree-sitter-c-sharp
 greenlet==3.3.2
 lsprotocol==2025.0.0
 playwright==1.58.0
-pydantic-core==2.42.0
+pydantic-core==2.41.5
 pyee==13.0.1
 pip==26.0.1
