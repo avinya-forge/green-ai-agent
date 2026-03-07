@@ -6,9 +6,8 @@
 
 # Exception: Allow canonical files
 !backlog.md
-!releasenotes.md
+!release-notes.md
 !vision.md
-!eventlet-migration.md
 
 # API Contracts
 !api/swagger.yaml
@@ -19,10 +18,7 @@
 !rules/hygiene.md
 
 # Standards
-!standards/ultra_lean.md
-
-# System Metrics
-!system-health.md
+!standards/ultra-lean.md
 
 # Directories
 !api/
