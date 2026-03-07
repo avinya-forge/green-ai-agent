@@ -13,7 +13,7 @@ green-ai-scan:
   image: python:3.9
   
   before_script:
-    - pip install --upgrade pip
+    - pip install pip==26.0.1
     - pip install green-ai-agent
     
   script:

@@ -1,7 +1,7 @@
 import logging
 import asyncio
 from typing import Optional
-from pygls.server import LanguageServer
+from pygls.lsp.server import LanguageServer
 from lsprotocol.types import (
     TEXT_DOCUMENT_DID_OPEN,
     TEXT_DOCUMENT_DID_CHANGE,
