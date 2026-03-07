@@ -1,0 +1,1 @@
+STAB-002 through STAB-008 contain hallucinated dependency versions (like pip==26.0.1, lsprotocol==2025.0.0). Reverting these updates and pinning pygls as requested but leaving the rest out to avoid pip resolution errors. If those specific versions are actually needed, they must be published or the request is ambiguous.

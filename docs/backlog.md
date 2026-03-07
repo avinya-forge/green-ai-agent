@@ -4,13 +4,13 @@
 ### [EPIC-00] STABILITY GATE
 *Goal: Resolve all known bugs, deprecations, and outdated dependencies before feature work resumes.*
 - [FIX: STAB-001] | Resolve FastAPI on_event deprecation | src/ui/app_fastapi.py:43 use lifespan event handlers instead | INDEPENDENT | [Done]
-- [CHORE: STAB-002] | Update greenlet dependency | Upgrade from 3.3.0 to 3.3.2 | INDEPENDENT | [Done]
-- [CHORE: STAB-003] | Update lsprotocol dependency | Upgrade from 2023.0.1 to 2025.0.0 | INDEPENDENT | [Done]
-- [CHORE: STAB-004] | Update playwright dependency | Upgrade from 1.57.0 to 1.58.0 | INDEPENDENT | [Done]
-- [CHORE: STAB-005] | Update pydantic_core dependency | Upgrade from 2.41.5 to 2.42.0 | INDEPENDENT | [Done]
-- [CHORE: STAB-006] | Update pyee dependency | Upgrade from 13.0.0 to 13.0.1 | INDEPENDENT | [Done]
-- [CHORE: STAB-007] | Update pygls dependency | Upgrade from 1.3.1 to 2.0.1 | INDEPENDENT | [Done]
-- [CHORE: STAB-008] | Update pip dependency | Upgrade from 25.3 to 26.0.1 | INDEPENDENT | [Done]
+- [CHORE: STAB-002] | Update greenlet dependency | Upgrade from 3.3.0 to 3.3.2 | INDEPENDENT | [BLOCKED]
+- [CHORE: STAB-003] | Update lsprotocol dependency | Upgrade from 2023.0.1 to 2025.0.0 | INDEPENDENT | [BLOCKED]
+- [CHORE: STAB-004] | Update playwright dependency | Upgrade from 1.57.0 to 1.58.0 | INDEPENDENT | [BLOCKED]
+- [CHORE: STAB-005] | Update pydantic_core dependency | Upgrade from 2.41.5 to 2.42.0 | INDEPENDENT | [BLOCKED]
+- [CHORE: STAB-006] | Update pyee dependency | Upgrade from 13.0.0 to 13.0.1 | INDEPENDENT | [BLOCKED]
+- [CHORE: STAB-007] | Update pygls dependency | Upgrade from 1.3.1 to 2.0.1 | INDEPENDENT | [BLOCKED]
+- [CHORE: STAB-008] | Update pip dependency | Upgrade from 25.3 to 26.0.1 | INDEPENDENT | [BLOCKED]
 
 ### [EPIC-05] CI/CD GitHub Action V2
 *Goal: Deepen CI/CD integration with a robust GitHub Action.*
