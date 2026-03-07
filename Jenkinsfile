@@ -50,7 +50,7 @@ pipeline {
                     try {
                         sh '''
                             python --version
-                            pip install --upgrade pip
+                            pip install pip==26.0.1
                             pip install green-ai-agent
                             green-ai --version
                         '''
