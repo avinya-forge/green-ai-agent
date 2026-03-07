@@ -5,7 +5,7 @@
 ## The Pulse
 | Milestone | Version | Phase | Status | Tech Debt | Backlog Density |
 |-----------|---------|-------|--------|-----------|-----------------|
-| Stability Gate | v0.9.1 | Phase 2 | ACTIVE | Low | 60 |
+| Stability Gate | v0.9.1 | Phase 2 | ACTIVE | Low | 60/60 |
 
 ## Documentation Map
 - [Vision](./docs/vision.md)
