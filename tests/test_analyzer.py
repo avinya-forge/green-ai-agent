@@ -91,7 +91,7 @@ def read_file():
         assert metrics.has_io_operations is True
 
     def test_expensive_ops_detection(self):
-        code = """
+        code = r"""
 import re
 def process():
     pattern = re.compile(r'\d+')

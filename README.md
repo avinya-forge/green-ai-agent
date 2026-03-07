@@ -14,6 +14,7 @@
 - [Habits](./docs/rules/habits.md)
 - [Hygiene](./docs/rules/hygiene.md)
 - [Ultra Lean Standards](./docs/standards/ultra-lean.md)
+- [GitHub Action](./docs/github-action.md)
 
 ## Quick Start
 **Current Active Milestone: [EPIC-00] STABILITY GATE**
