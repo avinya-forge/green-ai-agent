@@ -5,25 +5,29 @@
 *
 
 # Exception: Allow canonical files
-!BACKLOG.md
-!release-notes.md
+!backlog.md
+!releasenotes.md
 !vision.md
-!development-standards.md
 !eventlet-migration.md
 
 # API Contracts
 !api/swagger.yaml
 !api/mock_data.json
 
-# Agents rules
-!agents/standards.md
+# Rules
+!rules/habits.md
+!rules/hygiene.md
+
+# Standards
+!standards/ultra_lean.md
 
 # System Metrics
 !system-health.md
 
 # Directories
 !api/
-!agents/
+!rules/
+!standards/
 
 # Allow .gitignore itself
 !.gitignore
