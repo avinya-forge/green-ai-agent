@@ -1,27 +1,5 @@
 **MILESTONE M1** | **PHASE 2** | **GATEKEEPER** [0-Hygiene-Error | 95% Test | Build-Pass]
 
-### [EPIC-00] STABILITY GATE
-**TASK STAB-001: Resolve FastAPI on_event deprecation** | [Done] | [PRAGMATIST]
-**SPEC:** src/ui/app_fastapi.py:43 use lifespan event handlers instead
-**TASK STAB-002: Update greenlet dependency** | [Done] | [PRAGMATIST]
-**SPEC:** Upgrade from 3.3.0 to 3.3.2
-**TASK STAB-003: Update lsprotocol dependency** | [Done] | [PRAGMATIST]
-**SPEC:** Upgrade from 2023.0.1 to 2025.0.0
-**TASK STAB-004: Update playwright dependency** | [Done] | [PRAGMATIST]
-**SPEC:** Upgrade from 1.57.0 to 1.58.0
-**TASK STAB-005: Update pydantic_core dependency** | [Done] | [PRAGMATIST]
-**SPEC:** Upgrade from 2.41.5 to 2.42.0
-**TASK STAB-006: Update pyee dependency** | [Done] | [PRAGMATIST]
-**SPEC:** Upgrade from 13.0.0 to 13.0.1
-**TASK STAB-007: Update pygls dependency** | [Done] | [PRAGMATIST]
-**SPEC:** Upgrade from 1.3.1 to 2.0.1
-**TASK STAB-008: Update pip dependency** | [Done] | [PRAGMATIST]
-**SPEC:** Upgrade from 25.3 to 26.0.1
-
-### [EPIC-05] CI/CD GitHub Action V2
-**TASK CI-010: Marketplace prep: Documentation** | [Done] | [PRAGMATIST]
-**SPEC:** Create docs/github-action.md detailing action.yml inputs, outputs, and example workflow usage for marketplace listing.
-
 ### [EPIC-06] Performance Optimization
 **TASK GO-009: Go Performance Benchmark** | [TODO] | [PRAGMATIST]
 **SPEC:** Implement standard benchmark suite using 'testing' package for Go language detector evaluating AST parsing speed vs python reference.
