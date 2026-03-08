@@ -3,6 +3,22 @@
 Current Session ID: 1772882094
 Last Action: [ACTION: AUDIT]
 
+## [v0.9.2] - Patch Release
+### Vaulted Epics
+
+#### [EPIC-00] STABILITY GATE
+- [STAB-001] | Resolve FastAPI on_event deprecation | DONE
+- [STAB-002] | Update greenlet dependency | DONE
+- [STAB-003] | Update lsprotocol dependency | DONE
+- [STAB-004] | Update playwright dependency | DONE
+- [STAB-005] | Update pydantic_core dependency | DONE
+- [STAB-006] | Update pyee dependency | DONE
+- [STAB-007] | Update pygls dependency | DONE
+- [STAB-008] | Update pip dependency | DONE
+
+#### [EPIC-05] CI/CD GitHub Action V2
+- [CI-010] | Marketplace prep: Documentation | DONE
+
 ## [v0.9.1] - Stability & Quality Pass
 ### Vaulted
 
