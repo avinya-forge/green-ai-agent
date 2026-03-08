@@ -132,7 +132,8 @@ class Scanner:
         if config_chunk_size:
             chunksize = int(config_chunk_size)
         else:
-            chunksize = max(1, total_files // (num_workers * 4))
+            cpus = os.cpu_count() or 1
+            chunksize = max(1, total_files // (cpus * 4))
 
         # Use 'spawn' context
         mp_context = multiprocessing.get_context('spawn')
@@ -149,7 +150,7 @@ class Scanner:
 
         if total_scan_files > 0:
             with concurrent.futures.ProcessPoolExecutor(
-                max_workers=num_workers, mp_context=mp_context
+                max_workers=num_workers, mp_context=mp_context, max_tasks_per_child=50
             ) as executor:
                 # Use executor.map with chunksize
                 # We need to pass constant arguments as repeated iterables
