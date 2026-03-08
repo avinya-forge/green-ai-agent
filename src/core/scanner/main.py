@@ -149,8 +149,12 @@ class Scanner:
         total_scan_files = len(files_to_scan)
 
         if total_scan_files > 0:
+            kwargs = {}
+            if sys.version_info >= (3, 11):
+                kwargs['max_tasks_per_child'] = 50
+
             with concurrent.futures.ProcessPoolExecutor(
-                max_workers=num_workers, mp_context=mp_context, max_tasks_per_child=50
+                max_workers=num_workers, mp_context=mp_context, **kwargs
             ) as executor:
                 # Use executor.map with chunksize
                 # We need to pass constant arguments as repeated iterables
