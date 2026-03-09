@@ -15,7 +15,7 @@ fi
 # Check 2: No unauthorized files in docs/
 DOCS_FILES=$(git diff --cached --name-only | grep '^docs/' || true)
 for file in $DOCS_FILES; do
-    if [[ ! "$file" =~ (\.gitignore|api/|rules/.*|standards/.*|backlog\.md|releasenotes\.md|vision\.md|eventlet-migration\.md|system-health\.md)$ ]]; then
+    if [[ ! "$file" =~ (\.gitignore|api/|rules/.*|standards/.*|backlog\.md|release-notes\.md|project-health\.md|conflict-map\.md|vision\.md|eventlet-migration\.md|system-health\.md)$ ]]; then
         # Ensure we are not failing on DELETED files.
         # git diff --cached --name-only just gives names, we should check status.
         if git diff --cached --name-status | grep -q "^D.*$file$"; then
