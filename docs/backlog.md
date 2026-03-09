@@ -1,13 +1,15 @@
 **MILESTONE M1** | **PHASE 2** | **GATEKEEPER** [0-Hygiene-Error | 95% Test | Build-Pass]
 
 ### [EPIC-06] Performance Optimization
-**TASK GO-009: Go Performance Benchmark** | [TODO] | [PRAGMATIST]
+**TASK GO-009: Go Performance Benchmark** | [DONE] | [PRAGMATIST]
 **SPEC:** Implement standard benchmark suite using 'testing' package for Go language detector evaluating AST parsing speed vs python reference.
+**TASK GO-010: Native Go Benchmark** | [TODO] | [PRAGMATIST]
+**SPEC:** Implement a native Go benchmark using the `testing` package to verify AST parsing performance natively in Go instead of relying purely on Python bindings benchmark.
 
 ### [EPIC-07] Security Hardening
-**TASK SEC-002: Dependency Upgrade: Bump versions** | [TODO] | [HARDENER]
+**TASK SEC-002: Dependency Upgrade: Bump versions** | [DONE] | [HARDENER]
 **SPEC:** Run pip-audit and upgrade remaining dependencies flagged with CVEs in requirements.txt.
-**TASK SEC-008: OWASP Top 10: Mapping review** | [TODO] | [HARDENER]
+**TASK SEC-008: OWASP Top 10: Mapping review** | [DONE] | [HARDENER]
 **SPEC:** Create security-review.md mapping current scanner rules against OWASP Top 10 vulnerabilities identifying coverage gaps.
 
 ### [EPIC-09] IDE Plugins (Prep)
