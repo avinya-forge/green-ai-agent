@@ -3,7 +3,7 @@
 ### [EPIC-06] Performance Optimization
 **TASK GO-009: Go Performance Benchmark** | [DONE] | [PRAGMATIST]
 **SPEC:** Implement standard benchmark suite using 'testing' package for Go language detector evaluating AST parsing speed vs python reference.
-**TASK GO-010: Native Go Benchmark** | [TODO] | [PRAGMATIST]
+**TASK GO-010: Native Go Benchmark** | [DONE] | [PRAGMATIST]
 **SPEC:** Implement a native Go benchmark using the `testing` package to verify AST parsing performance natively in Go instead of relying purely on Python bindings benchmark.
 
 ### [EPIC-07] Security Hardening
