@@ -1,4 +1,4 @@
 # Project Health
 
-- Buffer: Yellow
-- State: S4 [GATED_RELEASE]
+- Buffer: Green
+- State: S1 [INITIALIZE]
