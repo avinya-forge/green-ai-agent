@@ -164,6 +164,10 @@ async def api_charts() -> Any:
 async def api_results() -> Any:
     return state.last_scan_results or {}
 
+@app.get("/api/health")
+async def api_health() -> Any:
+    return {"status": "ok"}
+
 @app.get("/api/telemetry")
 async def api_telemetry() -> Any:
     try:

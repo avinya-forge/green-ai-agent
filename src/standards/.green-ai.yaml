@@ -1,17 +1,17 @@
 standards:
   enabled:
+  - suscom
+  - ecocode
+  - gsf
   - nvidia
   - microsoft
-  - suscom
-  - gsf
-  - ecocode
   rules:
     disable:
+    - unnecessary_computation
+    - no_infinite_loops
     - inefficient_loop
     - algorithm_efficiency
-    - gpu_utilization
-    - proper_resource_cleanup
     - no_n2_algorithms
-    - no_infinite_loops
-    - unnecessary_computation
+    - proper_resource_cleanup
+    - gpu_utilization
     enable: []

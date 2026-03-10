@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: green-ai
+  labels:
+    app: green-ai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: green-ai
+  template:
+    metadata:
+      labels:
+        app: green-ai
+    spec:
+      containers:
+      - name: green-ai
+        image: green-ai:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
