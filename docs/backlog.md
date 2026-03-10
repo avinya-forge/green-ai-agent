@@ -33,19 +33,19 @@
 **SPEC:** Implement window/logMessage reporting LSP server initialization and scanning progress to an output channel.
 
 ### [EPIC-11] Cloud Native Deployment
-**TASK CLD-002: Implement Kubernetes Deployment manifests** | [TODO] | [PRAGMATIST]
+**TASK CLD-002: Implement Kubernetes Deployment manifests** | [DONE] | [PRAGMATIST]
 **SPEC:** Create deploy/kubernetes/deployment.yaml defining green-ai replica set with resource requests/limits (CPU 500m, Mem 512Mi).
-**TASK CLD-003: Implement Kubernetes Service manifests** | [TODO] | [PRAGMATIST]
+**TASK CLD-003: Implement Kubernetes Service manifests** | [DONE] | [PRAGMATIST]
 **SPEC:** Create deploy/kubernetes/service.yaml defining ClusterIP service exposing the FastAPI UI on port 80.
-**TASK CLD-004: Implement Kubernetes Ingress configurations** | [TODO] | [PRAGMATIST]
+**TASK CLD-004: Implement Kubernetes Ingress configurations** | [DONE] | [PRAGMATIST]
 **SPEC:** Create deploy/kubernetes/ingress.yaml defining routing rules for green-ai dashboard domain mapping.
-**TASK CLD-007: Configure horizontal pod autoscaling for scanner** | [TODO] | [PRAGMATIST]
+**TASK CLD-007: Configure horizontal pod autoscaling for scanner** | [DONE] | [PRAGMATIST]
 **SPEC:** Create deploy/kubernetes/hpa.yaml targeting the deployment to scale between 1-5 pods based on 70% CPU utilization.
-**TASK CLD-008: Implement readiness and liveness probes** | [TODO] | [PRAGMATIST]
+**TASK CLD-008: Implement readiness and liveness probes** | [DONE] | [PRAGMATIST]
 **SPEC:** Add /api/health endpoint to app_fastapi.py and configure liveness/readiness probes in deployment.yaml.
-**TASK CLD-009: Document cloud deployment steps** | [TODO] | [PRAGMATIST]
+**TASK CLD-009: Document cloud deployment steps** | [DONE] | [PRAGMATIST]
 **SPEC:** Create docs/cloud-deployment.md detailing kubectl apply commands and Helm chart alternatives.
-**TASK CLD-010: Integration tests for Kubernetes deployment** | [TODO] | [PRAGMATIST]
+**TASK CLD-010: Integration tests for Kubernetes deployment** | [DONE] | [PRAGMATIST]
 **SPEC:** Add pytest integration test deploying test manifest via local kind cluster and verifying service response.
 
 ### [EPIC-12] Team Collaboration Dashboard
