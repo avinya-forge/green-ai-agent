@@ -91,6 +91,7 @@ reports/               # Generated reports (keep .gitkeep)
 !/docs/PRD.md
 !/docs/ROADMAP.md
 !/docs/CONSOLIDATION_REPORT.md
+!/docs/cloud-deployment.md
 
 # Archive (intentionally ignored)
 archive/               # Old story files, deprecated docs
