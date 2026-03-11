@@ -1,17 +1,5 @@
 **MILESTONE M1** | **PHASE 2** | **GATEKEEPER** [0-Hygiene-Error | 95% Test | Build-Pass]
 
-### [EPIC-06] Performance Optimization
-**TASK GO-009: Go Performance Benchmark** | [DONE] | [PRAGMATIST]
-**SPEC:** Implement standard benchmark suite using 'testing' package for Go language detector evaluating AST parsing speed vs python reference.
-**TASK GO-010: Native Go Benchmark** | [DONE] | [PRAGMATIST]
-**SPEC:** Implement a native Go benchmark using the `testing` package to verify AST parsing performance natively in Go instead of relying purely on Python bindings benchmark.
-
-### [EPIC-07] Security Hardening
-**TASK SEC-002: Dependency Upgrade: Bump versions** | [DONE] | [HARDENER]
-**SPEC:** Run pip-audit and upgrade remaining dependencies flagged with CVEs in requirements.txt.
-**TASK SEC-008: OWASP Top 10: Mapping review** | [DONE] | [HARDENER]
-**SPEC:** Create security-review.md mapping current scanner rules against OWASP Top 10 vulnerabilities identifying coverage gaps.
-
 ### [EPIC-09] IDE Plugins (Prep)
 **TASK IDE-001: VS Code Ext: Project scaffold** | [TODO] | [PRAGMATIST]
 **SPEC:** Initialize VS Code extension scaffold in src/ide/vscode/ using yo code with package.json configuring the 'green-ai' command.
@@ -31,22 +19,6 @@
 **SPEC:** Add configuration section 'green-ai.scanner' in package.json to control LSP server path and scanner strictness.
 **TASK IDE-010: VS Code Ext: Output channel logging** | [TODO] | [PRAGMATIST]
 **SPEC:** Implement window/logMessage reporting LSP server initialization and scanning progress to an output channel.
-
-### [EPIC-11] Cloud Native Deployment
-**TASK CLD-002: Implement Kubernetes Deployment manifests** | [DONE] | [PRAGMATIST]
-**SPEC:** Create deploy/kubernetes/deployment.yaml defining green-ai replica set with resource requests/limits (CPU 500m, Mem 512Mi).
-**TASK CLD-003: Implement Kubernetes Service manifests** | [DONE] | [PRAGMATIST]
-**SPEC:** Create deploy/kubernetes/service.yaml defining ClusterIP service exposing the FastAPI UI on port 80.
-**TASK CLD-004: Implement Kubernetes Ingress configurations** | [DONE] | [PRAGMATIST]
-**SPEC:** Create deploy/kubernetes/ingress.yaml defining routing rules for green-ai dashboard domain mapping.
-**TASK CLD-007: Configure horizontal pod autoscaling for scanner** | [DONE] | [PRAGMATIST]
-**SPEC:** Create deploy/kubernetes/hpa.yaml targeting the deployment to scale between 1-5 pods based on 70% CPU utilization.
-**TASK CLD-008: Implement readiness and liveness probes** | [DONE] | [PRAGMATIST]
-**SPEC:** Add /api/health endpoint to app_fastapi.py and configure liveness/readiness probes in deployment.yaml.
-**TASK CLD-009: Document cloud deployment steps** | [DONE] | [PRAGMATIST]
-**SPEC:** Create docs/cloud-deployment.md detailing kubectl apply commands and Helm chart alternatives.
-**TASK CLD-010: Integration tests for Kubernetes deployment** | [DONE] | [PRAGMATIST]
-**SPEC:** Add pytest integration test deploying test manifest via local kind cluster and verifying service response.
 
 ### [EPIC-12] Team Collaboration Dashboard
 **TASK TEAM-001: Design database schema for team analytics** | [TODO] | [PRAGMATIST]
