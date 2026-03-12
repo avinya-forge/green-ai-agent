@@ -125,3 +125,13 @@
 **TASK RUST-010: Release Rust Support Beta** | [TODO] | [PRAGMATIST]
 **SPEC:** Bump application minor version and generate release note for Rust Beta.
    - [TASK] Bump application minor version and generate release note for Rust Beta.
+### [EPIC-15] Autonomous Architecture & Documentation Engine
+**TASK ARCH-001: Implement Master Controller Script** | [TODO] | [PRAGMATIST]
+**SPEC:** Create run.sh to serve as the Master Controller for Sync, Test, Backlog, and Start operations.
+   - [TASK] Create run.sh to serve as the Master Controller for Sync, Test, Backlog, and Start operations.
+**TASK ARCH-002: Ensure SSOT Hierarchy is Maintained** | [TODO] | [PRAGMATIST]
+**SPEC:** Sync docs/planning, docs/architecture, and docs/engineering without data loss.
+   - [TASK] Sync docs/planning, docs/architecture, and docs/engineering without data loss.
+**TASK ARCH-003: Expand Run Script Capabilities** | [TODO] | [PRAGMATIST]
+**SPEC:** Add testing, linting, backlog parsing, environment initialization, and external skills fetching functionality.
+   - [TASK] Add testing, linting, backlog parsing, environment initialization, and external skills fetching functionality.
