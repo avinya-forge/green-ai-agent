@@ -9,7 +9,7 @@ green-ai-agent/
 ├── src/                      # Source code (all modules)
 ├── tests/                    # Test files (pytest)
 ├── rules/                    # YAML rule definitions (per language)
-├── docs/                     # Documentation (backlog, release-notes, vision, standards)
+├── docs/                     # Documentation (planning, architecture, testing, release, rules)
 ├── output/                   # ALL generated reports (CSV, HTML, emissions, logs)
 ├── data/                     # Data files (CSVs from scanning)
 └── [root files]              # Only: README.md, requirements.txt, config files
@@ -20,7 +20,7 @@ green-ai-agent/
 > **STRICT RULE:** No new files or folders may be created in this repository by Copilot or any automated tool without explicit USER permission. All documentation, code, and configuration changes must be reviewed and approved by a human user. Any attempt to auto-generate files, markdowns, or logs outside the approved structure will be rejected.
 
 - All outputs must go to the `output/` folder.
-- Only `BACKLOG.md`, `release-notes.md`, `vision.md`, and `development-standards.md` are allowed in `docs/`.
+- Only files following the `IO_SSOT` mapping are allowed in `docs/`.
 - No new markdown or config files may be created in any folder unless approved by the USER.
 - All code, test, and rule files must follow the structure in this README.
 - Any violation of this policy will be reverted.
@@ -135,7 +135,7 @@ pytest tests/ -v
 1. **Pull Request**: Create a PR for significant changes (>200 LOC or 5 tasks).
 2. **Review**: All PRs must be reviewed.
 3. **Merge**: Merge only when all tests pass and coverage is maintained.
-4. **Release**: Update `docs/release-notes.md` with user-facing changes.
+4. **Release**: Update `docs/release/release-notes.md` with user-facing changes.
 
 ## 🛡️ Pre-commit Hooks
 

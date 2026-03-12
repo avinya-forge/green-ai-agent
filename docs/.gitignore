@@ -4,29 +4,34 @@
 # Deny all files by default
 *
 
-# Exception: Allow canonical files
-!backlog.md
-!release-notes.md
-!vision.md
-!github-action.md
-!cloud-deployment.md
+# Allow .gitignore itself
+!.gitignore
 
 # API Contracts
+!api/
 !api/swagger.yaml
 !api/mock_data.json
 
-# Rules
-!rules/habits.md
-!rules/hygiene.md
-!rules/decisions.md
+# SSOT
+!planning/
+!planning/backlog.md
+!planning/map.md
+!planning/doubts.md
 
-# Standards
-!standards/ultra-lean.md
+!architecture/
+!architecture/vision.md
+!architecture/arch.md
+!architecture/decisions.md
 
-# Directories
-!api/
+!testing/
+!testing/test-cases.md
+!testing/coverage.md
+
+!release/
+!release/release-notes.md
+!release/metrics.md
+
 !rules/
-!standards/
-
-# Allow .gitignore itself
-!.gitignore
+!rules/standards.md
+!rules/hygiene.md
+!rules/habits.md
