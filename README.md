@@ -3,18 +3,31 @@
 ![Version](https://img.shields.io/badge/version-v0.9.1-blue.svg)
 
 ## The Pulse
-| Milestone | Version | Phase | Status | Debt | Density |
-|-----------|---------|-------|--------|-----------|-----------------|
+| Milestone | Version | Phase | Status | Debt% | Density |
+|-----------|---------|-------|--------|-------|---------|
 | Stability Gate | v0.9.1 | Phase 2 | ACTIVE | Low | 60 |
 
 ## Documentation Map
-- [Vision](./docs/vision.md)
-- [Backlog](./docs/backlog.md)
-- [Release Notes](./docs/release-notes.md)
-- [Habits](./docs/rules/habits.md)
-- [Hygiene](./docs/rules/hygiene.md)
-- [Ultra Lean Standards](./docs/standards/ultra-lean.md)
-- [GitHub Action](./docs/github-action.md)
+- [Pulse Table / Index](./README.md)
+- **Config**: [Execution Logic](./scripts/skills.sh)
+- **Planning**:
+  - [Backlog](./docs/planning/backlog.md)
+  - [Map](./docs/planning/map.md)
+  - [Doubts](./docs/planning/doubts.md)
+- **Architecture**:
+  - [Vision](./docs/architecture/vision.md)
+  - [Architecture](./docs/architecture/arch.md)
+  - [Decisions](./docs/architecture/decisions.md)
+- **Testing**:
+  - [Test Cases](./docs/testing/test-cases.md)
+  - [Coverage](./docs/testing/coverage.md)
+- **Release**:
+  - [Release Notes](./docs/release/release-notes.md)
+  - [Metrics](./docs/release/metrics.md)
+- **Rules**:
+  - [Standards](./docs/rules/standards.md)
+  - [Hygiene](./docs/rules/hygiene.md)
+  - [Habits](./docs/rules/habits.md)
 
 ## Quick Start
 **Current Active Milestone: [EPIC-00] STABILITY GATE**

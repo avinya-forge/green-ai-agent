@@ -309,7 +309,7 @@ The current implementation relies on `eventlet` for asynchronous support in `Fla
 - **JSON Validation**: Added validation logic to `JSONExporter` to ensure data consistency (REP-012).
 - **Export Metadata**: Standardized metadata fields in JSON export (REP-013).
 - **Performance Profiling**: Added `--perf-profile` flag to `scan` command for internal cProfile analysis (PERF-001).
-- **Bottleneck Analysis**: Conducted initial performance analysis and documented findings in `docs/performance_analysis.md` (PERF-002).
+- **Bottleneck Analysis**: Conducted initial performance analysis and documented findings in `docs/architecture/performance_analysis.md` (PERF-002).
 - **LLM CLI Enhancements**: Added colored diff view (`difflib`) to `fix-ai` command for verifying changes before applying, plus robust file patching logic.
 - **Prompt Engineering**: Implemented specialized prompts for Python/JS loops, IO, and logic optimization in `src/core/llm/prompts.py`.
 - **CSV Export Improvements**: Added `snippet` and `remediation` columns to CSV export, providing more context for violations.
@@ -356,8 +356,8 @@ The current implementation relies on `eventlet` for asynchronous support in `Fla
 - **Pre-commit Hook**: Fixed `.git_hooks_pre-commit.sh` to correctly handle `BACKLOG.md` casing and allow standard documentation files, improving developer experience.
 
 ### Documentation
-- **Standards & Vision**: Updated `docs/vision.md` and `docs/development-standards.md` to reflect current capabilities (v0.6.1) and rule definitions.
-- **Migration Plan**: Added comprehensive `docs/eventlet-migration.md` outlining the roadmap to replace Eventlet with FastAPI/Uvicorn.
+- **Standards & Vision**: Updated `docs/architecture/vision.md` and `docs/rules/standards.md` to reflect current capabilities (v0.6.1) and rule definitions.
+- **Migration Plan**: Added comprehensive `docs/architecture/eventlet-migration.md` outlining the roadmap to replace Eventlet with FastAPI/Uvicorn.
 
 ## [v0.6.2] - Architecture & Security Update (Consolidated Batch)
 ### 🏗️ Architectural Refactor
