@@ -2,12 +2,12 @@
 > To empower every developer to write energy-efficient code by default, making software sustainability as fundamental as performance and security.
 ![Version](https://img.shields.io/badge/version-v0.9.1-blue.svg)
 
-## The Pulse
+## Pulse-Table
 | Milestone | Version | Phase | Status | Debt% | Density |
 |-----------|---------|-------|--------|-------|---------|
 | Stability Gate | v0.9.1 | Phase 2 | ACTIVE | Low | 60 |
 
-## Visual Index
+## Visual-Index
 - **Config**: [Execution Logic](./scripts/skills.sh)
 - **Planning**:
   - [Backlog](./docs/planning/backlog.md)

@@ -3,11 +3,15 @@
 
 MODE="IDEMPOTENT | TERSE | 100%-INTEGRITY"
 
+log_blocker() {
+    echo "- [RESOLVE] Blocker encountered: $1" >> docs/planning/backlog.md
+}
+
 case "$1" in
     --sync)
         echo "[PHASE: 1-Strategy] | [SCENARIO: S1-S5] | [STATUS: syncing file-tree]"
-        mkdir -p docs/planning docs/architecture docs/engineering
-        touch docs/planning/backlog.md
+        mkdir -p docs/planning docs/architecture docs/engineering || log_blocker "Failed to create dirs"
+        touch docs/planning/backlog.md || log_blocker "Failed to touch backlog"
         if [ ! -f docs/planning/roadmap.md ]; then
             echo "# Roadmap" > docs/planning/roadmap.md
         fi
@@ -20,12 +24,12 @@ case "$1" in
         ;;
     --test)
         echo "[PHASE: 1-Strategy] | [SCENARIO: S1-S5] | [STATUS: running tests]"
-        pytest --cov=src || true
-        flake8 src || true
+        pytest --cov=src || log_blocker "pytest failed"
+        flake8 src || log_blocker "flake8 failed"
         ;;
     --backlog)
         echo "[PHASE: 1-Strategy] | [SCENARIO: S1-S5] | [STATUS: parsing backlog]"
-        grep -r -E "\[EPIC|DEBT\]" docs/planning/backlog.md || true
+        grep -r -E "\[EPIC|DEBT\]" docs/planning/ || log_blocker "grep backlog failed"
         ;;
     --start)
         echo "[PHASE: 1-Strategy] | [SCENARIO: S1-S5] | [STATUS: env initialization]"
@@ -33,7 +37,7 @@ case "$1" in
         ;;
     --skills)
         echo "[PHASE: 1-Strategy] | [SCENARIO: S1-S5] | [STATUS: injecting patterns]"
-        curl -s https://skills.sh/ | grep -o '"skillId":"[^"]*"' | cut -d '"' -f 4 > docs/engineering/skills-patterns.txt || true
+        curl -s https://skills.sh/ | grep -o '"skillId":"[^"]*"' | cut -d '"' -f 4 > docs/engineering/skills-patterns.txt || log_blocker "skills fetch failed"
         ;;
     *)
         echo "Usage: \$0 {--sync|--test|--backlog|--start|--skills}"

@@ -136,3 +136,12 @@
 **TASK ARCH-003: Expand Run Script Capabilities** | [TODO] | [PRAGMATIST]
 **SPEC:** Add testing, linting, backlog parsing, environment initialization, and external skills fetching functionality.
    - [x] TASK: Add testing, linting, backlog parsing, environment initialization, and external skills fetching functionality.
+
+### [EPIC-16] Technical Debt & Refactor Pivot
+**TASK DEBT-001: Resolve PERF-005 RISKY_REFACTOR** | [TODO] | [HIGH-RISK] | [PRAGMATIST]
+**SPEC:** Address the risky refactor flagged by silent-compensation-detector where Task PERF-005 changed 265 files.
+   - [ ] TASK: Analyze and break down the PERF-005 changes.
+- [RESOLVE] Blocker encountered: pytest failed
+- [RESOLVE] Blocker encountered: flake8 failed
+- [RESOLVE] Blocker encountered: pytest failed
+- [RESOLVE] Blocker encountered: flake8 failed
