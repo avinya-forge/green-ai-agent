@@ -30,6 +30,11 @@ case "$1" in
     --backlog)
         echo "[PHASE: 1-Strategy] | [SCENARIO: S1-S5] | [STATUS: parsing backlog]"
         grep -r -E "\[EPIC|DEBT\]" docs/planning/ || log_blocker "grep backlog failed"
+        # Recursive expansion of backlog items
+        while IFS= read -r epic; do
+            echo "Expanding: $epic"
+            grep -r -E "TASK" docs/planning/ | grep -v "\[x\]" || true
+        done < <(grep -r -E "\[EPIC|DEBT\]" docs/planning/)
         ;;
     --start)
         echo "[PHASE: 1-Strategy] | [SCENARIO: S1-S5] | [STATUS: env initialization]"

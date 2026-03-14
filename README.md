@@ -3,9 +3,9 @@
 ![Version](https://img.shields.io/badge/version-v0.9.1-blue.svg)
 
 ## Pulse-Table
-| Milestone | Version | Phase | Status | Debt% | Density |
-|-----------|---------|-------|--------|-------|---------|
-| Stability Gate | v0.9.1 | Phase 2 | ACTIVE | Low | 60 |
+| Milestone | Version | Phase | Status | Debt% |
+|-----------|---------|-------|--------|-------|
+| Stability Gate | v0.9.1 | Phase 2 | ACTIVE | Low |
 
 ## Visual-Index
 - **Config**: [Execution Logic](./scripts/skills.sh)
