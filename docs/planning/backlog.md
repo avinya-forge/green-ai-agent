@@ -141,6 +141,14 @@
 **TASK DEBT-001: Resolve PERF-005 RISKY_REFACTOR** | [TODO] | [HIGH-RISK] | [PRAGMATIST]
 **SPEC:** Address the risky refactor flagged by silent-compensation-detector where Task PERF-005 changed 265 files.
    - [ ] TASK: Analyze and break down the PERF-005 changes.
+
+### [EPIC-17] Address PERF-005 Risky Refactor
+**TASK REF-001: Assess Architecture Changes** | [TODO] | [HIGH-RISK] | [HARDENER]
+**SPEC:** Audit 265 files changed in PERF-005 to identify gaps in system-design.md and update architecture documents accordingly.
+   - [ ] TASK: Audit 265 files changed in PERF-005 to identify gaps in system-design.md and update architecture documents accordingly.
+**TASK REF-002: Verify DB/Auth/API Integrations** | [TODO] | [HIGH-RISK] | [HARDENER]
+**SPEC:** Ensure DB, Auth, and API integrations modified in PERF-005 strictly adhere to security constraints.
+   - [ ] TASK: Ensure DB, Auth, and API integrations modified in PERF-005 strictly adhere to security constraints.
 - [RESOLVE] Blocker encountered: pytest failed
 - [RESOLVE] Blocker encountered: flake8 failed
 - [RESOLVE] Blocker encountered: pytest failed
