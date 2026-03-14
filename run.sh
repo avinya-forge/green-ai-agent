@@ -35,6 +35,10 @@ case "$1" in
             echo "Expanding: $epic"
             grep -r -E "TASK" docs/planning/ | grep -v "\[x\]" || true
         done < <(grep -r -E "\[EPIC|DEBT\]" docs/planning/)
+        if [ -f docs/engineering/skills-patterns.txt ]; then
+            echo "Applying skills patterns to backlog..."
+            grep -f docs/engineering/skills-patterns.txt docs/planning/backlog.md || true
+        fi
         ;;
     --start)
         echo "[PHASE: 1-Strategy] | [SCENARIO: S1-S5] | [STATUS: env initialization]"
