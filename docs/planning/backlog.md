@@ -4,7 +4,7 @@
 ### [EPIC-09] IDE Plugins (Prep)
 **TASK IDE-001: VS Code Ext: Project scaffold** | [TODO] | [PRAGMATIST]
 **SPEC:** Initialize VS Code extension scaffold in src/ide/vscode/ using yo code with package.json configuring the 'green-ai' command.
-   - [x] TASK: Initialize VS Code extension scaffold in src/ide/vscode/ using yo code with package.json configuring the 'green-ai' command.
+   - [DEBT] TASK: Initialize VS Code extension scaffold in src/ide/vscode/ using yo code with package.json configuring the 'green-ai' command.
 **TASK IDE-002: LSP Server: Basic protocol implementation** | [TODO] | [PRAGMATIST]
 **SPEC:** Implement base pygls LanguageServer instance in src/ide/lsp/server.py supporting standard I/O communication.
    - [x] TASK: Implement base pygls LanguageServer instance in src/ide/lsp/server.py supporting standard I/O communication.
