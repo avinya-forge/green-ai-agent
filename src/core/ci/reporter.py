@@ -1,5 +1,6 @@
 from typing import Dict, Any, Optional
 
+
 class CIReporter:
     def generate_report(self, scan_results: Dict[str, Any], diff_changes: Optional[Dict[str, set]] = None) -> str:
         """
@@ -79,7 +80,7 @@ class CIReporter:
             file = issue.get('file', 'N/A')
             # If path is absolute, try to make it relative for display
             if '/' in file:
-                file = file.split('/')[-1] # Show just filename to save space in table
+                file = file.split('/')[-1]  # Show just filename to save space in table
 
             line = issue.get('line', '0')
             msg = issue.get('message', 'N/A')

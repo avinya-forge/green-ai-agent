@@ -8,7 +8,6 @@ Loads and validates .green-ai.yaml configuration files with support for:
 """
 
 import os
-import sys
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 import hashlib
@@ -21,36 +20,35 @@ except ImportError:
 
 class ConfigError(Exception):
     """Configuration loading/validation error."""
-    pass
 
 
 class ConfigLoader:
     """
     Loads and validates .green-ai.yaml configuration files.
-    
+
     Features:
     - Load from project root
     - YAML validation against schema
     - Fall back to defaults if file doesn't exist
     - CLI override support
-    
+
     Example config:
         languages:
           - python
           - javascript
-        
+
         rules:
           enabled:
             - excessive_nesting_depth
             - io_in_loop
           disabled:
             - unused_variable
-        
+
         standards:
           - gsf_principles
           - ecocode_python
     """
-    
+
     # Default configuration (works if no .green-ai.yaml exists)
     DEFAULT_CONFIG = {
         'languages': ['python', 'javascript', 'typescript', 'java', 'go'],
@@ -104,32 +102,32 @@ class ConfigLoader:
             }
         }
     }
-    
+
     def __init__(self, config_path: Optional[str] = None):
         """
         Initialize config loader.
-        
+
         Args:
             config_path: Path to .green-ai.yaml file. If None, searches project root.
         """
         self.config_path = config_path or self._find_config_file()
         self.config: Dict[str, Any] = {}
-    
+
     def _find_config_file(self) -> Optional[str]:
         """Find .green-ai.yaml in current directory or parent directories."""
         current = Path.cwd()
-        
+
         # Search up to 5 levels
         for _ in range(5):
             config_file = current / '.green-ai.yaml'
             if config_file.exists():
                 return str(config_file)
-            
+
             # Go to parent
             if current.parent == current:
                 break
             current = current.parent
-        
+
         return None
 
     def _is_url(self, path: str) -> bool:
@@ -150,7 +148,7 @@ class ConfigLoader:
             ConfigError: If fetch fails
         """
         if not httpx:
-             raise ConfigError("httpx not installed. Cannot fetch remote config.")
+            raise ConfigError("httpx not installed. Cannot fetch remote config.")
 
         # Create cache directory
         cache_dir = Path.home() / '.green-ai' / 'remote_configs'
@@ -192,20 +190,20 @@ class ConfigLoader:
             return str(xdg_config)
 
         return None
-    
+
     def load(self) -> Dict[str, Any]:
         """
         Load configuration from file or defaults.
-        
+
         Returns:
             Configuration dictionary
-            
+
         Raises:
             ConfigError: If YAML is invalid or required field missing
         """
         # Start with defaults
         config = self.DEFAULT_CONFIG.copy()
-        
+
         # Import yaml when needed
         try:
             import yaml
@@ -245,21 +243,21 @@ class ConfigLoader:
                 raise ConfigError(f"Invalid YAML in {local_config_path}: {e}")
             except IOError as e:
                 raise ConfigError(f"Cannot read {local_config_path}: {e}")
-        
+
         # Validate using Pydantic
         self.config = self._validate_config(config)
-        
+
         return self.config
-    
+
     def _merge_config(self, default: Dict, user: Dict) -> Dict:
         """Recursively merge user config into defaults."""
         from src.utils.dict_utils import deep_merge
         return deep_merge(default, user)
-    
+
     def _validate_config(self, config: Dict[str, Any]) -> Dict[str, Any]:
         """
         Validate configuration using Pydantic model.
-        
+
         Raises:
             ConfigError: If validation fails
         """
@@ -271,21 +269,21 @@ class ConfigLoader:
             raise ConfigError("Pydantic not installed or config_models missing.")
         except Exception as e:
             raise ConfigError(f"Configuration validation failed: {e}")
-    
+
     def get(self, key: str, default: Any = None) -> Any:
         """
         Get configuration value.
-        
+
         Args:
             key: Configuration key (supports dot notation: 'rules.enabled')
             default: Default value if key not found
-            
+
         Returns:
             Configuration value
         """
         if not self.config:
             self.load()
-        
+
         # Support dot notation (e.g., 'rules.enabled')
         if '.' in key:
             parts = key.split('.')
@@ -296,9 +294,9 @@ class ConfigLoader:
                 else:
                     return default
             return value if value is not None else default
-        
+
         return self.config.get(key, default)
-    
+
     def get_rule_severity(self, rule_id: str, default_severity: str = "medium") -> str:
         """
         Get rule severity with overrides.
@@ -327,46 +325,46 @@ class ConfigLoader:
     def is_rule_enabled(self, rule_id: str) -> bool:
         """
         Check if a rule is enabled.
-        
+
         Args:
             rule_id: Rule ID to check
-            
+
         Returns:
             True if rule is enabled, False if disabled
         """
         if not self.config:
             self.load()
-        
+
         enabled = self.get('rules.enabled', [])
         disabled = self.get('rules.disabled', [])
-        
+
         # If rule is explicitly disabled, it's disabled
         if rule_id in disabled:
             return False
-        
+
         # If rule is explicitly enabled, it's enabled
         if rule_id in enabled:
             return True
-        
+
         # Default: enabled (for backward compatibility)
         return True
-    
+
     def get_enabled_languages(self) -> List[str]:
         """Get list of enabled languages."""
         if not self.config:
             self.load()
         return self.get('languages', ['python', 'javascript'])
-    
+
     def get_ignored_files(self) -> List[str]:
         """Get list of file patterns to ignore."""
         if not self.config:
             self.load()
         return self.get('ignore_files', [])
-    
+
     def export_example_yaml(self, output_path: str) -> None:
         """
         Export example .green-ai.yaml file.
-        
+
         Args:
             output_path: Path where to write the example file
         """
@@ -376,7 +374,7 @@ class ConfigLoader:
             raise ConfigError(
                 "PyYAML not installed. Install with: pip install pyyaml"
             )
-        
+
         example_config = {
             'languages': ['python', 'javascript'],
             'rules': {
@@ -405,23 +403,23 @@ class ConfigLoader:
             ],
             'auto_fix': False,
         }
-        
+
         with open(output_path, 'w') as f:
             f.write("# Green-AI Configuration\n")
             f.write("# Copy this file to .green-ai.yaml in your project root\n")
             f.write("# All fields are optional and have sensible defaults\n\n")
             yaml.dump(example_config, f, default_flow_style=False, sort_keys=False)
-        
+
         print(f"Example configuration written to: {output_path}")
 
 
 def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
     """
     Convenience function to load configuration.
-    
+
     Args:
         config_path: Optional path to .green-ai.yaml
-        
+
     Returns:
         Configuration dictionary
     """

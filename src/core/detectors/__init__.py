@@ -15,6 +15,7 @@ from .csharp_detector import CSharpASTDetector
 from .pattern_detector import PatternBasedDetector
 from src.core.detectors.cache import detection_cache
 
+
 def detect_violations(content: str, file_path: str, language: str = 'python') -> List[Dict]:
     """
     Detect all violations in code.

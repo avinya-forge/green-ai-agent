@@ -9,12 +9,12 @@ from collections import defaultdict
 
 class ChartDataGenerator:
     """Generate chart data from scan results for dashboard visualization."""
-    
+
     @staticmethod
     def violations_by_severity(issues: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
         Generate severity distribution chart data.
-        
+
         Returns:
             {
                 'labels': ['Critical', 'High', 'Medium', 'Low'],
@@ -29,18 +29,18 @@ class ChartDataGenerator:
             'medium': {'label': 'Medium', 'color': '#f59e0b'},
             'low': {'label': 'Low', 'color': '#3b82f6'},
         }
-        
+
         counts = defaultdict(int)
         for issue in issues:
             severity = issue.get('severity', 'low').lower()
             counts[severity] += 1
-        
+
         labels = []
         data = []
         colors = []
         total = sum(counts.values())
         percentages = []
-        
+
         for severity in ['critical', 'high', 'medium', 'low']:
             if severity in counts or total > 0:
                 count = counts.get(severity, 0)
@@ -49,7 +49,7 @@ class ChartDataGenerator:
                 colors.append(severity_map[severity]['color'])
                 pct = (count / total * 100) if total > 0 else 0
                 percentages.append(round(pct, 1))
-        
+
         return {
             'labels': labels,
             'data': data,
@@ -57,12 +57,12 @@ class ChartDataGenerator:
             'percentages': percentages,
             'total': total
         }
-    
+
     @staticmethod
     def violations_by_type(issues: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
         Generate violation type distribution chart data.
-        
+
         Returns:
             {
                 'labels': ['Memory', 'CPU', 'IO', ...],
@@ -72,7 +72,7 @@ class ChartDataGenerator:
         """
         type_counts = defaultdict(int)
         total = len(issues)
-        
+
         for issue in issues:
             issue_type = issue.get('type', 'unknown')
             if issue_type == 'green_violation':
@@ -90,23 +90,23 @@ class ChartDataGenerator:
                     type_counts['Energy'] += 1
                 else:
                     type_counts['Other'] += 1
-        
+
         labels = sorted(type_counts.keys())
         data = [type_counts[label] for label in labels]
         percentages = [round(count / total * 100, 1) if total > 0 else 0 for count in data]
-        
+
         return {
             'labels': labels,
             'data': data,
             'percentages': percentages,
             'total': total
         }
-    
+
     @staticmethod
     def violations_by_file(issues: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
         Generate violations per file breakdown.
-        
+
         Returns:
             {
                 'labels': ['file1.py', 'file2.py', ...],
@@ -117,29 +117,29 @@ class ChartDataGenerator:
         """
         file_violations = defaultdict(lambda: {'count': 0, 'emissions': 0.0})
         total = len(issues)
-        
+
         for issue in issues:
             filename = issue.get('file', 'unknown')
             file_violations[filename]['count'] += 1
             file_violations[filename]['emissions'] += issue.get('codebase_emissions', 0.0)
-        
+
         # Sort by count descending, limit to top 10
         sorted_files = sorted(
             file_violations.items(),
             key=lambda x: x[1]['count'],
             reverse=True
         )[:10]
-        
+
         labels = [f[0] for f in sorted_files]
         data = [f[1]['count'] for f in sorted_files]
         emissions = [round(f[1]['emissions'], 9) for f in sorted_files]
-        
+
         total_emissions = sum(emissions)
         percentages = [
             round(f[1]['count'] / total * 100, 1) if total > 0 else 0
             for f in sorted_files
         ]
-        
+
         return {
             'labels': labels,
             'data': data,
@@ -148,12 +148,12 @@ class ChartDataGenerator:
             'total': total,
             'total_emissions': total_emissions
         }
-    
+
     @staticmethod
     def top_violations(issues: List[Dict[str, Any]], limit: int = 10) -> List[Dict[str, Any]]:
         """
         Get top violations by emissions impact.
-        
+
         Returns:
             [
                 {
@@ -173,7 +173,7 @@ class ChartDataGenerator:
             key=lambda x: x.get('codebase_emissions', 0.0),
             reverse=True
         )[:limit]
-        
+
         return [
             {
                 'id': issue.get('id', 'unknown'),
@@ -186,12 +186,12 @@ class ChartDataGenerator:
             }
             for issue in sorted_issues
         ]
-    
+
     @staticmethod
     def emissions_trend(per_file_emissions: Dict[str, float]) -> Dict[str, Any]:
         """
         Generate emissions by file trend data for bar chart.
-        
+
         Returns:
             {
                 'labels': ['file1.py', 'file2.py', ...],
@@ -207,32 +207,32 @@ class ChartDataGenerator:
                 'total': 0.0,
                 'average': 0.0
             }
-        
+
         # Sort by emissions descending, limit to top 10
         sorted_files = sorted(
             per_file_emissions.items(),
             key=lambda x: x[1],
             reverse=True
         )[:10]
-        
+
         labels = [f[0] for f in sorted_files]
         data = [round(f[1], 9) for f in sorted_files]
-        
+
         total = sum(per_file_emissions.values())
         average = total / len(per_file_emissions) if per_file_emissions else 0.0
-        
+
         return {
             'labels': labels,
             'data': data,
             'total': round(total, 9),
             'average': round(average, 9)
         }
-    
+
     @staticmethod
     def summary_metrics(results: Dict[str, Any]) -> Dict[str, Any]:
         """
         Generate key summary metrics for dashboard.
-        
+
         Returns:
             {
                 'total_issues': 0,
@@ -247,16 +247,16 @@ class ChartDataGenerator:
         """
         issues = results.get('issues', [])
         total_issues = len(issues)
-        
+
         critical_issues = sum(
             1 for issue in issues
             if issue.get('severity') in ['critical', 'high']
         )
-        
+
         scanning_emissions = results.get('scanning_emissions', 0.0)
         codebase_emissions = results.get('codebase_emissions', 0.0)
         total_emissions = scanning_emissions + codebase_emissions
-        
+
         avg_issue_emissions = 0.0
         if total_issues > 0:
             total_issue_emissions = sum(
@@ -264,11 +264,11 @@ class ChartDataGenerator:
                 for issue in issues
             )
             avg_issue_emissions = total_issue_emissions / total_issues
-        
+
         # Find most affected file
         per_file = results.get('per_file_emissions', {})
         most_affected_file = max(per_file, key=per_file.get) if per_file else 'N/A'
-        
+
         # Find highest impact rule
         highest_impact_rule = 'N/A'
         if issues:
@@ -277,7 +277,7 @@ class ChartDataGenerator:
                 key=lambda x: x.get('codebase_emissions', 0.0)
             )
             highest_impact_rule = highest_issue.get('id', 'N/A')
-        
+
         return {
             'total_issues': total_issues,
             'critical_issues': critical_issues,
@@ -296,10 +296,10 @@ class ChartDataGenerator:
 def generate_all_charts(results: Dict[str, Any]) -> Dict[str, Any]:
     """Generate all chart data from scan results."""
     generator = ChartDataGenerator()
-    
+
     issues = results.get('issues', [])
     per_file_emissions = results.get('per_file_emissions', {})
-    
+
     return {
         'severity_chart': generator.violations_by_severity(issues),
         'type_chart': generator.violations_by_type(issues),

@@ -2,7 +2,6 @@ import os
 import sys
 import concurrent.futures
 import multiprocessing
-from multiprocessing import cpu_count
 from typing import Optional, List, Union
 
 from src.core.rules import RuleRepository
@@ -68,10 +67,7 @@ class Scanner:
 
         logger.info(f"Starting scan on {path}...")
 
-        files = []
         scan_metadata_path = ""
-
-        import types
 
         # Iterate over generator to find files, avoiding full list loading early on,
         # but we do need the length for total_files and progress tracking.
@@ -248,7 +244,7 @@ class Scanner:
         if not command:
             return {
                 'error': f'Runtime monitoring not supported for language '
-                         f'{self.language}'
+                f'{self.language}'
             }
 
         try:

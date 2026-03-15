@@ -4,11 +4,13 @@ from starlette.responses import JSONResponse
 import time
 from typing import Dict, List
 
+
 class RateLimitMiddleware(BaseHTTPMiddleware):
     """
     Simple in-memory rate limiting middleware.
     Tracks request timestamps per IP address.
     """
+
     def __init__(self, app, limit: int = 100, window: int = 60):
         super().__init__(app)
         self.limit = limit

@@ -2,6 +2,7 @@ from typing import Dict, Any, Optional
 from datetime import datetime, timezone
 from pydantic import BaseModel, Field
 
+
 class ScanMetrics(BaseModel):
     """Metrics collected during a single scan."""
     project_id: str = Field(..., description="Unique ID of the project scanned (or name/hash)")
@@ -23,6 +24,7 @@ class ScanMetrics(BaseModel):
     ci_environment: bool = False
     os_system: str = "unknown"
     python_version: str = "unknown"
+
 
 class TelemetryEvent(BaseModel):
     """Generic telemetry event."""

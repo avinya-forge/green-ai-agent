@@ -36,8 +36,6 @@ def benchmark_scan(target='tests/', iterations=3):
             print(f"Scan failed: {result.stderr}")
     
     if times:
-        avg_time = sum(times) / len(times)
-        avg_emissions = sum(emissions) / len(emissions)
         print("\nBenchmark Results:")
         print(".2f")
         print(".6f")

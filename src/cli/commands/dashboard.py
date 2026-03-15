@@ -2,6 +2,7 @@ import click
 import logging
 from pathlib import Path
 
+
 @click.command()
 def dashboard():
     """Launch the web dashboard"""
@@ -11,7 +12,6 @@ def dashboard():
     except ImportError as e:
         click.echo(f"Error importing dashboard server: {e}", err=True)
         return
-
 
     # Configure Flask logging to output/logs
     # Note: Using absolute path resolution relative to this file

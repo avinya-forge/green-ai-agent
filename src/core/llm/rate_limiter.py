@@ -1,6 +1,7 @@
 import time
 from threading import Lock
 
+
 class TokenBucketRateLimiter:
     """
     Thread-safe rate limiter using the Token Bucket algorithm.

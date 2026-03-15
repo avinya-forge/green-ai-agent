@@ -4,13 +4,12 @@ Green AI Software Analyzer (GASA) - CLI Tool
 """
 
 import click
-import sys
-import os
+
 
 @click.group()
 def cli():
     """Green AI Software Analyzer"""
-    pass
+
 
 # Register commands
 try:

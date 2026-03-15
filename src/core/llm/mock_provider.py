@@ -1,6 +1,7 @@
 from typing import Optional, Dict
 from .provider import LLMProvider
 
+
 class MockLLMProvider(LLMProvider):
     """
     Mock LLM provider for testing purposes.

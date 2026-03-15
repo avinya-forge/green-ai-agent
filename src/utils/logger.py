@@ -1,5 +1,4 @@
 import logging
-import os
 import sys
 from pathlib import Path
 from typing import Optional
@@ -8,14 +7,14 @@ from typing import Optional
 def setup_logger(name: str, log_file: Optional[str] = None, level=logging.INFO):
     """
     Standardized logger setup for Green-AI.
-    
+
     All logs are stored in output/logs/ by default.
     """
     # 1. Determine logs directory (always output/logs)
     # Using absolute path relative to project root (2 levels up from src/utils)
     base_dir = Path(__file__).parent.parent.parent
     logs_dir = base_dir / 'output' / 'logs'
-    
+
     # 2. Ensure logs directory exists
     try:
         logs_dir.mkdir(parents=True, exist_ok=True)
@@ -33,7 +32,7 @@ def setup_logger(name: str, log_file: Optional[str] = None, level=logging.INFO):
     # 4. Create logger
     logger = logging.getLogger(name)
     logger.setLevel(level)
-    
+
     # Clean up existing handlers to avoid duplicates
     if logger.hasHandlers():
         logger.handlers.clear()
@@ -51,6 +50,7 @@ def setup_logger(name: str, log_file: Optional[str] = None, level=logging.INFO):
     logger.addHandler(console_handler)
 
     return logger
+
 
 # Single instance of core logger
 logger = setup_logger('green-ai', 'app.log')

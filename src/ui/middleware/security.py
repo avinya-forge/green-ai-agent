@@ -1,11 +1,12 @@
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
-from starlette.responses import Response
+
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """
     Middleware to add security headers to all responses.
     """
+
     async def dispatch(self, request: Request, call_next):
         response = await call_next(request)
 
@@ -29,6 +30,6 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
         # HSTS (only effective if served over HTTPS)
         if request.url.scheme == "https":
-             response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
 
         return response

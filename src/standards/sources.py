@@ -6,10 +6,10 @@ Handles fetching and parsing of green software standards from remote sources.
 import requests
 import yaml
 import json
-from typing import List, Dict, Optional, Any
+from typing import List, Dict
 from abc import ABC, abstractmethod
-from dataclasses import asdict
 from .registry import StandardRule
+
 
 class StandardSource(ABC):
     """Abstract base class for standard sources."""
@@ -18,12 +18,11 @@ class StandardSource(ABC):
     @abstractmethod
     def name(self) -> str:
         """Name of the standard source."""
-        pass
 
     @abstractmethod
     def fetch(self) -> List[StandardRule]:
         """Fetch rules from the source."""
-        pass
+
 
 class GitHubStandardSource(StandardSource):
     """Base class for standards hosted on GitHub."""
@@ -46,6 +45,7 @@ class GitHubStandardSource(StandardSource):
         except requests.RequestException as e:
             print(f"Error fetching from {url}: {e}")
             return ""
+
 
 class GSFSource(GitHubStandardSource):
     """Fetcher for Green Software Foundation standards."""
@@ -84,6 +84,7 @@ class GSFSource(GitHubStandardSource):
         except yaml.YAMLError:
             return []
 
+
 class EcoCodeSource(GitHubStandardSource):
     """Fetcher for ecoCode standards."""
 
@@ -110,7 +111,7 @@ class EcoCodeSource(GitHubStandardSource):
                         name=r.get('name', ''),
                         description=r.get('summary', ''),
                         severity=r.get('severity', 'minor'),
-                        languages=['python'], # specialized for python file
+                        languages=['python'],  # specialized for python file
                         pattern=r.get('pattern', ''),
                         remediation=r.get('fix', ''),
                         source='ecoCode'
@@ -118,6 +119,7 @@ class EcoCodeSource(GitHubStandardSource):
             return rules
         except json.JSONDecodeError:
             return []
+
 
 class SourceManager:
     """Manages multiple sources."""

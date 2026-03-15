@@ -2,7 +2,6 @@
 PDF Export module for GASA using WeasyPrint.
 """
 
-import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any, Optional
@@ -15,6 +14,7 @@ from src.core.export.charts import ChartGenerator
 # Default output directory
 OUTPUT_DIR = Path(__file__).parent.parent.parent.parent / 'output'
 TEMPLATE_DIR = Path(__file__).parent / 'templates'
+
 
 class PDFExporter:
     """Export scan results to PDF format."""

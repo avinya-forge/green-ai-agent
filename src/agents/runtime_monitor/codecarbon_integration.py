@@ -6,8 +6,8 @@ Integration with CodeCarbon for Python code emission tracking.
 from codecarbon import EmissionsTracker
 import psutil
 import time
-import os
 from pathlib import Path
+
 
 class CodeCarbonMonitor:
     def __init__(self, output_file=None):

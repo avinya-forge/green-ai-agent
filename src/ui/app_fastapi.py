@@ -7,9 +7,8 @@ for the migration from Flask/Eventlet.
 
 import socketio
 from fastapi import FastAPI, Request, HTTPException, Query, Response
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel
 from typing import Any, List, Optional
 import os
 import sys
@@ -30,6 +29,7 @@ from src.ui.middleware.security import SecurityHeadersMiddleware
 from src.ui.middleware.rate_limit import RateLimitMiddleware
 
 from contextlib import asynccontextmanager
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -123,6 +123,8 @@ async def broadcast_progress(message: str, percentage: int):
     await sio.emit('scan_progress', {'message': message, 'percentage': percentage})
 
 # Routes
+
+
 @app.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request):
     if state.last_scan_results:
@@ -156,17 +158,21 @@ async def dashboard(request: Request):
             }
         )
 
+
 @app.get("/api/charts")
 async def api_charts() -> Any:
     return state.last_charts or {}
+
 
 @app.get("/api/results")
 async def api_results() -> Any:
     return state.last_scan_results or {}
 
+
 @app.get("/api/health")
 async def api_health() -> Any:
     return {"status": "ok"}
+
 
 @app.get("/api/telemetry")
 async def api_telemetry() -> Any:
@@ -179,9 +185,11 @@ async def api_telemetry() -> Any:
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.get("/api/standards")
 async def api_standards_list() -> Any:
     return state.get_standards_registry().list_standards()
+
 
 @app.get("/api/standards/{standard_name}/rules")
 async def api_standard_rules(standard_name: str) -> Any:
@@ -194,6 +202,7 @@ async def api_standard_rules(standard_name: str) -> Any:
             'rules': [{'id': r.id, 'name': r.name, 'severity': r.severity} for r in rules]
         }
     raise HTTPException(status_code=404, detail="Standard not found")
+
 
 @app.get("/api/projects")
 async def api_projects_list() -> Any:
@@ -215,10 +224,11 @@ async def api_projects_list() -> Any:
         }
     }
 
+
 @app.get("/api/projects/comparison")
 async def api_projects_comparison(projects: List[str] = Query(None)) -> Any:
     if not projects or len(projects) == 0:
-         raise HTTPException(status_code=400, detail="No projects specified. Use ?projects=name1&projects=name2")
+        raise HTTPException(status_code=400, detail="No projects specified. Use ?projects=name1&projects=name2")
 
     if len(projects) > 5:
         raise HTTPException(status_code=400, detail="Maximum 5 projects can be compared at once")
@@ -239,6 +249,7 @@ async def api_projects_comparison(projects: List[str] = Query(None)) -> Any:
         'projects': comparison_data
     }
 
+
 @app.get("/api/projects/{project_name}")
 async def api_project_detail(project_name: str) -> Any:
     pm = state.get_project_manager()
@@ -251,6 +262,7 @@ async def api_project_detail(project_name: str) -> Any:
         'status': 'ok',
         'project': ProjectDTO.from_project(project).model_dump()
     }
+
 
 @app.get("/api/history")
 async def api_get_history(project: str, days: Optional[int] = None) -> Any:
@@ -267,6 +279,7 @@ async def api_get_history(project: str, days: Optional[int] = None) -> Any:
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.get("/api/trending")
 async def api_get_trending(project: str, days: Optional[int] = None) -> Any:
     if not project:
@@ -282,6 +295,7 @@ async def api_get_trending(project: str, days: Optional[int] = None) -> Any:
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/api/compare")
 async def api_compare_scans(
@@ -314,11 +328,12 @@ async def api_compare_scans(
             'details': comparison.get('details', {})
         }
     except IndexError:
-         raise HTTPException(status_code=400, detail="Scan index out of range")
+        raise HTTPException(status_code=400, detail="Scan index out of range")
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.post("/api/scan")
 async def api_scan(request: ScanRequest):
@@ -376,6 +391,7 @@ async def api_scan(request: ScanRequest):
         'language': language
     }
 
+
 @app.delete("/api/projects/{project_name}")
 async def api_delete_project(project_name: str):
     pm = state.get_project_manager()
@@ -384,7 +400,7 @@ async def api_delete_project(project_name: str):
         raise HTTPException(status_code=404, detail=f"Project {project_name} not found")
 
     if project.is_system:
-         raise HTTPException(status_code=403, detail=f"Cannot delete system project: {project_name}")
+        raise HTTPException(status_code=403, detail=f"Cannot delete system project: {project_name}")
 
     try:
         pm.remove_project(project_name)
@@ -394,6 +410,7 @@ async def api_delete_project(project_name: str):
         }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
 
 @app.post("/api/projects/{project_name}/rescan")
 async def api_rescan_project(project_name: str):
@@ -408,6 +425,7 @@ async def api_rescan_project(project_name: str):
         'url': project.repo_url,
         'language': project.language
     }
+
 
 @app.post("/api/projects/{project_name}/clear")
 async def api_clear_project(project_name: str):
@@ -428,20 +446,25 @@ async def api_clear_project(project_name: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 # Standards Management
+
+
 @app.post("/api/standards/{standard_name}/enable")
 async def api_enable_standard(standard_name: str):
     state.get_standards_registry().enable_standard(standard_name)
     return {'status': 'ok', 'message': f'Standard {standard_name} enabled'}
+
 
 @app.post("/api/standards/{standard_name}/disable")
 async def api_disable_standard(standard_name: str):
     state.get_standards_registry().disable_standard(standard_name)
     return {'status': 'ok', 'message': f'Standard {standard_name} disabled'}
 
+
 @app.post("/api/rules/{rule_id}/enable")
 async def api_enable_rule(rule_id: str):
     state.get_standards_registry().enable_rule(rule_id)
     return {'status': 'ok', 'message': f'Rule {rule_id} enabled'}
+
 
 @app.post("/api/rules/{rule_id}/disable")
 async def api_disable_rule(rule_id: str):
@@ -449,6 +472,8 @@ async def api_disable_rule(rule_id: str):
     return {'status': 'ok', 'message': f'Rule {rule_id} disabled'}
 
 # Remediation
+
+
 @app.get("/api/remediation/preview")
 async def api_remediation_preview(
     project: str = Query(...),
@@ -474,6 +499,8 @@ async def api_remediation_preview(
         raise HTTPException(status_code=500, detail=str(e))
 
 # Calibration
+
+
 @app.api_route("/api/calibrate", methods=["GET", "POST"])
 async def api_calibrate(request: Request):
     try:
@@ -491,9 +518,11 @@ async def api_calibrate(request: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 # Export
+
+
 def _handle_export(exporter_cls, mime_type, file_extension, project_name='Scan'):
     if not state.last_scan_results:
-         raise HTTPException(status_code=400, detail="No scan results available. Run a scan first.")
+        raise HTTPException(status_code=400, detail="No scan results available. Run a scan first.")
 
     try:
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -511,16 +540,18 @@ def _handle_export(exporter_cls, mime_type, file_extension, project_name='Scan')
             'Content-Type': f'{mime_type}; charset=utf-8'
         }
         if file_extension == 'csv':
-             headers['Content-Disposition'] = f'attachment; filename="{output_path.name}"'
+            headers['Content-Disposition'] = f'attachment; filename="{output_path.name}"'
 
         return Response(content=content, media_type=mime_type, headers=headers)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to export {file_extension.upper()}: {str(e)}")
 
+
 @app.get("/api/export/csv")
 async def api_export_csv(project: str = 'Scan'):
     return _handle_export(CSVExporter, 'text/csv', 'csv', project)
+
 
 @app.get("/api/export/html")
 async def api_export_html(project: str = 'Scan'):

@@ -2,6 +2,7 @@ from pydantic import BaseModel, field_validator
 from typing import Optional
 from src.utils.security import sanitize_project_name, sanitize_path, is_safe_git_url
 
+
 class ScanRequest(BaseModel):
     project_name: str
     language: str

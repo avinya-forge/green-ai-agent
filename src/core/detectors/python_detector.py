@@ -6,9 +6,10 @@ import ast
 from typing import List, Dict
 from src.utils.entropy import calculate_shannon_entropy
 
+
 class PythonViolationDetector(ast.NodeVisitor):
     """AST visitor to detect green software violations in Python code."""
-    
+
     IO_PATTERNS = {'open', 'read', 'write', 'requests', 'urlopen'}
     REDUNDANT_FUNCS = {'len', 'range', 're.compile', 'datetime.now', 'time.time'}
     BLOCKING_IO = {'requests.get', 'urlopen', 'time.sleep'}
@@ -26,27 +27,27 @@ class PythonViolationDetector(ast.NodeVisitor):
         self.used_variables = set()
         self.imports = {}
         self.var_types = {}
-        
+
     def detect_all(self) -> List[Dict]:
         """Run all detectors and return violations."""
         try:
             tree = ast.parse(self.content)
             self.visit(tree)
-            
+
             # Post-processing for unused detection
             self._detect_unused_variables()
             self._detect_unused_imports()
-            
+
         except SyntaxError:
             pass
-        
+
         return self.violations
-    
+
     def visit_For(self, node: ast.For) -> None:
         """Detect nested loops and I/O in loops."""
         self._check_empty_block(node, 'for loop')
         self.current_depth += 1
-        
+
         # Rule: Excessive nesting depth (O(n^2) or worse)
         if self.current_depth >= 2:
             severity = 'critical' if self.current_depth >= 3 else 'major'
@@ -80,33 +81,33 @@ class PythonViolationDetector(ast.NodeVisitor):
                 'message': 'Iterating over .keys() is redundant. Iterate over the dictionary directly.',
                 'pattern_match': 'dict_keys_iter'
             })
-        
+
         # Rule: Inefficient Lookup (item in list in loop)
         # Moved to visit_Compare
-        
+
         # Check for I/O and redundant computations in loop
         prev_in_loop = self.in_loop
         self.in_loop = True
         # Moved checks to visit_Call and visit_Compare to avoid re-traversal
-        
+
         self.generic_visit(node)
         self.in_loop = prev_in_loop
         self.current_depth -= 1
-    
+
     def visit_While(self, node: ast.While) -> None:
         """Detect while loop violations."""
         self._check_empty_block(node, 'while loop')
         self.current_depth += 1
-        
+
         is_infinite = False
         test = node.test
         if isinstance(test, ast.Constant) and test.value is True:
             is_infinite = True
         elif isinstance(test, ast.Name) and test.id == 'True':
             is_infinite = True
-            
+
         if is_infinite:
-             self.violations.append({
+            self.violations.append({
                 'id': 'no_infinite_loops',
                 'line': node.lineno,
                 'severity': 'critical',
@@ -122,22 +123,22 @@ class PythonViolationDetector(ast.NodeVisitor):
                 'message': f'Nesting depth {self.current_depth}: O(n^{self.current_depth}) complexity detected.',
                 'pattern_match': 'nested_while_loop'
             })
-        
+
         prev_in_loop = self.in_loop
         self.in_loop = True
         # Moved checks to visit_Call and visit_Compare to avoid re-traversal
-        
+
         self.generic_visit(node)
         self.in_loop = prev_in_loop
         self.current_depth -= 1
-    
+
     def visit_If(self, node: ast.If) -> None:
         """Track if statements for complexity."""
         self._check_empty_block(node, 'if statement')
         self.current_depth += 1
         self.generic_visit(node)
         self.current_depth -= 1
-    
+
     def visit_Compare(self, node: ast.Compare) -> None:
         """Detect inefficient lookups in loops."""
         if self.in_loop:
@@ -157,7 +158,7 @@ class PythonViolationDetector(ast.NodeVisitor):
                             'pattern_match': 'list_lookup_loop'
                         })
         self.generic_visit(node)
-    
+
     def visit_BinOp(self, node: ast.BinOp) -> None:
         """Detect string concatenation in loops."""
         # Simplified handling moved to visit_Assign for proper accumulation detection
@@ -178,7 +179,7 @@ class PythonViolationDetector(ast.NodeVisitor):
                 is_string_op = True
 
             if is_string_op:
-                 self.violations.append({
+                self.violations.append({
                     'id': 'string_concatenation_in_loop',
                     'line': node.lineno,
                     'severity': 'medium',
@@ -186,7 +187,7 @@ class PythonViolationDetector(ast.NodeVisitor):
                     'pattern_match': 'string_concat_loop'
                 })
         self.generic_visit(node)
-    
+
     def visit_Call(self, node: ast.Call) -> None:
         """Detect function calls for I/O and performance issues."""
         func_name = None
@@ -199,24 +200,24 @@ class PythonViolationDetector(ast.NodeVisitor):
         if func_name:
             # Rule: IO in Loop
             if self.in_loop:
-                 io_patterns = ['open', 'read', 'write', 'requests', 'urlopen']
-                 is_io = False
+                io_patterns = ['open', 'read', 'write', 'requests', 'urlopen']
+                is_io = False
 
-                 # Check exact match
-                 if func_name in io_patterns:
-                     is_io = True
-                 # Check suffix match (e.g. f.read, requests.get)
-                 elif any(func_name.endswith(f'.{p}') for p in io_patterns) or func_name.startswith('requests.'):
-                     is_io = True
+                # Check exact match
+                if func_name in io_patterns:
+                    is_io = True
+                # Check suffix match (e.g. f.read, requests.get)
+                elif any(func_name.endswith(f'.{p}') for p in io_patterns) or func_name.startswith('requests.'):
+                    is_io = True
 
-                 if is_io:
-                      self.violations.append({
-                            'id': 'io_in_loop',
-                            'line': node.lineno,
-                            'severity': 'critical',
-                            'message': f'I/O operation "{func_name}()" in loop. Each call costs 100-1000x more energy.',
-                            'pattern_match': 'io_operation_in_loop'
-                        })
+                if is_io:
+                    self.violations.append({
+                        'id': 'io_in_loop',
+                        'line': node.lineno,
+                        'severity': 'critical',
+                        'message': f'I/O operation "{func_name}()" in loop. Each call costs 100-1000x more energy.',
+                        'pattern_match': 'io_operation_in_loop'
+                    })
 
             # Rule: Unnecessary computation
             if self.in_loop:
@@ -226,18 +227,18 @@ class PythonViolationDetector(ast.NodeVisitor):
                 if func_name in redundant_funcs:
                     is_redundant = True
                 elif isinstance(node.func, ast.Attribute) and node.func.attr == 'count':
-                     is_redundant = True
+                    is_redundant = True
                 elif func_name and func_name.endswith('.compile') and func_name.startswith('re.'):
-                     is_redundant = True
+                    is_redundant = True
 
                 if is_redundant:
-                     self.violations.append({
-                            'id': 'unnecessary_computation',
-                            'line': node.lineno,
-                            'severity': 'critical',
-                            'message': f'Redundant computation "{func_name}()" in loop. Move outside for O(1) impact.',
-                            'pattern_match': 'computation_outside_loop'
-                        })
+                    self.violations.append({
+                        'id': 'unnecessary_computation',
+                        'line': node.lineno,
+                        'severity': 'critical',
+                        'message': f'Redundant computation "{func_name}()" in loop. Move outside for O(1) impact.',
+                        'pattern_match': 'computation_outside_loop'
+                    })
 
             # Rule: Blocking I/O
             blocking_io = ['requests.get', 'urlopen', 'time.sleep']
@@ -249,11 +250,11 @@ class PythonViolationDetector(ast.NodeVisitor):
                     'message': f'Blocking I/O operation "{func_name}()". Consider async/await.',
                     'pattern_match': 'sync_io'
                 })
-            
+
             # Rule: Blocking I/O in Async
             if self.in_async:
                 # time.sleep, requests.*, open
-                blocking_calls = ['time.sleep', 'requests', 'open']
+                pass
                 # Note: 'requests' covers all methods if we match prefix or exact
 
                 is_blocking_in_async = False
@@ -263,8 +264,8 @@ class PythonViolationDetector(ast.NodeVisitor):
                     is_blocking_in_async = True
                 elif func_name.startswith('requests.'):
                     is_blocking_in_async = True
-                elif func_name == 'requests': # if called directly? rare but possible
-                     is_blocking_in_async = True
+                elif func_name == 'requests':  # if called directly? rare but possible
+                    is_blocking_in_async = True
 
                 if is_blocking_in_async:
                     self.violations.append({
@@ -297,9 +298,9 @@ class PythonViolationDetector(ast.NodeVisitor):
 
         # Rule: Excessive Logging (Logger methods)
         if isinstance(node.func, ast.Attribute) and node.func.attr in ['debug', 'info', 'log']:
-             # Heuristic: check if called on something like 'args.logger' or 'logging' or 'logger'
-             if isinstance(node.func.value, ast.Name) and node.func.value.id in ['logger', 'logging']:
-                  self.violations.append({
+            # Heuristic: check if called on something like 'args.logger' or 'logging' or 'logger'
+            if isinstance(node.func.value, ast.Name) and node.func.value.id in ['logger', 'logging']:
+                self.violations.append({
                     'id': 'excessive_logging',
                     'line': node.lineno,
                     'severity': 'minor',
@@ -318,17 +319,17 @@ class PythonViolationDetector(ast.NodeVisitor):
             })
 
         # Rule: Process Spawning
-        call_s = ast.dump(node.func) # Simplified string check
+        call_s = ast.dump(node.func)  # Simplified string check
         if 'subprocess' in call_s or 'os.system' in call_s or 'popen' in call_s.lower():
-             # Basic filter to avoid false positives if variable names match
-             is_process = False
-             if isinstance(node.func, ast.Attribute):
-                 if node.func.attr in ['run', 'Popen', 'system', 'spawn']:
-                     is_process = True
-             elif func_name in ['system', 'popen', 'spawn']:
-                 is_process = True
-            
-             if is_process:
+            # Basic filter to avoid false positives if variable names match
+            is_process = False
+            if isinstance(node.func, ast.Attribute):
+                if node.func.attr in ['run', 'Popen', 'system', 'spawn']:
+                    is_process = True
+            elif func_name in ['system', 'popen', 'spawn']:
+                is_process = True
+
+            if is_process:
                 self.violations.append({
                     'id': 'process_spawning',
                     'line': node.lineno,
@@ -360,7 +361,7 @@ class PythonViolationDetector(ast.NodeVisitor):
         # Rule: Any/All List Comprehension
         if isinstance(node.func, ast.Name) and node.func.id in ['any', 'all']:
             if node.args and isinstance(node.args[0], ast.ListComp):
-                 self.violations.append({
+                self.violations.append({
                     'id': 'any_all_list_comprehension',
                     'line': node.lineno,
                     'severity': 'major',
@@ -370,8 +371,8 @@ class PythonViolationDetector(ast.NodeVisitor):
 
         # Rule: Unnecessary List in Generator (sum/max/min)
         if isinstance(node.func, ast.Name) and node.func.id in ['sum', 'max', 'min']:
-             if node.args and isinstance(node.args[0], ast.ListComp):
-                 self.violations.append({
+            if node.args and isinstance(node.args[0], ast.ListComp):
+                self.violations.append({
                     'id': 'unnecessary_generator_list',
                     'line': node.lineno,
                     'severity': 'minor',
@@ -401,7 +402,7 @@ class PythonViolationDetector(ast.NodeVisitor):
         # Rule: Unnecessary Comprehension (list([...]) or set({...}))
         if isinstance(node.func, ast.Name) and node.func.id in ['list', 'set', 'dict']:
             if node.args and isinstance(node.args[0], (ast.ListComp, ast.SetComp, ast.DictComp)):
-                 self.violations.append({
+                self.violations.append({
                     'id': 'unnecessary_comprehension',
                     'line': node.lineno,
                     'severity': 'major',
@@ -426,7 +427,7 @@ class PythonViolationDetector(ast.NodeVisitor):
                         is_numpy = True
 
                 if is_numpy:
-                     self.violations.append({
+                    self.violations.append({
                         'id': 'numpy_sum_vs_python_sum',
                         'line': node.lineno,
                         'severity': 'minor',
@@ -444,7 +445,7 @@ class PythonViolationDetector(ast.NodeVisitor):
                     break
 
             if not has_timeout:
-                 self.violations.append({
+                self.violations.append({
                     'id': 'subprocess_run_without_timeout',
                     'line': node.lineno,
                     'severity': 'major',
@@ -454,18 +455,18 @@ class PythonViolationDetector(ast.NodeVisitor):
 
         # Rule: Requests Without Timeout
         if func_name and (func_name.startswith('requests.') or func_name == 'requests'):
-             # Check if method is one that makes a request (get, post, put, delete, etc)
-             # or generic request()
-             method = func_name.split('.')[-1] if '.' in func_name else None
-             if method in ['get', 'post', 'put', 'delete', 'head', 'options', 'patch', 'request']:
-                 has_timeout = False
-                 for keyword in node.keywords:
-                     if keyword.arg == 'timeout':
-                         has_timeout = True
-                         break
+            # Check if method is one that makes a request (get, post, put, delete, etc)
+            # or generic request()
+            method = func_name.split('.')[-1] if '.' in func_name else None
+            if method in ['get', 'post', 'put', 'delete', 'head', 'options', 'patch', 'request']:
+                has_timeout = False
+                for keyword in node.keywords:
+                    if keyword.arg == 'timeout':
+                        has_timeout = True
+                        break
 
-                 if not has_timeout:
-                     self.violations.append({
+                if not has_timeout:
+                    self.violations.append({
                         'id': 'requests_without_timeout',
                         'line': node.lineno,
                         'severity': 'major',
@@ -476,19 +477,19 @@ class PythonViolationDetector(ast.NodeVisitor):
         # Rule: SQL Injection (Basic)
         # Detect cursor.execute(f"...") or cursor.execute("..." % ...)
         if isinstance(node.func, ast.Attribute) and node.func.attr == 'execute':
-             # Heuristic: Check if arg is an f-string or % formatting
-             if node.args:
-                 arg = node.args[0]
-                 is_sql_injection = False
-                 if isinstance(arg, ast.JoinedStr): # f-string
-                     is_sql_injection = True
-                 elif isinstance(arg, ast.BinOp) and isinstance(arg.op, ast.Mod): # % formatting
-                     is_sql_injection = True
-                 elif isinstance(arg, ast.Call) and isinstance(arg.func, ast.Attribute) and arg.func.attr == 'format': # .format()
-                     is_sql_injection = True
+            # Heuristic: Check if arg is an f-string or % formatting
+            if node.args:
+                arg = node.args[0]
+                is_sql_injection = False
+                if isinstance(arg, ast.JoinedStr):  # f-string
+                    is_sql_injection = True
+                elif isinstance(arg, ast.BinOp) and isinstance(arg.op, ast.Mod):  # % formatting
+                    is_sql_injection = True
+                elif isinstance(arg, ast.Call) and isinstance(arg.func, ast.Attribute) and arg.func.attr == 'format':  # .format()
+                    is_sql_injection = True
 
-                 if is_sql_injection:
-                     self.violations.append({
+                if is_sql_injection:
+                    self.violations.append({
                         'id': 'sql_injection_risk',
                         'line': node.lineno,
                         'severity': 'critical',
@@ -497,7 +498,7 @@ class PythonViolationDetector(ast.NodeVisitor):
                     })
 
         self.generic_visit(node)
-    
+
     def visit_Global(self, node: ast.Global) -> None:
         """Detect global variable usage."""
         self.violations.append({
@@ -512,7 +513,7 @@ class PythonViolationDetector(ast.NodeVisitor):
     def visit_Try(self, node: ast.Try) -> None:
         """Detect try-except blocks inside loops."""
         if self.in_loop:
-             self.violations.append({
+            self.violations.append({
                 'id': 'exceptions_in_loop',
                 'line': node.lineno,
                 'severity': 'major',
@@ -520,7 +521,7 @@ class PythonViolationDetector(ast.NodeVisitor):
                 'pattern_match': 'try_in_loop'
             })
         self.generic_visit(node)
-    
+
     def visit_ExceptHandler(self, node: ast.ExceptHandler) -> None:
         """Detect bare except clauses."""
         if node.type is None:
@@ -560,10 +561,10 @@ class PythonViolationDetector(ast.NodeVisitor):
         # Scope handling for variable types
         prev_var_types = self.var_types.copy()
         self.var_types = {}
-        
+
         # Calculate cyclomatic complexity
         complexity = self._calculate_cyclomatic_complexity(node)
-        
+
         if complexity > 10:
             self.violations.append({
                 'id': 'high_cyclomatic_complexity',
@@ -572,10 +573,10 @@ class PythonViolationDetector(ast.NodeVisitor):
                 'message': f'Function has high cyclomatic complexity ({complexity}). More code paths = more CPU execution.',
                 'pattern_match': 'complex_function'
             })
-        
+
         # Rule: Deep Recursion
         if self._is_recursive(node):
-             self.violations.append({
+            self.violations.append({
                 'id': 'deep_recursion',
                 'line': node.lineno,
                 'severity': 'major',
@@ -588,7 +589,7 @@ class PythonViolationDetector(ast.NodeVisitor):
         if defaults:
             for default in defaults:
                 if default and isinstance(default, (ast.List, ast.Dict, ast.Set)):
-                     self.violations.append({
+                    self.violations.append({
                         'id': 'mutable_default_argument',
                         'line': node.lineno,
                         'severity': 'major',
@@ -597,7 +598,7 @@ class PythonViolationDetector(ast.NodeVisitor):
                     })
 
         self.generic_visit(node)
-        self.var_types = prev_var_types # Restore scope
+        self.var_types = prev_var_types  # Restore scope
         self.current_function = prev_function
 
     def _is_recursive(self, node: [ast.FunctionDef, ast.AsyncFunctionDef]) -> bool:
@@ -607,21 +608,21 @@ class PythonViolationDetector(ast.NodeVisitor):
                 if child.func.id == node.name:
                     return True
         return False
-    
+
     def visit_Import(self, node: ast.Import) -> None:
         """Track imports for unused detection."""
         for alias in node.names:
             name = alias.asname if alias.asname else alias.name
             self.imports[name] = node.lineno
         self.generic_visit(node)
-    
+
     def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
         """Track from imports."""
         for alias in node.names:
             name = alias.asname if alias.asname else alias.name
             self.imports[name] = node.lineno
         self.generic_visit(node)
-    
+
     def visit_Assign(self, node: ast.Assign) -> None:
         """Track variable assignments."""
 
@@ -645,22 +646,22 @@ class PythonViolationDetector(ast.NodeVisitor):
                     var_name = target.id
                     # Check if variable is a string (and accumulating)
                     if self.var_types.get(var_name) == 'str':
-                         # Check if variable is on RHS (recursively)
-                         is_rhs = False
-                         for child in ast.walk(node.value):
-                             if isinstance(child, ast.Name) and child.id == var_name:
-                                 is_rhs = True
-                                 break
+                        # Check if variable is on RHS (recursively)
+                        is_rhs = False
+                        for child in ast.walk(node.value):
+                            if isinstance(child, ast.Name) and child.id == var_name:
+                                is_rhs = True
+                                break
 
-                         if is_rhs:
-                             self.violations.append({
+                        if is_rhs:
+                            self.violations.append({
                                 'id': 'string_concatenation_in_loop',
                                 'line': node.lineno,
                                 'severity': 'medium',
                                 'message': 'String concatenation in loop creates O(n²) memory allocations. Use list.append() and "".join().',
                                 'pattern_match': 'string_concat_loop'
                             })
-                             break
+                            break
 
         for target in node.targets:
             if isinstance(target, ast.Name):
@@ -673,11 +674,11 @@ class PythonViolationDetector(ast.NodeVisitor):
                 elif isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
                     self.var_types[target.id] = 'str'
                 elif isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Attribute):
-                     # Check np.array()
-                     if isinstance(node.value.func.value, ast.Name) and node.value.func.value.id in ['np', 'numpy'] and node.value.func.attr == 'array':
-                         self.var_types[target.id] = 'numpy'
+                    # Check np.array()
+                    if isinstance(node.value.func.value, ast.Name) and node.value.func.value.id in ['np', 'numpy'] and node.value.func.attr == 'array':
+                        self.var_types[target.id] = 'numpy'
         self.generic_visit(node)
-    
+
     def _check_hardcoded_secrets(self, node: ast.Assign) -> None:
         """Check for hardcoded secrets in assignments."""
         secret_patterns = ['password', 'secret', 'key', 'token', 'auth', 'credential', 'api_key']
@@ -693,7 +694,7 @@ class PythonViolationDetector(ast.NodeVisitor):
                         val = node.value.value
                         # Filter out empty strings, short strings, placeholders
                         if len(val) > 8 and ' ' not in val and not val.startswith('<') and 'YOUR_' not in val and not val.startswith('os.getenv'):
-                             self.violations.append({
+                            self.violations.append({
                                 'id': 'hardcoded_secret',
                                 'line': node.lineno,
                                 'severity': 'critical',
@@ -717,7 +718,7 @@ class PythonViolationDetector(ast.NodeVisitor):
                 entropy = calculate_shannon_entropy(val)
                 # Threshold 4.0 is heuristic for base64/random strings
                 if entropy > 4.0:
-                        self.violations.append({
+                    self.violations.append({
                         'id': 'high_entropy_string',
                         'line': node.lineno,
                         'severity': 'critical',
@@ -743,11 +744,11 @@ class PythonViolationDetector(ast.NodeVisitor):
         if isinstance(node.ctx, ast.Load):
             self.used_variables.add(node.id)
         self.generic_visit(node)
-    
+
     def visit_Constant(self, node: ast.Constant) -> None:
         """Detect magic numbers and exposed secrets."""
         if isinstance(node.value, (int, float)) and not isinstance(node.value, bool):
-            if node.value > 100 and node.value not in [1000, 1024, 60, 3600]: # Exempt common constants
+            if node.value > 100 and node.value not in [1000, 1024, 60, 3600]:  # Exempt common constants
                 self.violations.append({
                     'id': 'magic_numbers',
                     'line': node.lineno,
@@ -764,7 +765,7 @@ class PythonViolationDetector(ast.NodeVisitor):
                 # Basic heuristic: if it looks like an ID
                 import re
                 if re.search(r'AKIA[0-9A-Z]{16}', val):
-                     self.violations.append({
+                    self.violations.append({
                         'id': 'exposed_aws_key',
                         'line': node.lineno,
                         'severity': 'critical',
@@ -779,13 +780,11 @@ class PythonViolationDetector(ast.NodeVisitor):
         # Track items in with statements to identify manual open() calls elsewhere
         self.generic_visit(node)
 
-
-    
     def _is_in_context_manager(self, call_node) -> bool:
         """Check if call is within a with statement."""
         # Simplified check - would need to track parent nodes properly
         return False
-    
+
     def _calculate_cyclomatic_complexity(self, node) -> int:
         """Calculate cyclomatic complexity of a function."""
         complexity = 1
@@ -793,7 +792,7 @@ class PythonViolationDetector(ast.NodeVisitor):
             if isinstance(child, (ast.If, ast.For, ast.While, ast.ExceptHandler, ast.With)):
                 complexity += 1
         return complexity
-    
+
     def _detect_unused_variables(self) -> None:
         """Detect unused variables."""
         for var_name, line_num in self.unused_variables.items():
@@ -805,7 +804,7 @@ class PythonViolationDetector(ast.NodeVisitor):
                     'message': f'Unused variable "{var_name}". Remove to free memory.',
                     'pattern_match': 'unused_var'
                 })
-    
+
     def _detect_unused_imports(self) -> None:
         """Detect unused imports."""
         for import_name, line_num in self.imports.items():
@@ -822,19 +821,19 @@ class PythonViolationDetector(ast.NodeVisitor):
         """Check if a block is empty (pass or ...)."""
         if not hasattr(node, 'body'):
             return
-            
+
         is_empty = False
         if not node.body:
-             is_empty = True
+            is_empty = True
         elif len(node.body) == 1:
-             stmt = node.body[0]
-             if isinstance(stmt, ast.Pass):
-                 is_empty = True
-             elif isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Constant) and stmt.value.value is Ellipsis:
-                 is_empty = True
-        
+            stmt = node.body[0]
+            if isinstance(stmt, ast.Pass):
+                is_empty = True
+            elif isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Constant) and stmt.value.value is Ellipsis:
+                is_empty = True
+
         if is_empty:
-             self.violations.append({
+            self.violations.append({
                 'id': 'empty_block',
                 'line': node.lineno,
                 'severity': 'minor',

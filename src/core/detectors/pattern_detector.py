@@ -5,6 +5,7 @@ Pattern-based detection strategies for green software violations.
 import re
 from typing import List, Dict
 
+
 class PatternBasedDetector:
     """Pattern-based detection using regex for simple violations."""
 
@@ -79,4 +80,3 @@ class PatternBasedDetector:
     def _detect_pandas_inefficiency(self) -> None:
         """Detect pandas inefficiencies via regex for simple cases."""
         # Already handled by AST visit_Call for iterrows, but regex can catch chained calls etc if needed.
-        pass

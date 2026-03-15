@@ -2,6 +2,7 @@ import os
 import httpx
 from typing import Optional, Dict, Any
 
+
 class GitHubClient:
     """Client for interacting with GitHub API."""
 

@@ -4,6 +4,7 @@ Dictionary utility functions.
 
 from typing import Dict, Any
 
+
 def deep_merge(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:
     """
     Recursively merge two dictionaries.

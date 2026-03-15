@@ -63,7 +63,7 @@ def generate_insights(results: Dict[str, Any]) -> List[str]:
     if codebase_emissions > 0.000001:
         insights.append(f"Estimated codebase emissions are {codebase_emissions:.9f} kg CO₂. Fixing the high-severity issues will reduce this impact.")
 
-    total_emissions = scanning_emissions + codebase_emissions
+
     if codebase_emissions > scanning_emissions * 10:
         insights.append("Codebase emissions significantly exceed scanning emissions. Focus on optimizing the analyzed code.")
 

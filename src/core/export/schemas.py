@@ -1,6 +1,7 @@
-from typing import List, Dict, Any, Optional, Union
+from typing import List, Dict, Optional, Union
 from pydantic import BaseModel, Field, ConfigDict
 from src.version import __version__
+
 
 class ExportMetadata(BaseModel):
     exported_at: str
@@ -11,6 +12,7 @@ class ExportMetadata(BaseModel):
     path: Optional[str] = None
 
     model_config = ConfigDict(extra='ignore')
+
 
 class Issue(BaseModel):
     id: str
@@ -28,6 +30,7 @@ class Issue(BaseModel):
     name: Optional[str] = None
 
     model_config = ConfigDict(extra='ignore')
+
 
 class ScanResultSchema(BaseModel):
     issues: List[Issue]

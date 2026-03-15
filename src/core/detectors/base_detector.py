@@ -2,9 +2,10 @@
 Base classes for detectors.
 """
 
-from typing import List, Dict, Optional, Any
+from typing import List, Dict, Any
 from tree_sitter import Language, Parser, Query, QueryCursor
 from src.utils.logger import logger
+
 
 class BaseTreeSitterDetector:
     """
@@ -34,12 +35,12 @@ class BaseTreeSitterDetector:
             # Handle special cases where language_lib might need specific init (like TS)
             # But mostly it's language_lib.language()
             if isinstance(language_lib, Language):
-                 self.language = language_lib
+                self.language = language_lib
             elif hasattr(language_lib, 'language'):
-                 self.language = Language(language_lib.language())
+                self.language = Language(language_lib.language())
             else:
-                 # Fallback or direct object
-                 self.language = Language(language_lib)
+                # Fallback or direct object
+                self.language = Language(language_lib)
 
             self.parser = Parser(self.language)
             self.tree = self.parser.parse(bytes(self.content, "utf8"))
@@ -131,7 +132,7 @@ class BaseTreeSitterDetector:
                 nodes = captures.get('block', [])
                 for node in nodes:
                     if node.named_child_count == 0:
-                         self._add_violation(
+                        self._add_violation(
                             node,
                             'empty_block',
                             'minor',
