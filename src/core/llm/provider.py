@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import List, Dict, Optional, Any
+from typing import Optional
 from .usage import TokenUsage
 from .rate_limiter import TokenBucketRateLimiter
+
 
 class LLMProvider(ABC):
     """
@@ -62,7 +63,6 @@ class LLMProvider(ABC):
         Returns:
             The suggested fix as a string, or None if generation failed.
         """
-        pass
 
     @abstractmethod
     def explain_violation(self, code_snippet: str, violation_description: str, language: str = "python") -> Optional[str]:
@@ -77,7 +77,6 @@ class LLMProvider(ABC):
         Returns:
             An explanation string.
         """
-        pass
 
     @abstractmethod
     def estimate_cost(self, prompt_tokens: int, completion_tokens: int) -> float:
@@ -91,4 +90,3 @@ class LLMProvider(ABC):
         Returns:
             Estimated cost in USD.
         """
-        pass

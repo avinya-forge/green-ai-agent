@@ -3,10 +3,11 @@ Java-specific detection strategies for green software violations.
 """
 
 from typing import List, Dict
-from tree_sitter import Language, Parser, Query, QueryCursor
+from tree_sitter import Query, QueryCursor
 import tree_sitter_java
 from src.utils.logger import logger
 from .base_detector import BaseTreeSitterDetector
+
 
 class JavaASTDetector(BaseTreeSitterDetector):
     """AST-based detector for Java using Tree-sitter."""
@@ -39,7 +40,7 @@ class JavaASTDetector(BaseTreeSitterDetector):
           (#eq? @method "println"))
         """
         self._run_query(query_scm, 'excessive_logging', 'minor',
-                       'System.out.println detected. Use a logger.', 'java_sysout')
+                        'System.out.println detected. Use a logger.', 'java_sysout')
 
     def _detect_blocking_io(self) -> None:
         """Detect blocking I/O like Thread.sleep."""
@@ -52,7 +53,7 @@ class JavaASTDetector(BaseTreeSitterDetector):
           (#eq? @method "sleep"))
         """
         self._run_query(query_simple, 'blocking_io', 'major',
-                       'Thread.sleep() blocks the thread.', 'java_thread_sleep')
+                        'Thread.sleep() blocks the thread.', 'java_thread_sleep')
 
         # Case 2: java.lang.Thread.sleep()
         query_fq = """
@@ -69,7 +70,7 @@ class JavaASTDetector(BaseTreeSitterDetector):
           (#eq? @method "sleep"))
         """
         self._run_query(query_fq, 'blocking_io', 'major',
-                       'Thread.sleep() blocks the thread.', 'java_thread_sleep')
+                        'Thread.sleep() blocks the thread.', 'java_thread_sleep')
 
     def _detect_string_concatenation(self) -> None:
         """Detect string concatenation in loops."""
@@ -100,7 +101,7 @@ class JavaASTDetector(BaseTreeSitterDetector):
                         parent = parent.parent
 
                     if in_loop:
-                         self._add_violation(
+                        self._add_violation(
                             node,
                             'string_concatenation_in_loop',
                             'major',

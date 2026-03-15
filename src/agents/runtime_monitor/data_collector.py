@@ -7,6 +7,7 @@ import time
 from .codecarbon_integration import CodeCarbonMonitor
 from .scaphandre_integration import ScaphandreMonitor
 
+
 class RuntimeDataCollector:
     def __init__(self, language="python"):
         self.language = language

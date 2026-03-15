@@ -1,6 +1,5 @@
 from pathlib import Path
 import fnmatch
-from typing import List
 from src.utils.logger import logger
 from src.core.config import ConfigLoader
 

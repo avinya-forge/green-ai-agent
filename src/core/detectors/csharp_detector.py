@@ -3,6 +3,7 @@ from tree_sitter import Language
 import tree_sitter_c_sharp
 from src.core.detectors.base_detector import BaseTreeSitterDetector
 
+
 class CSharpASTDetector(BaseTreeSitterDetector):
     """
     Detector for C# files using tree-sitter-c-sharp.

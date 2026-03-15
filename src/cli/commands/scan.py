@@ -4,8 +4,9 @@ from src.core.scanner import Scanner
 from src.core.config import ConfigLoader
 from src.core.git_operations import GitOperations, GitException
 from src.core.project_manager import ProjectManager
-from src.core.export import CSVExporter, HTMLReporter, JSONExporter, \
-    JUnitXMLExporter, PDFExporter
+from src.core.export import CSVExporter, HTMLReporter, JSONExporter
+from src.core.export.xml_exporter import JUnitXMLExporter
+from src.core.export.pdf_exporter import PDFExporter
 from src.ui.state import set_last_scan_results
 from src.utils.security import sanitize_path, sanitize_project_name, \
     is_safe_git_url
@@ -152,7 +153,7 @@ def scan(
         # Override telemetry setting if flag is explicitly set
         import os
         if telemetry is False:
-             os.environ['GREEN_AI_TELEMETRY'] = 'false'
+            os.environ['GREEN_AI_TELEMETRY'] = 'false'
         # Note: If telemetry is True (default), we don't force it to allow config/env var to disable it.
 
         # Determine language
@@ -452,12 +453,12 @@ def scan(
 
         # Detailed issue output with better formatting
         if not export or export_format != 'json':
-            click.echo(f"\n{'='*80}", err=True)
+            click.echo(f"\n{'=' * 80}", err=True)
             click.echo(
                 f"DETAILED VIOLATIONS ({len(results['issues'])} found)",
                 err=True
             )
-            click.echo(f"{'='*80}", err=True)
+            click.echo(f"{'=' * 80}", err=True)
 
             # Sort by severity
             severity_order = {

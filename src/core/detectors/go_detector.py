@@ -3,7 +3,7 @@ Go-specific detection strategies for green software violations.
 """
 
 from typing import List, Dict, Set
-from tree_sitter import Language, Parser, Query, QueryCursor
+from tree_sitter import Language, Query, QueryCursor
 import tree_sitter_go
 from src.utils.logger import logger
 from .base_detector import BaseTreeSitterDetector
@@ -43,6 +43,7 @@ QUERY_STRING_CONCAT = """
   ))
 ) @assign_any_add
 """
+
 
 class GoASTDetector(BaseTreeSitterDetector):
     """AST-based detector for Go using Tree-sitter."""
@@ -126,7 +127,7 @@ class GoASTDetector(BaseTreeSitterDetector):
             nodes = captures.get('block', [])
             for node in nodes:
                 if node.named_child_count == 0:
-                     self._add_violation(
+                    self._add_violation(
                         node,
                         'empty_block',
                         'minor',
@@ -182,14 +183,14 @@ class GoASTDetector(BaseTreeSitterDetector):
                         break
 
                 if has_plus_eq and self._is_in_loop(node):
-                     self._add_violation(
+                    self._add_violation(
                         node,
                         'string_concatenation_in_loop',
                         'high',
                         'String concatenation in loop detected. Use strings.Builder for efficiency.',
                         'go_str_concat'
                     )
-                     processed_nodes.add(node.id)
+                    processed_nodes.add(node.id)
 
             # 2. Check assign_add (s = s + "literal")
             nodes = captures.get('assign_add', [])
@@ -198,14 +199,14 @@ class GoASTDetector(BaseTreeSitterDetector):
                     continue
 
                 if self._is_in_loop(node):
-                     self._add_violation(
+                    self._add_violation(
                         node,
                         'string_concatenation_in_loop',
                         'high',
                         'String concatenation in loop detected. Use strings.Builder for efficiency.',
                         'go_str_concat'
                     )
-                     processed_nodes.add(node.id)
+                    processed_nodes.add(node.id)
 
             # 3. Check assign_any_add (heuristic: s = s + var)
             nodes = captures.get('assign_any_add', [])
@@ -218,7 +219,8 @@ class GoASTDetector(BaseTreeSitterDetector):
 
                 # Try to get left side identifier
                 left_nodes = node.children_by_field_name('left')
-                if not left_nodes: continue
+                if not left_nodes:
+                    continue
 
                 # Assuming expression_list -> identifier
                 expr_list = left_nodes[0]
@@ -229,14 +231,14 @@ class GoASTDetector(BaseTreeSitterDetector):
                         is_string_var = any(s in var_name for s in str_indicators)
 
                 if is_string_var and self._is_in_loop(node):
-                     self._add_violation(
+                    self._add_violation(
                         node,
                         'string_concatenation_in_loop',
                         'high',
                         'String concatenation in loop detected (heuristic). Use strings.Builder for efficiency.',
                         'go_str_concat'
                     )
-                     processed_nodes.add(node.id)
+                    processed_nodes.add(node.id)
 
     def _is_in_loop(self, node) -> bool:
         """Check if node is inside a loop (for statement)."""

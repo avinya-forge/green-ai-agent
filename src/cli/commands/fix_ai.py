@@ -1,14 +1,12 @@
 import click
 import sys
 import os
-import ast
 import difflib
-from typing import List, Optional
 from src.core.scanner import Scanner
 from src.core.config import ConfigLoader
 from src.core.llm.factory import LLMFactory
-from src.ui.state import set_last_scan_results
 from src.core.security.llm_guard import check_code_safety
+
 
 def extract_snippet(file_path: str, line_number: int, context_lines: int = 2) -> str:
     """
@@ -25,6 +23,7 @@ def extract_snippet(file_path: str, line_number: int, context_lines: int = 2) ->
         return snippet
     except Exception:
         return ""
+
 
 def print_diff(original: str, fixed: str):
     """
@@ -50,6 +49,7 @@ def print_diff(original: str, fixed: str):
             click.secho(line.rstrip(), fg='blue')
         else:
             click.echo(line.rstrip())
+
 
 def apply_fix_to_file(file_path: str, original_snippet: str, fixed_snippet: str) -> bool:
     """
@@ -92,6 +92,7 @@ def apply_fix_to_file(file_path: str, original_snippet: str, fixed_snippet: str)
         click.secho(f"  Error applying fix: {e}", fg='red')
         return False
 
+
 def determine_language(file_path: str) -> str:
     """Determine language from file extension."""
     ext = os.path.splitext(file_path)[1].lower()
@@ -105,7 +106,8 @@ def determine_language(file_path: str) -> str:
         return 'java'
     if ext == '.go':
         return 'go'
-    return 'python' # Default
+    return 'python'  # Default
+
 
 @click.command()
 @click.argument('paths', nargs=-1, type=click.Path(exists=True), required=False)
@@ -135,7 +137,7 @@ def fix_ai(paths, config, provider, auto_apply, verbose):
     # Current Scanner implementation seems to take one language argument.
     # Let's rely on config.
     enabled_languages = cfg.get('languages', ['python'])
-    language = enabled_languages[0] # Primary language
+    language = enabled_languages[0]  # Primary language
 
     scanner = Scanner(language=language, config_path=config)
 
@@ -208,9 +210,9 @@ def fix_ai(paths, config, provider, auto_apply, verbose):
                 click.secho(f"    - {w}", fg='yellow')
 
             if auto_apply:
-                 click.secho("  Skipping auto-apply due to security warnings.", fg='red')
-                 skipped_count += 1
-                 continue
+                click.secho("  Skipping auto-apply due to security warnings.", fg='red')
+                skipped_count += 1
+                continue
 
             if not click.confirm("  Do you want to proceed with this fix?"):
                 skipped_count += 1

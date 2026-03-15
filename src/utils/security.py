@@ -6,7 +6,6 @@ security vulnerabilities like path traversal and command injection.
 """
 
 import re
-import os
 from pathlib import Path
 from typing import Optional, Union
 import urllib.parse

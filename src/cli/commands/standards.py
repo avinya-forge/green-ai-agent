@@ -1,10 +1,10 @@
 import click
 from src.standards.registry import StandardsRegistry
 
+
 @click.group()
 def standards():
     """Manage green coding standards"""
-    pass
 
 
 @standards.command('list')
@@ -21,6 +21,7 @@ def standards_list():
         click.echo(f"  Languages: {', '.join(info['languages'])}")
         click.echo()
 
+
 @standards.command('enable')
 @click.argument('standard_name')
 def standards_enable(standard_name):
@@ -28,6 +29,7 @@ def standards_enable(standard_name):
     registry = StandardsRegistry()
     registry.enable_standard(standard_name)
     click.echo(f"[OK] Standard '{standard_name}' enabled")
+
 
 @standards.command('disable')
 @click.argument('standard_name')
@@ -37,6 +39,7 @@ def standards_disable(standard_name):
     registry.disable_standard(standard_name)
     click.echo(f"[OK] Standard '{standard_name}' disabled")
 
+
 @standards.command('update')
 def standards_update():
     """Sync standards from online sources"""
@@ -45,6 +48,7 @@ def standards_update():
     click.echo("[OK] Standards updated from online sources")
     for standard, status in result.items():
         click.echo(f"  {standard}: {'[OK]' if status else '[X]'}")
+
 
 @standards.command('export')
 @click.option('--format', type=click.Choice(['json', 'yaml']), default='json', help='Export format')

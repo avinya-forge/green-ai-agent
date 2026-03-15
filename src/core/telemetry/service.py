@@ -1,15 +1,14 @@
 import uuid
 import platform
-import sys
 import os
 import json
 import hashlib
 from pathlib import Path
-from datetime import datetime, timezone
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, List
 
 from src.utils.logger import logger
 from .schemas import ScanMetrics, TelemetryEvent
+
 
 class TelemetryService:
     """
@@ -96,7 +95,7 @@ class TelemetryService:
         event = TelemetryEvent(
             event_type=event_type,
             payload=payload,
-            user_id=None # TODO: Implement user identification logic
+            user_id=None  # TODO: Implement user identification logic
         )
         self.events.append(event)
 

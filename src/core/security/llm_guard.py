@@ -36,6 +36,7 @@ RISKY_PYTHON_CALLS = {
     'urllib.request.urlopen'
 }
 
+
 def check_code_safety(code: str, language: str) -> List[str]:
     """
     Analyze code for potential security risks.
@@ -52,6 +53,7 @@ def check_code_safety(code: str, language: str) -> List[str]:
         warnings.extend(_check_js_ts_safety(code))
 
     return list(set(warnings))
+
 
 def _check_python_safety(code: str) -> List[str]:
     warnings = []
@@ -86,6 +88,7 @@ def _check_python_safety(code: str) -> List[str]:
 
     return warnings
 
+
 def _check_python_keywords(code: str) -> List[str]:
     warnings = []
     risky = ['os.system', 'subprocess.call', 'eval(', 'exec(', '__import__', 'input(']
@@ -93,6 +96,7 @@ def _check_python_keywords(code: str) -> List[str]:
         if r in code:
             warnings.append(f"Potential risky pattern '{r}' detected (keyword check).")
     return warnings
+
 
 def _parse_python_code(code: str) -> Optional[ast.AST]:
     """
@@ -120,13 +124,16 @@ def _parse_python_code(code: str) -> Optional[ast.AST]:
 
     return None
 
+
 def _is_risky_module(name: Optional[str]) -> bool:
     if not name:
         return False
     return name.split('.')[0] in RISKY_PYTHON_MODULES
 
+
 def _is_risky_function(name: str) -> bool:
     return name in RISKY_PYTHON_FUNCTIONS
+
 
 def _get_attribute_name(node) -> Optional[str]:
     if isinstance(node, ast.Name):
@@ -137,6 +144,7 @@ def _get_attribute_name(node) -> Optional[str]:
             return f"{value}.{node.attr}"
     return None
 
+
 def _is_risky_call(name: str) -> bool:
     # Check if it starts with any risky prefix? No, exact match or simple containment usually enough.
     # But let's check strict match against known risky patterns or prefix match
@@ -144,6 +152,7 @@ def _is_risky_call(name: str) -> bool:
         if name.startswith(pattern):
             return True
     return False
+
 
 def _check_js_ts_safety(code: str) -> List[str]:
     warnings = []

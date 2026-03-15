@@ -6,7 +6,7 @@ Integration with Scaphandre for general energy consumption monitoring.
 import subprocess
 import json
 import time
-import psutil
+
 
 class ScaphandreMonitor:
     def __init__(self, scaphandre_path="scaphandre", output_file=None):
@@ -38,7 +38,7 @@ class ScaphandreMonitor:
             output, _ = self.process.communicate()
             try:
                 self.metrics = json.loads(output.decode())
-            except:
+            except Exception:
                 self.metrics = {}
 
     def get_report(self):

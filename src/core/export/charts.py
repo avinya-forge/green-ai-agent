@@ -1,4 +1,3 @@
-import math
 import html
 import io
 import base64
@@ -8,6 +7,7 @@ import matplotlib.pyplot as plt
 
 # Use non-interactive backend for static image generation
 matplotlib.use('Agg')
+
 
 class ChartGenerator:
     """Generates static image charts (base64 PNG) for reports."""
@@ -156,7 +156,7 @@ class ChartGenerator:
         # Add value labels to the end of each bar
         for i, bar in enumerate(bars):
             width = bar.get_width()
-            ax.text(width + (max_val * 0.02), bar.get_y() + bar.get_height()/2,
+            ax.text(width + (max_val * 0.02), bar.get_y() + bar.get_height() / 2,
                     f'{values[i]}',
                     ha='left', va='center', fontsize=10, color='#4a5568')
 

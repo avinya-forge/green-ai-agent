@@ -1,10 +1,10 @@
-import os
-from typing import Optional, Dict
+from typing import Optional
 from .provider import LLMProvider
 import requests
 import json
 from src.utils.logger import logger
 from src.core.llm.prompts import PromptManager
+
 
 class OpenAIProvider(LLMProvider):
     """

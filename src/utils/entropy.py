@@ -1,6 +1,7 @@
 import math
 from collections import Counter
 
+
 def calculate_shannon_entropy(data: str) -> float:
     """
     Calculate the Shannon entropy of a string.

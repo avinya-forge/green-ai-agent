@@ -1,14 +1,14 @@
 import click
 import sys
-import os
 import json
 from src.core.ci.github_client import GitHubClient
 from src.core.ci.reporter import CIReporter
 
+
 @click.group()
 def ci():
     """CI/CD Integration commands."""
-    pass
+
 
 @ci.command()
 @click.option('--repo', required=True, help='Repository in format owner/repo')

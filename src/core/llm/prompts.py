@@ -1,5 +1,5 @@
-from typing import Dict, Optional
 import re
+
 
 class PromptManager:
     """
@@ -139,10 +139,10 @@ class PromptManager:
         if "loop" in desc_lower:
             return (lang_lower, "loop")
         if "io" in desc_lower or "file" in desc_lower or "network" in desc_lower:
-             return (lang_lower, "io")
+            return (lang_lower, "io")
         if "dom" in desc_lower or "html" in desc_lower:
-             return (lang_lower, "dom")
+            return (lang_lower, "dom")
         if "logic" in desc_lower or "complexity" in desc_lower:
-             return (lang_lower, "logic")
+            return (lang_lower, "logic")
 
         return "generic"

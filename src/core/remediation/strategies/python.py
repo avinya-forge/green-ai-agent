@@ -3,6 +3,7 @@ import difflib
 from typing import Optional, Union
 from src.core.remediation.base import RemediationStrategy
 
+
 class PythonRemediationStrategy(RemediationStrategy):
     """Base class for Python CST-based remediation strategies."""
 
@@ -32,14 +33,15 @@ class PythonRemediationStrategy(RemediationStrategy):
 
             return modified_tree.code
 
-        except Exception as e:
+        except Exception:
             # Log specific errors if needed, but fail gracefully
-            import traceback
+            pass
             # traceback.print_exc()
             return None
 
     def get_transformer(self, line: int) -> cst.CSTTransformer:
         raise NotImplementedError
+
 
 class ListAppendToComprehension(PythonRemediationStrategy):
     @property
@@ -55,6 +57,7 @@ class ListAppendToComprehension(PythonRemediationStrategy):
 
     def get_transformer(self, line: int) -> cst.CSTTransformer:
         return ListAppendTransformer(line)
+
 
 class ListAppendTransformer(cst.CSTTransformer):
     METADATA_DEPENDENCIES = (cst.metadata.PositionProvider,)
@@ -119,6 +122,7 @@ class ListAppendTransformer(cst.CSTTransformer):
             body=[cst.Expr(value=extend_call)]
         )
 
+
 class EnumerateTransformer(PythonRemediationStrategy):
     @property
     def rule_id(self) -> str:
@@ -133,6 +137,7 @@ class EnumerateTransformer(PythonRemediationStrategy):
 
     def get_transformer(self, line: int) -> cst.CSTTransformer:
         return RangeLenToEnumerateTransformer(line)
+
 
 class RangeLenToEnumerateTransformer(cst.CSTTransformer):
     METADATA_DEPENDENCIES = (cst.metadata.PositionProvider,)
@@ -201,6 +206,7 @@ class UnnecessaryComprehensionTransformer(PythonRemediationStrategy):
 
     def get_transformer(self, line: int) -> cst.CSTTransformer:
         return RemoveComprehensionTransformer(line)
+
 
 class RemoveComprehensionTransformer(cst.CSTTransformer):
     METADATA_DEPENDENCIES = (cst.metadata.PositionProvider,)

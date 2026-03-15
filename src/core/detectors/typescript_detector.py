@@ -3,10 +3,11 @@ TypeScript-specific detection strategies for green software violations.
 """
 
 from typing import List, Dict
-from tree_sitter import Language, Query, QueryCursor
+from tree_sitter import Query, QueryCursor
 import tree_sitter_typescript
 from src.utils.logger import logger
 from .javascript_detector import JavaScriptASTDetector
+
 
 class TypeScriptASTDetector(JavaScriptASTDetector):
     """AST-based detector for TypeScript using Tree-sitter."""
@@ -39,7 +40,7 @@ class TypeScriptASTDetector(JavaScriptASTDetector):
         (#eq? @type "any")
         """
         self._run_query(query_scm, 'any_type_usage', 'major',
-                       'Avoid using "any" type. It defeats the purpose of TypeScript and can hide inefficiencies.', 'any_type')
+                        'Avoid using "any" type. It defeats the purpose of TypeScript and can hide inefficiencies.', 'any_type')
 
     def _detect_enum(self) -> None:
         """Detect usage of regular enum (prefer const enum)."""

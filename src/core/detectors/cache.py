@@ -2,6 +2,7 @@ import hashlib
 from typing import List, Dict, Optional, Tuple
 from collections import OrderedDict
 
+
 class DetectionCache:
     """
     In-memory LRU cache for detection results using OrderedDict.
@@ -42,6 +43,7 @@ class DetectionCache:
         # MD5 is fast enough for this purpose
         content_hash = hashlib.md5(content.encode('utf-8')).hexdigest()
         return (content_hash, language)
+
 
 # Global instance
 detection_cache = DetectionCache()

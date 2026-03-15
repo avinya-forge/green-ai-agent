@@ -1,4 +1,5 @@
-from typing import List, Dict, Any
+from typing import List, Any
+
 
 def calculate_average_grade(grades: List[str]) -> str:
     """
@@ -31,6 +32,7 @@ def calculate_average_grade(grades: List[str]) -> str:
         return 'D'
     else:
         return 'F'
+
 
 def calculate_projects_grade(projects: List[Any]) -> str:
     """

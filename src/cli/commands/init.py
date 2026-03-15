@@ -5,9 +5,9 @@ CLI command to initialize configuration.
 import click
 import yaml
 import shutil
-import os
 from pathlib import Path
 from src.core.config import ConfigLoader
+
 
 @click.command()
 @click.option('--path', default='.', help='Directory to initialize config in.')
@@ -31,7 +31,7 @@ def init(path):
 
     try:
         if template_path.exists():
-             shutil.copy(template_path, target_path)
+            shutil.copy(template_path, target_path)
         else:
             # Fallback to ConfigLoader defaults if template is missing
             config = ConfigLoader.DEFAULT_CONFIG.copy()

@@ -1,8 +1,9 @@
-from typing import Dict, Optional, List, Type
+from typing import Dict, Optional, List
 import logging
 from src.core.remediation.base import RemediationStrategy
 
 logger = logging.getLogger(__name__)
+
 
 class RemediationEngine:
     """

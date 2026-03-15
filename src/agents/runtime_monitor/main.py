@@ -7,6 +7,7 @@ from .data_collector import RuntimeDataCollector
 from .pattern_analyzer import PatternAnalyzer
 from .remediation_suggester import RemediationSuggester
 
+
 def run_runtime_analysis(code_snippet, language="python", iterations=1):
     """Run full runtime analysis pipeline."""
     collector = RuntimeDataCollector(language)
@@ -20,6 +21,7 @@ def run_runtime_analysis(code_snippet, language="python", iterations=1):
         "patterns": patterns,
         "remediations": remediations
     }
+
 
 if __name__ == "__main__":
     # Example usage

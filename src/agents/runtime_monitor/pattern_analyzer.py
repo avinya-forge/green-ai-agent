@@ -3,6 +3,7 @@
 Analyzes runtime data to identify energy-wasteful patterns.
 """
 
+
 class PatternAnalyzer:
     def __init__(self):
         self.thresholds = {

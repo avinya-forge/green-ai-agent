@@ -4,13 +4,14 @@ import hashlib
 import time
 import shutil
 import tempfile
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Optional
 
 from src.utils.logger import logger
 try:
     from src.version import __version__
 except ImportError:
     __version__ = "0.0.0"
+
 
 class DiskCache:
     """

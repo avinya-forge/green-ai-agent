@@ -4,22 +4,19 @@ Export module for GASA - Violation data export to multiple formats
 Supports CSV and HTML export with comprehensive violation and metrics data.
 """
 
+from src.core.remediation.engine import RemediationEngine
+from .schemas import ScanResultSchema
+from src.utils.security import sanitize_path
 import csv
-import os
 import json
 import html
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import Dict, Any, Optional
 
 # Default output directory for all exports
 OUTPUT_DIR = Path(__file__).parent.parent.parent.parent / 'output'
 
-from src.utils.security import sanitize_path
-from .xml_exporter import JUnitXMLExporter
-from .pdf_exporter import PDFExporter
-from .schemas import ScanResultSchema
-from src.core.remediation.engine import RemediationEngine
 
 def safe_read_snippet(file_path: str, line_number: int) -> str:
     """Safely read a single line snippet from a file."""
@@ -31,6 +28,7 @@ def safe_read_snippet(file_path: str, line_number: int) -> str:
     except Exception:
         pass
     return ""
+
 
 class JSONExporter:
     """Export scan results to JSON format."""
@@ -83,22 +81,22 @@ class JSONExporter:
 
 class CSVExporter:
     """Export scan results to CSV format."""
-    
+
     def __init__(self, output_path: Optional[str] = None):
         """
         Initialize CSV exporter.
-        
+
         Args:
             output_path: Path to write CSV file. If None, defaults to 'output/green-ai-report.csv'
         """
         # Ensure output directory exists
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-        
+
         if output_path:
             self.output_path = str(sanitize_path(output_path, allow_absolute=True))
         else:
             self.output_path = str(OUTPUT_DIR / 'green-ai-report.csv')
-    
+
     @staticmethod
     def _get_severity_score(severity: str) -> int:
         """Convert severity string to numeric score for sorting."""
@@ -110,13 +108,13 @@ class CSVExporter:
             'info': 0
         }
         return severity_scores.get(severity.lower(), 0)
-    
+
     @staticmethod
     def _get_energy_factor(issue: Dict[str, Any]) -> str:
         """Extract energy factor from issue."""
         if 'energy_factor' in issue:
             return str(issue['energy_factor'])
-        
+
         # Infer from rule ID
         severity = issue.get('severity', 'low').lower()
         if 'io_in_loop' in issue.get('id', ''):
@@ -133,13 +131,13 @@ class CSVExporter:
             return '1x'
         else:
             return '0.1x'
-    
+
     @staticmethod
     def _get_effort(issue: Dict[str, Any]) -> str:
         """Extract effort estimation from issue."""
         if 'effort' in issue:
             return issue['effort']
-        
+
         severity = issue.get('severity', 'low').lower()
         effort_map = {
             'critical': 'high',
@@ -149,20 +147,20 @@ class CSVExporter:
             'info': 'trivial'
         }
         return effort_map.get(severity, 'medium')
-    
+
     def export(self, results: Dict[str, Any], project_name: str = 'Scan') -> str:
         """
         Export scan results to CSV file.
-        
+
         Args:
             results: Scan results dictionary from Scanner.scan()
             project_name: Name of the project being scanned
-            
+
         Returns:
             Path to generated CSV file
         """
         issues = results.get('issues', [])
-        
+
         # Sort by severity (critical first) then by file
         severity_order = {'critical': 0, 'high': 1, 'medium': 2, 'low': 3, 'info': 4}
         sorted_issues = sorted(
@@ -173,14 +171,14 @@ class CSVExporter:
                 x.get('line', 0)
             )
         )
-        
+
         # Calculate totals
         total_violations = len(sorted_issues)
         critical_count = sum(1 for i in sorted_issues if i.get('severity', '').lower() == 'critical')
         high_count = sum(1 for i in sorted_issues if i.get('severity', '').lower() == 'high')
         medium_count = sum(1 for i in sorted_issues if i.get('severity', '').lower() == 'medium')
         low_count = sum(1 for i in sorted_issues if i.get('severity', '').lower() == 'low')
-        
+
         # Average effort (simplified)
         effort_scores = {'high': 3, 'medium': 2, 'easy': 1, 'trivial': 0}
         avg_effort = 'medium'
@@ -197,14 +195,14 @@ class CSVExporter:
             remediation_engine = RemediationEngine()
         except Exception:
             remediation_engine = None
-        
+
         with open(self.output_path, 'w', newline='', encoding='utf-8-sig') as csvfile:
             fieldnames = ['file', 'line', 'rule_id', 'severity', 'message', 'energy_factor', 'effort', 'snippet', 'remediation']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-            
+
             # Write header
             writer.writeheader()
-            
+
             # Write issues
             for issue in sorted_issues:
                 # Get snippet
@@ -226,12 +224,12 @@ class CSVExporter:
                     'snippet': snippet,
                     'remediation': remediation
                 })
-            
+
             # Write summary row
             codebase_emissions = results.get('codebase_emissions', 0)
             scanning_emissions = results.get('scanning_emissions', 0)
             total_emissions = codebase_emissions + scanning_emissions
-            
+
             writer.writerow({
                 'file': 'SUMMARY',
                 'line': '',
@@ -243,21 +241,21 @@ class CSVExporter:
                 'snippet': '',
                 'remediation': ''
             })
-        
+
         return self.output_path
-    
+
     def get_statistics(self, results: Dict[str, Any]) -> Dict[str, Any]:
         """
         Calculate statistics from scan results.
-        
+
         Args:
             results: Scan results dictionary
-            
+
         Returns:
             Dictionary with statistics
         """
         issues = results.get('issues', [])
-        
+
         severity_counts = {
             'critical': sum(1 for i in issues if i.get('severity', '').lower() == 'critical'),
             'high': sum(1 for i in issues if i.get('severity', '').lower() == 'high'),
@@ -265,9 +263,9 @@ class CSVExporter:
             'low': sum(1 for i in issues if i.get('severity', '').lower() == 'low'),
             'info': sum(1 for i in issues if i.get('severity', '').lower() == 'info')
         }
-        
+
         affected_files = len(set(i.get('file', 'unknown') for i in issues))
-        
+
         # Group by rule ID
         rules = {}
         for issue in issues:
@@ -275,7 +273,7 @@ class CSVExporter:
             if rule_id not in rules:
                 rules[rule_id] = 0
             rules[rule_id] += 1
-        
+
         return {
             'total_violations': len(issues),
             'severity_counts': severity_counts,
@@ -290,22 +288,22 @@ class CSVExporter:
 class HTMLReporter:
     # ... (same as before) ...
     """Export scan results to HTML format with charts and detailed breakdowns."""
-    
+
     def __init__(self, output_path: Optional[str] = None):
         """
         Initialize HTML reporter.
-        
+
         Args:
             output_path: Path to write HTML file. If None, defaults to 'output/green-ai-report.html'
         """
         # Ensure output directory exists
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-        
+
         if output_path:
             self.output_path = str(sanitize_path(output_path, allow_absolute=True))
         else:
             self.output_path = str(OUTPUT_DIR / 'green-ai-report.html')
-    
+
     @staticmethod
     def _get_color_for_severity(severity: str) -> str:
         """Get HTML color code for severity level."""
@@ -317,7 +315,7 @@ class HTMLReporter:
             'info': '#8b5cf6'       # purple
         }
         return severity_colors.get(severity.lower(), '#6b7280')
-    
+
     @staticmethod
     def _get_severity_badge(severity: str) -> str:
         """Generate HTML badge for severity."""
@@ -331,20 +329,20 @@ class HTMLReporter:
         }
         icon = icons.get(severity.lower(), '⚪')
         return f'<span style="color: {color}; font-weight: bold;">{icon} {severity.upper()}</span>'
-    
+
     def export(self, results: Dict[str, Any], project_name: str = 'Scan') -> str:
         """
         Export scan results to HTML report.
-        
+
         Args:
             results: Scan results dictionary from Scanner.scan()
             project_name: Name of the project being scanned
-            
+
         Returns:
             Path to generated HTML file
         """
         issues = results.get('issues', [])
-        
+
         # Security: Escape project name for HTML
         safe_project_name = html.escape(project_name)
 
@@ -356,7 +354,7 @@ class HTMLReporter:
             'low': sum(1 for i in issues if i.get('severity', '').lower() == 'low'),
             'info': sum(1 for i in issues if i.get('severity', '').lower() == 'info')
         }
-        
+
         # Group by file
         by_file = {}
         for issue in issues:
@@ -364,13 +362,13 @@ class HTMLReporter:
             if file_path not in by_file:
                 by_file[file_path] = []
             by_file[file_path].append(issue)
-        
+
         # Sort files by violation count
         sorted_files = sorted(by_file.items(), key=lambda x: len(x[1]), reverse=True)
-        
+
         codebase_emissions = results.get('codebase_emissions', 0)
         scanning_emissions = results.get('scanning_emissions', 0)
-        
+
         # Pre-calculate JSON strings for charts to avoid backslashes in f-strings
         file_labels_json = json.dumps(list(by_file.keys())).replace('<', '\\u003c').replace('>', '\\u003e')
         file_counts_json = json.dumps([len(issues) for issues in by_file.values()])
@@ -729,7 +727,7 @@ class HTMLReporter:
                 <h2>🔍 Detailed Violations</h2>
                 <div>
 """
-        
+
         # Add file sections with violations
         for file_path, file_issues in sorted_files:
             safe_file_path = html.escape(file_path)
@@ -740,7 +738,7 @@ class HTMLReporter:
                         {len(file_issues)} violation(s)
                     </div>
 """
-            
+
             for issue in sorted(file_issues, key=lambda x: x.get('line', 0)):
                 severity = issue.get('severity', 'info').lower()
                 effort = html.escape(CSVExporter._get_effort(issue))
@@ -762,11 +760,11 @@ class HTMLReporter:
                         </div>
                     </div>
 """
-            
+
             html_content += """
                 </div>
 """
-        
+
         html_content += f"""
                 </div>
             </div>
@@ -930,8 +928,8 @@ class HTMLReporter:
 </body>
 </html>
 """
-        
+
         with open(self.output_path, 'w', encoding='utf-8') as f:
             f.write(html_content)
-        
+
         return self.output_path

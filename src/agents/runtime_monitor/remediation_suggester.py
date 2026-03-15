@@ -3,6 +3,7 @@
 Suggests remediations based on identified patterns.
 """
 
+
 class RemediationSuggester:
     def __init__(self):
         self.suggestions = {

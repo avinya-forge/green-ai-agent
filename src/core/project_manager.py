@@ -18,17 +18,15 @@ logger = logging.getLogger(__name__)
 
 class ProjectException(Exception):
     """Custom exception for project operations"""
-    pass
-
 
 
 class ProjectManager:
     """Manage multiple projects and scan history"""
-    
+
     CONFIG_DIR = Path.home() / ".green-ai"
     REGISTRY_FILE = CONFIG_DIR / "projects.json"
     HISTORY_DIR = CONFIG_DIR / "history"
-    
+
     def __init__(self):
         """Initialize project manager and ensure directories exist"""
         self.CONFIG_DIR.mkdir(parents=True, exist_ok=True)
@@ -36,7 +34,7 @@ class ProjectManager:
         self.projects: Dict[str, Project] = {}
         self.projects_by_name: Dict[str, str] = {}
         self._load_projects()
-    
+
     def _load_projects(self) -> None:
         """Load projects from registry file"""
         try:
@@ -50,7 +48,7 @@ class ProjectManager:
                 logger.info(f"Loaded {len(self.projects)} projects from registry")
         except Exception as e:
             logger.warning(f"Error loading projects: {e}")
-    
+
     def _save_projects(self) -> None:
         """Save projects to registry file"""
         try:
@@ -62,12 +60,12 @@ class ProjectManager:
             logger.info(f"Saved {len(self.projects)} projects to registry")
         except Exception as e:
             raise ProjectException(f"Error saving projects: {e}")
-    
+
     def ensure_default_project(self) -> Project:
         """
         Ensure the default Green-AI project exists.
         If projects list is empty, auto-add Green-AI Agent as default project.
-        
+
         Returns:
             The default Project (Green-AI Agent)
         """
@@ -75,7 +73,7 @@ class ProjectManager:
         default = self.get_project("Green-AI Agent")
         if default:
             return default
-        
+
         # If no projects exist, create the default one
         if len(self.projects) == 0:
             default = self.add_project(
@@ -87,9 +85,9 @@ class ProjectManager:
             )
             logger.info("Created default Green-AI Agent project")
             return default
-        
+
         return None
-    
+
     def add_project(
         self,
         name: str,
@@ -100,17 +98,17 @@ class ProjectManager:
     ) -> Project:
         """
         Add a new project to the registry.
-        
+
         Args:
             name: Project name
             repo_url: Git repository URL
             branch: Git branch (default: main). If None, defaults to "main".
             language: Programming language
             is_system: Whether this is a system project (non-deletable)
-            
+
         Returns:
             Created Project object
-            
+
         Raises:
             ProjectException: If project name already exists
         """
@@ -121,7 +119,7 @@ class ProjectManager:
         # Check for duplicate names (O(1) lookup)
         if name in self.projects_by_name:
             raise ProjectException(f"Project '{name}' already exists")
-        
+
         project = Project(
             name=name,
             repo_url=repo_url,
@@ -132,69 +130,69 @@ class ProjectManager:
         self.projects[project.id] = project
         self.projects_by_name[project.name] = project.id
         self._save_projects()
-        
+
         logger.info(f"Added project '{name}' (ID: {project.id})" + (" [SYSTEM]" if is_system else ""))
         return project
-    
+
     def get_project(self, project_id_or_name: str) -> Optional[Project]:
         """
         Get project by ID or name.
-        
+
         Args:
             project_id_or_name: Project ID or name
-            
+
         Returns:
             Project object or None if not found
         """
         # Try by ID first
         if project_id_or_name in self.projects:
             return self.projects[project_id_or_name]
-        
+
         # Try by name (O(1) lookup)
         project_id = self.projects_by_name.get(project_id_or_name)
         if project_id:
             return self.projects[project_id]
-        
+
         return None
-    
+
     def remove_project(self, project_id_or_name: str) -> None:
         """
         Remove a project from the registry.
-        
+
         Args:
             project_id_or_name: Project ID or name
-            
+
         Raises:
             ProjectException: If project not found or is a system project
         """
         project = self.get_project(project_id_or_name)
         if not project:
             raise ProjectException(f"Project '{project_id_or_name}' not found")
-        
+
         if project.is_system:
             raise ProjectException(f"Cannot delete system project '{project.name}'")
-        
+
         # Remove from both mappings
         if project.name in self.projects_by_name:
             del self.projects_by_name[project.name]
 
         del self.projects[project.id]
         self._save_projects()
-        
+
         logger.info(f"Removed project '{project.name}'")
-    
+
     def list_projects(self, sort_by: str = "name") -> List[Project]:
         """
         List all projects, sorted by specified field.
-        
+
         Args:
             sort_by: Sort field (name, violations, last_scan, emissions)
-            
+
         Returns:
             List of Project objects
         """
         projects = list(self.projects.values())
-        
+
         sort_fields = {
             'name': lambda p: p.name.lower(),
             'violations': lambda p: p.latest_violations,
@@ -202,12 +200,12 @@ class ProjectManager:
             'emissions': lambda p: p.total_emissions,
             'grade': lambda p: p.get_grade()
         }
-        
+
         if sort_by in sort_fields:
             projects.sort(key=sort_fields[sort_by])
-        
+
         return projects
-    
+
     def update_project_scan(
         self,
         project_id_or_name: str,
@@ -216,36 +214,36 @@ class ProjectManager:
     ) -> None:
         """
         Update project with scan results.
-        
+
         Args:
             project_id_or_name: Project ID or name
             violations: Number of violations OR List of violation dicts
             emissions: Total emissions in kg
-            
+
         Raises:
             ProjectException: If project not found
         """
         project = self.get_project(project_id_or_name)
         if not project:
             raise ProjectException(f"Project '{project_id_or_name}' not found")
-        
+
         project.update_scan_results(violations, emissions)
         self._save_projects()
-        
+
         logger.info(
             f"Updated project '{project.name}': "
             f"{violations} violations, {emissions:.9f} kg CO₂"
         )
-    
+
     def get_summary_metrics(self) -> Dict[str, Any]:
         """
         Get summary metrics across all projects.
-        
+
         Returns:
             Dict with aggregated metrics
         """
         projects = list(self.projects.values())
-        
+
         if not projects:
             return {
                 'total_projects': 0,
@@ -256,18 +254,18 @@ class ProjectManager:
                 'average_emissions': 0.0,
                 'average_grade': 'N/A'
             }
-        
+
         total_violations = sum(p.latest_violations for p in projects)
         total_scans = sum(p.scan_count for p in projects)
         total_emissions = sum(p.total_emissions for p in projects)
-        
+
         # Calculate average grade
         grades = [p.get_grade() for p in projects]
         grade_values = {'A': 5, 'B': 4, 'C': 3, 'D': 2, 'F': 1}
         avg_grade_value = sum(grade_values.get(g, 0) for g in grades) / len(grades) if grades else 3
         grade_map = {5: 'A', 4: 'B', 3: 'C', 2: 'D', 1: 'F'}
         avg_grade = grade_map.get(round(avg_grade_value), 'C')
-        
+
         return {
             'total_projects': len(projects),
             'total_violations': total_violations,
@@ -277,11 +275,11 @@ class ProjectManager:
             'average_emissions': round(total_emissions / len(projects), 9) if projects else 0.0,
             'average_grade': avg_grade
         }
-    
+
     def export_projects(self) -> str:
         """
         Export all projects as JSON string.
-        
+
         Returns:
             JSON string representation of all projects
         """

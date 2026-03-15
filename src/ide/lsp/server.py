@@ -1,6 +1,4 @@
 import logging
-import asyncio
-from typing import Optional
 from pygls.lsp.server import LanguageServer
 from lsprotocol.types import (
     TEXT_DOCUMENT_DID_OPEN,
@@ -14,18 +12,20 @@ from lsprotocol.types import (
     DiagnosticSeverity,
     Position,
     Range,
-    PublishDiagnosticsParams,
 )
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("GreenAILSP")
 
+
 class GreenAILanguageServer(LanguageServer):
     def __init__(self):
         super().__init__("green-ai-lsp", "v0.1.0")
 
+
 server = GreenAILanguageServer()
+
 
 def _validate(ls: GreenAILanguageServer, params):
     """
@@ -57,11 +57,13 @@ def _validate(ls: GreenAILanguageServer, params):
 
     ls.publish_diagnostics(text_doc.uri, diagnostics)
 
+
 @server.feature("initialize")
 def initialize(ls: GreenAILanguageServer, params: InitializeParams):
     """Handle initialize request."""
     logger.info("Green AI LSP Initialized")
     return None
+
 
 @server.feature(TEXT_DOCUMENT_DID_OPEN)
 async def did_open(ls: GreenAILanguageServer, params: DidOpenTextDocumentParams):
@@ -69,10 +71,12 @@ async def did_open(ls: GreenAILanguageServer, params: DidOpenTextDocumentParams)
     logger.info(f"Document opened: {params.text_document.uri}")
     _validate(ls, params)
 
+
 @server.feature(TEXT_DOCUMENT_DID_CHANGE)
 async def did_change(ls: GreenAILanguageServer, params: DidChangeTextDocumentParams):
     """Handle document change."""
     _validate(ls, params)
+
 
 @server.feature(TEXT_DOCUMENT_DID_SAVE)
 async def did_save(ls: GreenAILanguageServer, params: DidSaveTextDocumentParams):
@@ -80,8 +84,10 @@ async def did_save(ls: GreenAILanguageServer, params: DidSaveTextDocumentParams)
     logger.info(f"Document saved: {params.text_document.uri}")
     _validate(ls, params)
 
+
 def main():
     server.start_io()
+
 
 if __name__ == '__main__':
     main()

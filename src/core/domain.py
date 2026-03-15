@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 import uuid
 from pydantic import BaseModel, Field, field_validator, ConfigDict
 
+
 class ViolationSeverity(str, Enum):
     """Severity levels for violations."""
     CRITICAL = "critical"
@@ -18,6 +19,7 @@ class ViolationSeverity(str, Enum):
     MINOR = "minor"
     LOW = "low"
     INFO = "info"
+
 
 class Violation(BaseModel):
     """
@@ -31,6 +33,7 @@ class Violation(BaseModel):
 
     model_config = ConfigDict(extra='ignore')
 
+
 class ViolationDetails(BaseModel):
     """Counts of violations by severity."""
     critical: int = 0
@@ -42,6 +45,7 @@ class ViolationDetails(BaseModel):
     info: int = 0
 
     model_config = ConfigDict(extra='ignore')
+
 
 class Project(BaseModel):
     """
@@ -148,14 +152,14 @@ class Project(BaseModel):
                     # For now, skip or log. We'll skip to ensure strict typing in 'violations' list.
                     # Or we could try to coerce severity to 'low'.
                     if isinstance(v_data, dict):
-                         # Try to salvage with default severity
-                         v_data_fixed = v_data.copy()
-                         v_data_fixed['severity'] = ViolationSeverity.LOW
-                         try:
+                        # Try to salvage with default severity
+                        v_data_fixed = v_data.copy()
+                        v_data_fixed['severity'] = ViolationSeverity.LOW
+                        try:
                             violation = Violation(**v_data_fixed)
                             valid_violations.append(violation)
                             details[ViolationSeverity.LOW.value] += 1
-                         except:
+                        except Exception:
                             pass
 
             self.violations = valid_violations
@@ -209,12 +213,13 @@ class ProjectSummaryDTO(BaseModel):
             high_violations=project.high_violations,
             medium_violations=project.medium_violations,
             low_violations=project.low_violations,
-            scanning_emissions=project.total_emissions, # Mapping total to scanning as per current implementation
+            scanning_emissions=project.total_emissions,  # Mapping total to scanning as per current implementation
             codebase_emissions=0,
             total_emissions=project.total_emissions,
             created_date=None,
             created_by='system'
         )
+
 
 class ProjectDTO(BaseModel):
     """DTO for detailed project view."""
@@ -251,6 +256,7 @@ class ProjectDTO(BaseModel):
             violations=project.violations,
             health_grade=project.get_grade()
         )
+
 
 class ProjectComparisonDTO(BaseModel):
     """DTO for project comparison."""
