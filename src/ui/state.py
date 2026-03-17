@@ -1,4 +1,3 @@
-import sys
 from typing import Any, Dict, List, Optional
 from src.standards.registry import StandardsRegistry
 from src.core.project_manager import ProjectManager
@@ -16,11 +15,13 @@ project_manager: Optional[ProjectManager] = None
 history_manager: Optional[HistoryManager] = None
 remediation_engine: Optional[RemediationEngine] = None
 
+
 def get_standards_registry() -> StandardsRegistry:
     global standards_registry
     if standards_registry is None:
         standards_registry = StandardsRegistry()
     return standards_registry
+
 
 def get_project_manager() -> ProjectManager:
     global project_manager
@@ -28,11 +29,13 @@ def get_project_manager() -> ProjectManager:
         project_manager = ProjectManager()
     return project_manager
 
+
 def get_history_manager() -> HistoryManager:
     global history_manager
     if history_manager is None:
         history_manager = HistoryManager()
     return history_manager
+
 
 def get_remediation_engine() -> RemediationEngine:
     global remediation_engine
@@ -40,10 +43,12 @@ def get_remediation_engine() -> RemediationEngine:
         remediation_engine = RemediationEngine()
     return remediation_engine
 
+
 def set_last_scan_results(results: Dict[str, Any]):
     global last_scan_results, last_charts
     last_scan_results = results
     last_charts = generate_all_charts(results)
+
 
 def generate_insights(results: Dict[str, Any]) -> List[str]:
     insights = []
@@ -62,7 +67,6 @@ def generate_insights(results: Dict[str, Any]) -> List[str]:
     codebase_emissions = results.get('codebase_emissions', 0)
     if codebase_emissions > 0.000001:
         insights.append(f"Estimated codebase emissions are {codebase_emissions:.9f} kg CO₂. Fixing the high-severity issues will reduce this impact.")
-
 
     if codebase_emissions > scanning_emissions * 10:
         insights.append("Codebase emissions significantly exceed scanning emissions. Focus on optimizing the analyzed code.")

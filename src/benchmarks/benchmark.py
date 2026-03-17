@@ -8,13 +8,14 @@ import sys
 import os
 from codecarbon import EmissionsTracker
 
+
 def benchmark_scan(target='tests/', iterations=3):
     """Benchmark scanning performance"""
     times = []
     emissions = []
     
     for i in range(iterations):
-        print(f"Benchmark iteration {i+1}/{iterations}")
+        print(f"Benchmark iteration {i + 1}/{iterations}")
         
         tracker = EmissionsTracker()
         tracker.start()
@@ -41,6 +42,7 @@ def benchmark_scan(target='tests/', iterations=3):
         print(".6f")
     else:
         print("No successful scans")
+
 
 if __name__ == '__main__':
     benchmark_scan()
