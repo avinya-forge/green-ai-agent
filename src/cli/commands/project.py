@@ -1,10 +1,10 @@
 import click
 import sys
-import os
 from src.core.project_manager import ProjectManager
 from src.core.git_operations import GitOperations, GitException
 from src.core.scanner import Scanner
 from src.ui.state import set_last_scan_results
+
 
 @click.group()
 def project():
@@ -63,13 +63,13 @@ def project_list(sort_by):
             click.echo("No projects registered yet.")
             return
 
-        click.echo(f"\n{'='*100}")
+        click.echo(f"\n{'=' * 100}")
         click.echo(f"REGISTERED PROJECTS (sorted by {sort_by})")
-        click.echo(f"{'='*100}\n")
+        click.echo(f"{'=' * 100}\n")
 
         # Header
         click.echo(f"{'Name':<25} {'Language':<12} {'Grade':<7} {'Violations':<12} {'Last Scan':<20} {'Emissions':<15}")
-        click.echo(f"{'-'*25} {'-'*12} {'-'*7} {'-'*12} {'-'*20} {'-'*15}")
+        click.echo(f"{'-' * 25} {'-' * 12} {'-' * 7} {'-' * 12} {'-' * 20} {'-' * 15}")
 
         for p in projects:
             grade = p.get_grade()
@@ -79,11 +79,11 @@ def project_list(sort_by):
 
             click.echo(f"{p.name:<25} {p.language:<12} {grade_symbol} {grade:<5} {p.latest_violations:<12} {last_scan:<20} {p.total_emissions:.9f}")
 
-        click.echo(f"\n{'='*100}")
+        click.echo(f"\n{'=' * 100}")
 
         # Summary metrics
         metrics = manager.get_summary_metrics()
-        click.echo(f"\nSummary:")
+        click.echo("\nSummary:")
         click.echo(f"  Total Projects: {metrics['total_projects']}")
         click.echo(f"  Total Violations: {metrics['total_violations']}")
         click.echo(f"  Average Violations: {metrics['average_violations']:.1f}")
@@ -149,7 +149,7 @@ def project_scan(project_name, branch):
             else:
                 scan_path = repo_url
                 cleanup_after = False
-                click.echo(f"✓ Using local repository")
+                click.echo("✓ Using local repository")
 
         except GitException as e:
             click.echo(f"Error: {e}", err=True)
@@ -165,7 +165,7 @@ def project_scan(project_name, branch):
             emissions = results.get('codebase_emissions', 0)
             manager.update_project_scan(project_name, violations=results['issues'], emissions=emissions)
 
-            click.echo(f"[OK] Scan complete")
+            click.echo("[OK] Scan complete")
             click.echo(f"  Found {violations_count} violations")
             click.echo(f"  Emissions: {emissions:.9f} kg CO2")
             click.echo(f"  Grade: {manager.get_project(project_name).get_grade()}")
@@ -177,7 +177,7 @@ def project_scan(project_name, branch):
             # Cleanup if needed
             if cleanup_after and GitOperations.is_git_url(repo_url):
                 GitOperations.cleanup_repo(scan_path)
-                click.echo(f"[OK] Cleaned up temporary repository")
+                click.echo("[OK] Cleaned up temporary repository")
 
     except Exception as e:
         click.echo(f"Error: {e}", err=True)
@@ -237,9 +237,9 @@ def project_scan_all():
                 results_summary.append((project.name, 'ERROR', -1, 0))
 
         # Summary
-        click.echo(f"\n{'='*80}")
-        click.echo(f"SCAN RESULTS SUMMARY")
-        click.echo(f"{'='*80}\n")
+        click.echo(f"\n{'=' * 80}")
+        click.echo("SCAN RESULTS SUMMARY")
+        click.echo(f"{'=' * 80}\n")
 
         for name, grade, violations, emissions in results_summary:
             grade_symbol = {'A': '[A]', 'B': '[B]', 'C': '[C]', 'D': '[D]', 'F': '[F]', 'ERROR': '[X]'}.get(grade, '[ ]')
@@ -247,8 +247,8 @@ def project_scan_all():
 
         # Aggregate metrics
         metrics = manager.get_summary_metrics()
-        click.echo(f"\n{'='*80}")
-        click.echo(f"Aggregate Metrics:")
+        click.echo(f"\n{'=' * 80}")
+        click.echo("Aggregate Metrics:")
         click.echo(f"  Total Projects: {metrics['total_projects']}")
         click.echo(f"  Total Violations: {metrics['total_violations']}")
         click.echo(f"  Average Violations: {metrics['average_violations']:.1f}")

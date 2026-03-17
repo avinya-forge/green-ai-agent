@@ -4,11 +4,12 @@ JavaScript-specific detection strategies for green software violations.
 
 import re
 from typing import List, Dict
-from tree_sitter import Language, Parser, Query, QueryCursor
+from tree_sitter import Query, QueryCursor
 import tree_sitter_javascript
 from src.utils.logger import logger
 from src.utils.entropy import calculate_shannon_entropy
 from .base_detector import BaseTreeSitterDetector
+
 
 class JavaScriptASTDetector(BaseTreeSitterDetector):
     """AST-based detector for JavaScript using Tree-sitter."""
@@ -252,7 +253,7 @@ class JavaScriptASTDetector(BaseTreeSitterDetector):
                     if any(p in name_text.lower() for p in secret_patterns):
                         # Filter out empty strings, short strings, placeholders
                         if len(clean_val) > 8 and ' ' not in clean_val and not clean_val.startswith('<') and 'YOUR_' not in clean_val and not clean_val.startswith('process.env'):
-                             self.violations.append({
+                            self.violations.append({
                                 'id': 'hardcoded_secret',
                                 'line': name_node[0].start_point[0] + 1,
                                 'severity': 'critical',
@@ -265,9 +266,9 @@ class JavaScriptASTDetector(BaseTreeSitterDetector):
                     safe_patterns = ['hash', 'checksum', 'md5', 'sha', 'signature', 'id', 'uuid', 'class', 'style', 'color', 'url', 'path']
                     if not any(p in name_text.lower() for p in safe_patterns):
                         if len(clean_val) > 20 and ' ' not in clean_val and not clean_val.startswith('<'):
-                             entropy = calculate_shannon_entropy(clean_val)
-                             if entropy > 4.0:
-                                 self.violations.append({
+                            entropy = calculate_shannon_entropy(clean_val)
+                            if entropy > 4.0:
+                                self.violations.append({
                                     'id': 'high_entropy_string',
                                     'line': val_node[0].start_point[0] + 1,
                                     'severity': 'critical',
@@ -300,7 +301,7 @@ class JavaScriptASTDetector(BaseTreeSitterDetector):
                         # Handle floats and ints
                         val = float(text)
                         if val >= 100 and val not in [1000, 1024, 3600]:
-                             self.violations.append({
+                            self.violations.append({
                                 'id': 'magic_numbers',
                                 'line': node.start_point[0] + 1,
                                 'severity': 'minor',
@@ -334,9 +335,7 @@ class JavaScriptASTDetector(BaseTreeSitterDetector):
         # 3. Nested loops (Depth check)
         # We need to traverse the tree or query for loops inside loops
         # Simple query for direct nesting:
-        query_nested = """
-        (for_statement body: (statement_block (for_statement))) @nested
-        """
+
         # Note: This only catches depth 2. For deeper nesting we might need a more general traversal or multiple queries.
         # But let's start with depth 2 which is the main concern.
 
@@ -346,33 +345,33 @@ class JavaScriptASTDetector(BaseTreeSitterDetector):
         # Helper to check depth
 
         try:
-             # Find all loops
-             query_loops = "[(for_statement) (while_statement) (do_statement) (for_in_statement)] @loop"
-             query = Query(self.language, query_loops)
-             cursor = QueryCursor(query)
-             matches = cursor.matches(self.tree.root_node)
+            # Find all loops
+            query_loops = "[(for_statement) (while_statement) (do_statement) (for_in_statement)] @loop"
+            query = Query(self.language, query_loops)
+            cursor = QueryCursor(query)
+            matches = cursor.matches(self.tree.root_node)
 
-             # Include for_of_statement
-             extended_loop_types = loop_types
+            # Include for_of_statement
+            extended_loop_types = loop_types
 
-             for _, captures in matches:
-                 for _, nodes in captures.items():
-                     for node in nodes:
-                         depth = 0
-                         parent = node.parent
-                         while parent:
-                             if parent.type in extended_loop_types:
-                                 depth += 1
-                             parent = parent.parent
+            for _, captures in matches:
+                for _, nodes in captures.items():
+                    for node in nodes:
+                        depth = 0
+                        parent = node.parent
+                        while parent:
+                            if parent.type in extended_loop_types:
+                                depth += 1
+                            parent = parent.parent
 
-                         if depth >= 1: # 1 parent loop means depth 2
-                             total_depth = depth + 1
-                             severity = 'critical' if total_depth >= 3 else 'major'
-                             # We need to manually add violation because _run_query deduplicates by line and doesn't support dynamic message
-                             line = node.start_point[0] + 1
-                             # Check if we already reported this line (maybe not needed as we iterate nodes)
+                        if depth >= 1:  # 1 parent loop means depth 2
+                            total_depth = depth + 1
+                            severity = 'critical' if total_depth >= 3 else 'major'
+                            # We need to manually add violation because _run_query deduplicates by line and doesn't support dynamic message
+                            line = node.start_point[0] + 1
+                            # Check if we already reported this line (maybe not needed as we iterate nodes)
 
-                             self.violations.append({
+                            self.violations.append({
                                 'id': 'no_n2_algorithms',
                                 'line': line,
                                 'severity': severity,
@@ -423,10 +422,10 @@ class JavaScriptASTDetector(BaseTreeSitterDetector):
                         parent = parent.parent
 
                     if in_loop:
-                         # Extract method name for message
-                         method_name = node.text.decode('utf8')
+                        # Extract method name for message
+                        method_name = node.text.decode('utf8')
 
-                         self.violations.append({
+                        self.violations.append({
                             'id': 'unnecessary_dom_manipulation',
                             'line': node.start_point[0] + 1,
                             'severity': 'critical',
@@ -469,7 +468,7 @@ class JavaScriptASTDetector(BaseTreeSitterDetector):
                             parent = parent.parent
 
                         if in_loop:
-                             self.violations.append({
+                            self.violations.append({
                                 'id': 'string_concatenation',
                                 'line': node.start_point[0] + 1,
                                 'severity': 'major',
