@@ -17,18 +17,18 @@
 **TASK IDE-005: LSP Server: Diagnostics publishing** | [TODO] | [PRAGMATIST]
 **SPEC:** Map scanner Violation objects to LSP Diagnostic objects and publish via LanguageServer.publish_diagnostics.
    - [x] TASK: Map scanner Violation objects to LSP Diagnostic objects and publish via LanguageServer.publish_diagnostics.
-**TASK IDE-007: Syntax Highlighting: Grammar definition** | [TODO] | [PRAGMATIST]
+**TASK IDE-007: Syntax Highlighting: Grammar definition** | [DONE] | [PRAGMATIST]
 **SPEC:** Define basic TextMate grammar for custom rule definition files in src/ide/vscode/syntaxes/.
-   - [ ] TASK: Define basic TextMate grammar for custom rule definition files in src/ide/vscode/syntaxes/.
-**TASK IDE-008: Quick Fix: Code action provider** | [TODO] | [PRAGMATIST]
+   - [x] TASK: Define basic TextMate grammar for custom rule definition files in src/ide/vscode/syntaxes/.
+**TASK IDE-008: Quick Fix: Code action provider** | [DONE] | [PRAGMATIST]
 **SPEC:** Implement textDocument/codeAction handler providing quick fixes for detected optimizer violations.
-   - [ ] TASK: Implement textDocument/codeAction handler providing quick fixes for detected optimizer violations.
-**TASK IDE-009: VS Code Ext: Settings page** | [TODO] | [PRAGMATIST]
+   - [x] TASK: Implement textDocument/codeAction handler providing quick fixes for detected optimizer violations.
+**TASK IDE-009: VS Code Ext: Settings page** | [DONE] | [PRAGMATIST]
 **SPEC:** Add configuration section 'green-ai.scanner' in package.json to control LSP server path and scanner strictness.
-   - [ ] TASK: Add configuration section 'green-ai.scanner' in package.json to control LSP server path and scanner strictness.
-**TASK IDE-010: VS Code Ext: Output channel logging** | [TODO] | [PRAGMATIST]
+   - [x] TASK: Add configuration section 'green-ai.scanner' in package.json to control LSP server path and scanner strictness.
+**TASK IDE-010: VS Code Ext: Output channel logging** | [DONE] | [PRAGMATIST]
 **SPEC:** Implement window/logMessage reporting LSP server initialization and scanning progress to an output channel.
-   - [ ] TASK: Implement window/logMessage reporting LSP server initialization and scanning progress to an output channel.
+   - [x] TASK: Implement window/logMessage reporting LSP server initialization and scanning progress to an output channel.
 
 ### [EPIC-12] Team Collaboration Dashboard
 **TASK TEAM-001: Design database schema for team analytics** | [NEEDS-SPLIT] | [HIGH-RISK] | [PRAGMATIST]
@@ -149,27 +149,3 @@
 **TASK REF-002: Verify DB/Auth/API Integrations** | [TODO] | [HIGH-RISK] | [HARDENER]
 **SPEC:** Ensure DB, Auth, and API integrations modified in PERF-005 strictly adhere to security constraints.
    - [ ] TASK: Ensure DB, Auth, and API integrations modified in PERF-005 strictly adhere to security constraints.
-- [RESOLVE] Blocker encountered: pytest failed
-- [RESOLVE] Blocker encountered: flake8 failed
-- [RESOLVE] Blocker encountered: pytest failed
-- [RESOLVE] Blocker encountered: flake8 failed
-- [RESOLVE] Blocker encountered: pytest failed
-- [RESOLVE] Blocker encountered: flake8 failed
-- [RESOLVE] Blocker encountered: pytest failed
-- [RESOLVE] Blocker encountered: flake8 failed
-- [RESOLVE] Blocker encountered: pytest failed
-- [RESOLVE] Blocker encountered: pytest failed
-- [RESOLVE] Blocker encountered: flake8 failed
-- [RESOLVE] Blocker encountered: pytest failed
-- [RESOLVE] Blocker encountered: pytest failed
-- [RESOLVE] Blocker encountered: pytest failed
-- [RESOLVE] Blocker encountered: flake8 failed
-- [RESOLVE] Blocker encountered: pytest failed
-- [RESOLVE] Blocker encountered: flake8 failed
-- [RESOLVE] Blocker encountered: pytest failed
-- [RESOLVE] Blocker encountered: flake8 failed
-- [RESOLVE] Blocker encountered: pytest failed
-- [RESOLVE] Blocker encountered: flake8 failed
-- [RESOLVE] Blocker encountered: pytest failed
-- [RESOLVE] Blocker encountered: flake8 failed
-- [RESOLVE] Blocker encountered: pytest failed
