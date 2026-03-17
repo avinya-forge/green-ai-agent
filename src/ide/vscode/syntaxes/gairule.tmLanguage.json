@@ -1,0 +1,41 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Green AI Rule",
+  "scopeName": "source.gairule",
+  "patterns": [
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#comments"
+    }
+  ],
+  "repository": {
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.gairule",
+          "match": "\\b(id|name|description|severity|languages|pattern|remediation|source|tags)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.gairule",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.gairule",
+          "match": "\\\\."
+        }
+      ]
+    },
+    "comments": {
+      "name": "comment.line.number-sign.gairule",
+      "match": "#.*"
+    }
+  }
+}

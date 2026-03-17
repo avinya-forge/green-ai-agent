@@ -12,6 +12,12 @@ from lsprotocol.types import (
     DiagnosticSeverity,
     Position,
     Range,
+    TEXT_DOCUMENT_CODE_ACTION,
+    CodeActionParams,
+    CodeAction,
+    CodeActionKind,
+    WorkspaceEdit,
+    TextEdit,
 )
 
 # Configure logging
@@ -61,14 +67,18 @@ def _validate(ls: GreenAILanguageServer, params):
 @server.feature("initialize")
 def initialize(ls: GreenAILanguageServer, params: InitializeParams):
     """Handle initialize request."""
-    logger.info("Green AI LSP Initialized")
+    msg = "Green AI LSP Initialized"
+    logger.info(msg)
+    ls.window_show_message(msg)
     return None
 
 
 @server.feature(TEXT_DOCUMENT_DID_OPEN)
 async def did_open(ls: GreenAILanguageServer, params: DidOpenTextDocumentParams):
     """Handle document open."""
-    logger.info(f"Document opened: {params.text_document.uri}")
+    msg = f"Document opened: {params.text_document.uri}"
+    logger.info(msg)
+    ls.window_show_message(msg)
     _validate(ls, params)
 
 
@@ -81,8 +91,31 @@ async def did_change(ls: GreenAILanguageServer, params: DidChangeTextDocumentPar
 @server.feature(TEXT_DOCUMENT_DID_SAVE)
 async def did_save(ls: GreenAILanguageServer, params: DidSaveTextDocumentParams):
     """Handle document save."""
-    logger.info(f"Document saved: {params.text_document.uri}")
+    msg = f"Document saved: {params.text_document.uri}"
+    logger.info(msg)
+    ls.window_show_message(msg)
     _validate(ls, params)
+
+
+@server.feature(TEXT_DOCUMENT_CODE_ACTION)
+def code_action(ls: GreenAILanguageServer, params: CodeActionParams):
+    """Handle code action requests (quick fixes)."""
+    items = []
+
+    for diagnostic in params.context.diagnostics:
+        if "Avoid using print() in production" in diagnostic.message:
+            # Provide quick fix to replace print( with logger.info(
+            edit = TextEdit(range=diagnostic.range, new_text="logger.info(")
+            workspace_edit = WorkspaceEdit(changes={params.text_document.uri: [edit]})
+            action = CodeAction(
+                title="Replace with logger.info(",
+                kind=CodeActionKind.QuickFix,
+                diagnostics=[diagnostic],
+                edit=workspace_edit,
+            )
+            items.append(action)
+
+    return items
 
 
 def main():

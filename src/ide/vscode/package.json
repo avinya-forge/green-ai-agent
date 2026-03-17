@@ -20,6 +20,20 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "languages": [
+      {
+        "id": "green-ai-rule",
+        "aliases": ["Green AI Rule", "gairule"],
+        "extensions": [".gairule"]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "green-ai-rule",
+        "scopeName": "source.gairule",
+        "path": "./syntaxes/gairule.tmLanguage.json"
+      }
+    ],
     "commands": [
       {
         "command": "green-ai.scan",
@@ -34,6 +48,17 @@
           "type": "boolean",
           "default": true,
           "description": "Enable/disable Green AI analysis."
+        },
+        "green-ai.scanner.serverPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the Green AI LSP server executable."
+        },
+        "green-ai.scanner.strictness": {
+          "type": "string",
+          "enum": ["low", "medium", "high"],
+          "default": "medium",
+          "description": "Strictness level of the Green AI scanner."
         }
       }
     }
