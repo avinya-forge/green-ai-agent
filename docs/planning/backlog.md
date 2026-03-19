@@ -149,4 +149,22 @@
 **TASK REF-002: Verify DB/Auth/API Integrations** | [DONE] | [HIGH-RISK] | [HARDENER]
 **SPEC:** Ensure DB, Auth, and API integrations modified in PERF-005 strictly adhere to security constraints.
    - [x] TASK: Ensure DB, Auth, and API integrations modified in PERF-005 strictly adhere to security constraints.
+
+### [EPIC-18] System Audit & Hardening
+**TASK AUDIT-001: Implement proper exception handling in app_fastapi.py** | [TODO] | [HIGH-RISK] | [HARDENER]
+**SPEC:** Improve error handling in `/api/scan` and global exception handlers to prevent internal system state leakage and better logging.
+   - [ ] TASK: Implement proper exception handling in app_fastapi.py
+**TASK AUDIT-002: Address XSS vulnerabilities in dashboard templates** | [DONE] | [HIGH-RISK] | [HARDENER]
+**SPEC:** Ensure `innerHTML` usages are properly escaped using `escapeHTML` across the UI, particularly for user-input fields.
+   - [x] TASK: Address XSS vulnerabilities in dashboard templates
+**TASK AUDIT-003: Expand automated security testing** | [TODO] | [HIGH-RISK] | [HARDENER]
+**SPEC:** Create security tests (e.g., in `test_dashboard_xss_playwright.py`) covering all dynamic fields rendering user-provided content.
+   - [ ] TASK: Expand automated security testing
+**TASK AUDIT-004: UI/UX Error state presentation** | [TODO] | [PRAGMATIST]
+**SPEC:** Make error popups user-friendly, potentially adding toasts instead of native browser alerts in the dashboard.
+   - [ ] TASK: UI/UX Error state presentation
+- [RESOLVE] Blocker encountered: pytest failed
+- [RESOLVE] Blocker encountered: pytest failed
+- [RESOLVE] Blocker encountered: flake8 failed
+- [RESOLVE] Blocker encountered: pytest failed
 - [RESOLVE] Blocker encountered: pytest failed
