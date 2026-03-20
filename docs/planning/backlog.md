@@ -151,9 +151,9 @@
    - [x] TASK: Ensure DB, Auth, and API integrations modified in PERF-005 strictly adhere to security constraints.
 
 ### [EPIC-18] System Audit & Hardening
-**TASK AUDIT-001: Implement proper exception handling in app_fastapi.py** | [TODO] | [HIGH-RISK] | [HARDENER]
+**TASK AUDIT-001: Implement proper exception handling in app_fastapi.py** | [DONE] | [HIGH-RISK] | [HARDENER]
 **SPEC:** Improve error handling in `/api/scan` and global exception handlers to prevent internal system state leakage and better logging.
-   - [ ] TASK: Implement proper exception handling in app_fastapi.py
+   - [x] TASK: Implement proper exception handling in app_fastapi.py
 **TASK AUDIT-002: Address XSS vulnerabilities in dashboard templates** | [DONE] | [HIGH-RISK] | [HARDENER]
 **SPEC:** Ensure `innerHTML` usages are properly escaped using `escapeHTML` across the UI, particularly for user-input fields.
    - [x] TASK: Address XSS vulnerabilities in dashboard templates
@@ -168,3 +168,7 @@
 - [RESOLVE] Blocker encountered: flake8 failed
 - [RESOLVE] Blocker encountered: pytest failed
 - [RESOLVE] Blocker encountered: pytest failed
+- [RESOLVE] Blocker encountered: pytest failed
+- [RESOLVE] Blocker encountered: flake8 failed
+- [RESOLVE] Blocker encountered: pytest failed
+- [RESOLVE] Blocker encountered: flake8 failed

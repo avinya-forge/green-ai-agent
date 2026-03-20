@@ -7,7 +7,7 @@ for the migration from Flask/Eventlet.
 
 import socketio
 from fastapi import FastAPI, Request, HTTPException, Query, Response
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from typing import Any, List, Optional
 import os
@@ -95,8 +95,18 @@ async def lifespan(app: FastAPI):
 
     yield
 
+
 # Initialize FastAPI app
 app = FastAPI(title="Green-AI Agent Dashboard", lifespan=lifespan)
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    print(f"Unhandled exception: {exc}", file=sys.stderr)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal Server Error"}
+    )
 
 # Add middleware
 # Note: Middleware is added in reverse order (LIFO).
@@ -183,7 +193,8 @@ async def api_telemetry() -> Any:
             'events': service.get_all_events()
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error in api_telemetry: {e}", file=sys.stderr)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
 @app.get("/api/standards")
@@ -277,7 +288,8 @@ async def api_get_history(project: str, days: Optional[int] = None) -> Any:
             'count': len(scans)
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error in api_get_history: {e}", file=sys.stderr)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
 @app.get("/api/trending")
@@ -294,7 +306,8 @@ async def api_get_trending(project: str, days: Optional[int] = None) -> Any:
             'grade_improvement': trending.get('grade_improvement', 'N/A')
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error in api_get_trending: {e}", file=sys.stderr)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
 @app.get("/api/compare")
@@ -332,7 +345,8 @@ async def api_compare_scans(
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error in api_compare_scans: {e}", file=sys.stderr)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
 @app.post("/api/scan")
@@ -375,9 +389,9 @@ async def api_scan(request: ScanRequest):
             asyncio.run_coroutine_threadsafe(sio.emit('scan_finished', {'project_name': project_name}), loop)
 
         except Exception as e:
-            print(f"Background scan error: {e}")
-            asyncio.run_coroutine_threadsafe(broadcast_progress(f"Error: {str(e)}", 0), loop)
-            asyncio.run_coroutine_threadsafe(sio.emit('scan_error', {'error': str(e)}), loop)
+            print(f"Background scan error: {e}", file=sys.stderr)
+            asyncio.run_coroutine_threadsafe(broadcast_progress("Error: Internal Server Error", 0), loop)
+            asyncio.run_coroutine_threadsafe(sio.emit('scan_error', {'error': 'Internal Server Error'}), loop)
 
     thread = threading.Thread(target=run_background_scan)
     thread.daemon = True
@@ -443,7 +457,8 @@ async def api_clear_project(project_name: str):
             'message': f'Project {project_name} cleared and ready for rescan'
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error in api_clear_project: {e}", file=sys.stderr)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 # Standards Management
 
@@ -496,7 +511,8 @@ async def api_remediation_preview(
             'description': description
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error in api_remediation_preview: {e}", file=sys.stderr)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 # Calibration
 
@@ -515,7 +531,8 @@ async def api_calibrate(request: Request):
             'profile': profile
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error in api_calibrate: {e}", file=sys.stderr)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 # Export
 
@@ -545,7 +562,8 @@ def _handle_export(exporter_cls, mime_type, file_extension, project_name='Scan')
         return Response(content=content, media_type=mime_type, headers=headers)
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to export {file_extension.upper()}: {str(e)}")
+        print(f"Error in _handle_export: {e}", file=sys.stderr)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
 @app.get("/api/export/csv")
