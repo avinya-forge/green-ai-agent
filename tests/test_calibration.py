@@ -39,4 +39,4 @@ def test_api_calibrate_failure(client):
         assert response.status_code == 500
         data = response.json()
         assert 'detail' in data
-        assert data['detail'] == "Benchmark failed"
+        assert data['detail'] == "Internal Server Error"
