@@ -160,9 +160,9 @@
 **TASK AUDIT-003: Expand automated security testing** | [TODO] | [HIGH-RISK] | [HARDENER]
 **SPEC:** Create security tests (e.g., in `test_dashboard_xss_playwright.py`) covering all dynamic fields rendering user-provided content.
    - [ ] TASK: Expand automated security testing
-**TASK AUDIT-004: UI/UX Error state presentation** | [TODO] | [PRAGMATIST]
+**TASK AUDIT-004: UI/UX Error state presentation** | [DONE] | [PRAGMATIST]
 **SPEC:** Make error popups user-friendly, potentially adding toasts instead of native browser alerts in the dashboard.
-   - [ ] TASK: UI/UX Error state presentation
+   - [x] TASK: UI/UX Error state presentation
 - [RESOLVE] Blocker encountered: pytest failed
 - [RESOLVE] Blocker encountered: pytest failed
 - [RESOLVE] Blocker encountered: flake8 failed

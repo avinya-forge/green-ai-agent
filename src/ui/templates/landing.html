@@ -479,6 +479,98 @@
             background: #cbd5e1;
         }
     </style>
+
+    <style>
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            min-width: 250px;
+            padding: 16px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: slideIn 0.3s ease-out forwards;
+            opacity: 0;
+            transform: translateY(100%);
+        }
+        .toast.success {
+            background-color: #10b981;
+        }
+        .toast.error {
+            background-color: #ef4444;
+        }
+        .toast.info {
+            background-color: #3b82f6;
+        }
+        .toast.hiding {
+            animation: slideOut 0.3s ease-in forwards;
+        }
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes slideOut {
+            to {
+                opacity: 0;
+                transform: translateY(100%);
+            }
+        }
+        .toast-close {
+            cursor: pointer;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        function showToast(message, type = 'info', duration = 3000) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            const msgSpan = document.createElement('span');
+            msgSpan.innerText = message;
+
+            const closeBtn = document.createElement('span');
+            closeBtn.className = 'toast-close';
+            closeBtn.innerHTML = '&times;';
+            closeBtn.onclick = () => {
+                toast.classList.add('hiding');
+                setTimeout(() => toast.remove(), 300);
+            };
+
+            toast.appendChild(msgSpan);
+            toast.appendChild(closeBtn);
+            container.appendChild(toast);
+
+            if (duration > 0) {
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.classList.add('hiding');
+                        setTimeout(() => {
+                            if (toast.parentElement) toast.remove();
+                        }, 300);
+                    }
+                }, duration);
+            }
+        }
+    </script>
+
 </head>
 <body>
     <div class="container">
@@ -556,8 +648,8 @@
         <div class="quick-links">
             <a href="https://github.com/Green-AI-Agent/green-ai" class="quick-link" target="_blank">📚 GitHub Repository</a>
             <a href="/api/projects" class="quick-link">📊 Projects Dashboard</a>
-            <a href="#" class="quick-link" onclick="alert('Docs coming soon'); return false;">📖 Documentation</a>
-            <a href="#" class="quick-link" onclick="alert('FAQ coming soon'); return false;">❓ FAQ</a>
+            <a href="#" class="quick-link" onclick="showToast('Docs coming soon', 'info'); return false;">📖 Documentation</a>
+            <a href="#" class="quick-link" onclick="showToast('FAQ coming soon', 'info'); return false;">❓ FAQ</a>
         </div>
     </div>
 
@@ -693,12 +785,12 @@
             const projectPath = document.getElementById('scanProjectPath').value.trim();
 
             if (!projectName) {
-                alert('Please enter a project name');
+                showToast('Please enter a project name', 'info');
                 return;
             }
 
             if (!projectPath) {
-                alert('Please enter a project path');
+                showToast('Please enter a project path', 'info');
                 return;
             }
 
@@ -715,12 +807,12 @@
                 if (!response.ok) throw new Error(`Scan failed: ${response.status}`);
 
                 const result = await response.json();
-                alert(`✓ Scan completed! Found ${result.issues?.length || 0} issues.`);
+                showToast(`✓ Scan completed! Found ${result.issues?.length || 0} issues.`, 'success');
                 closeModal('newScanModal');
                 setTimeout(() => location.reload(), 1000);
             } catch (error) {
                 console.error('Scan error:', error);
-                alert(`✗ Scan failed: ${error.message}`);
+                showToast(`✗ Scan failed: ${error.message}`, 'error');
             }
         }
 
@@ -735,12 +827,12 @@
             const projectLanguage = document.getElementById('projectLanguage').value;
 
             if (!projectName) {
-                alert('Please enter a project name');
+                showToast('Please enter a project name', 'info');
                 return;
             }
 
             if (!projectPath) {
-                alert('Please enter a project path');
+                showToast('Please enter a project path', 'info');
                 return;
             }
 
@@ -757,12 +849,12 @@
 
                 if (!response.ok) throw new Error(`Failed to create project: ${response.status}`);
 
-                alert(`✓ Project "${projectName}" created successfully`);
+                showToast(`✓ Project "${projectName}" created successfully`, 'success');
                 closeModal('addProjectModal');
                 setTimeout(() => location.reload(), 500);
             } catch (error) {
                 console.error('Project creation error:', error);
-                alert(`✗ Failed to create project: ${error.message}`);
+                showToast(`✗ Failed to create project: ${error.message}`, 'error');
             }
         }
 
@@ -780,7 +872,7 @@
             };
 
             localStorage.setItem('appSettings', JSON.stringify(settings));
-            alert('✓ Settings saved successfully');
+            showToast('✓ Settings saved successfully', 'success');
             closeModal('settingsModal');
         }
 
@@ -816,14 +908,14 @@
                                 `CPU Multiplier: ${profile.coefficients.cpu_multiplier}x\n` +
                                 `Efficiency Tier: ${profile.coefficients.efficiency_tier}\n\n` +
                                 `Carbon emission estimates will now be adjusted based on this profile.`;
-                    alert(msg);
+                    showToast(msg, 'info');
                 } else {
-                    alert('Error: ' + data.error);
+                    showToast('Error: ' + data.error, 'error');
                 }
             } catch (error) {
-                alert('Failed to calibrate: ' + error.message);
+                showToast('Failed to calibrate: ' + error.message, 'error');
             } finally {
-                location.reload();
+                setTimeout(() => location.reload(), 3000);
             }
         }
 
@@ -841,11 +933,11 @@
                 if (!response.ok) throw new Error(`Failed to rescan: ${response.status}`);
                 
                 const result = await response.json();
-                alert(`✓ Rescan initiated for "${projectName}"`);
+                showToast(`✓ Rescan initiated for "${projectName}"`, 'success');
                 setTimeout(() => location.reload(), 1000);
             } catch (error) {
                 console.error('Rescan error:', error);
-                alert(`✗ Failed to rescan project: ${error.message}`);
+                showToast(`✗ Failed to rescan project: ${error.message}`, 'error');
             }
         }
 
@@ -867,11 +959,11 @@
                 
                 if (!response.ok) throw new Error(`Failed to delete: ${response.status}`);
                 
-                alert(`✓ Project "${projectName}" deleted successfully`);
+                showToast(`✓ Project "${projectName}" deleted successfully`, 'success');
                 setTimeout(() => location.reload(), 500);
             } catch (error) {
                 console.error('Delete error:', error);
-                alert(`✗ Failed to delete project: ${error.message}`);
+                showToast(`✗ Failed to delete project: ${error.message}`, 'error');
             }
         }
 
@@ -923,10 +1015,13 @@
             }, 1000);
         });
         socket.on('scan_error', (data) => {
-            alert('Scan Error: ' + data.error);
+            showToast('Scan Error: ' + data.error, 'error');
             const modal = document.getElementById('progress-modal');
             if (modal) modal.style.display = 'none';
         });
     </script>
+
+    <div id="toast-container" class="toast-container"></div>
+
 </body>
 </html>
