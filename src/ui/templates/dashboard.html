@@ -1033,6 +1033,98 @@
             color: var(--text-dark);
         }
     </style>
+
+    <style>
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            min-width: 250px;
+            padding: 16px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: slideIn 0.3s ease-out forwards;
+            opacity: 0;
+            transform: translateY(100%);
+        }
+        .toast.success {
+            background-color: #10b981;
+        }
+        .toast.error {
+            background-color: #ef4444;
+        }
+        .toast.info {
+            background-color: #3b82f6;
+        }
+        .toast.hiding {
+            animation: slideOut 0.3s ease-in forwards;
+        }
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes slideOut {
+            to {
+                opacity: 0;
+                transform: translateY(100%);
+            }
+        }
+        .toast-close {
+            cursor: pointer;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        function showToast(message, type = 'info', duration = 3000) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            const msgSpan = document.createElement('span');
+            msgSpan.innerText = message;
+
+            const closeBtn = document.createElement('span');
+            closeBtn.className = 'toast-close';
+            closeBtn.innerHTML = '&times;';
+            closeBtn.onclick = () => {
+                toast.classList.add('hiding');
+                setTimeout(() => toast.remove(), 300);
+            };
+
+            toast.appendChild(msgSpan);
+            toast.appendChild(closeBtn);
+            container.appendChild(toast);
+
+            if (duration > 0) {
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.classList.add('hiding');
+                        setTimeout(() => {
+                            if (toast.parentElement) toast.remove();
+                        }, 300);
+                    }
+                }, duration);
+            }
+        }
+    </script>
+
 </head>
 
 <body>
@@ -1734,7 +1826,7 @@
             const projectNames = input.split(',').map(name => name.trim()).filter(name => name);
 
             if (projectNames.length < 2) {
-                alert('Please enter at least 2 project names');
+                showToast('Please enter at least 2 project names', 'info');
                 return;
             }
 
@@ -1853,12 +1945,12 @@
             const branch = document.getElementById('scan-branch').value;
 
             if (!projectName || !language) {
-                alert('Please fill in project name and language');
+                showToast('Please fill in project name and language', 'info');
                 return;
             }
 
             if (!gitUrl && !localPath) {
-                alert('Please provide either a Git URL or local path');
+                showToast('Please provide either a Git URL or local path', 'info');
                 return;
             }
 
@@ -1894,7 +1986,7 @@
                 }
 
                 const result = await response.json();
-                alert(`✓ Scan initiated for ${projectName}\\n\\nType: ${result.scan_type}\\nStatus: ${result.status}`);
+                showToast(`✓ Scan initiated for ${projectName}\\n\\nType: ${result.scan_type}\\nStatus: ${result.status}`, 'success');
                 closeScanModal();
                 updateCurrentProject(projectName, gitUrl || localPath, language);
 
@@ -1902,7 +1994,7 @@
                 setTimeout(() => location.reload(), 1000);
             } catch (error) {
                 console.error('Scan error:', error);
-                alert(`✗ Scan failed: ${error.message}`);
+                showToast(`✗ Scan failed: ${error.message}`, 'error');
             } finally {
                 scanButton.disabled = false;
                 scanButton.textContent = originalText;
@@ -1983,8 +2075,8 @@
         }
 
         function refreshCurrentProject() {
-            alert('Refreshing project data...\\n\\nThis will reload the current project\'s scan results and metrics.');
-            location.reload();
+            showToast('Refreshing project data...\\n\\nThis will reload the current project\'s scan results and metrics.', 'info');
+            setTimeout(() => location.reload(), 2000);
         }
 
         async function calibrateSystem() {
@@ -2010,14 +2102,14 @@
                                 `CPU Multiplier: ${profile.coefficients.cpu_multiplier}x\\n` +
                                 `Efficiency Tier: ${profile.coefficients.efficiency_tier}\\n\\n` +
                                 `Carbon emission estimates will now be adjusted based on this profile.`;
-                    alert(msg);
+                    showToast(msg, 'info');
                 } else {
-                    alert('Error: ' + data.error);
+                    showToast('Error: ' + data.error, 'error');
                 }
             } catch (error) {
-                alert('Failed to calibrate: ' + error.message);
+                showToast('Failed to calibrate: ' + error.message, 'error');
             } finally {
-                location.reload();
+                setTimeout(() => location.reload(), 3000);
             }
         }
 
@@ -2044,11 +2136,11 @@
 
                 if (!response.ok) throw new Error(`Failed to delete: ${response.status}`);
 
-                alert(`✓ Project "${projectName}" deleted successfully`);
+                showToast(`✓ Project "${projectName}" deleted successfully`, 'success');
                 setTimeout(() => location.reload(), 500);
             } catch (error) {
                 console.error('Delete error:', error);
-                alert(`✗ Failed to delete project: ${error.message}`);
+                showToast(`✗ Failed to delete project: ${error.message}`, 'error');
             }
         }
 
@@ -2066,11 +2158,11 @@
                 if (!response.ok) throw new Error(`Failed to rescan: ${response.status}`);
 
                 const result = await response.json();
-                alert(`✓ Rescan initiated for "${projectName}"`);
+                showToast(`✓ Rescan initiated for "${projectName}"`, 'success');
                 setTimeout(() => location.reload(), 1000);
             } catch (error) {
                 console.error('Rescan error:', error);
-                alert(`✗ Failed to rescan project: ${error.message}`);
+                showToast(`✗ Failed to rescan project: ${error.message}`, 'error');
             }
         }
 
@@ -2088,11 +2180,11 @@
                 if (!response.ok) throw new Error(`Failed to clear: ${response.status}`);
 
                 const result = await response.json();
-                alert(`✓ Project "${projectName}" cleared and ready for fresh scan`);
+                showToast(`✓ Project "${projectName}" cleared and ready for fresh scan`, 'success');
                 setTimeout(() => location.reload(), 500);
             } catch (error) {
                 console.error('Clear error:', error);
-                alert(`✗ Failed to clear project: ${error.message}`);
+                showToast(`✗ Failed to clear project: ${error.message}`, 'error');
             }
         }
 
@@ -2279,11 +2371,14 @@
             }, 1000);
         });
         socket.on('scan_error', (data) => {
-            alert('Scan Error: ' + data.error);
+            showToast('Scan Error: ' + data.error, 'error');
             const modal = document.getElementById('progress-modal');
             if (modal) modal.style.display = 'none';
         });
     </script>
+
+    <div id="toast-container" class="toast-container"></div>
+
 </body>
 
 </html>
