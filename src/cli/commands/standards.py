@@ -1,7 +1,8 @@
 import sys
+import hashlib
 import click
 from src.standards.registry import StandardsRegistry
-from src.standards.sync_engine import StandardsSyncEngine, _STALE_THRESHOLD_DAYS
+from src.standards.sync_engine import StandardsSyncEngine, _STALE_THRESHOLD_DAYS, _SOURCE_MAP
 
 
 @click.group()
@@ -171,3 +172,84 @@ def standards_check(max_age_days, fail_on_stale):
             sys.exit(1)
     else:
         click.echo("[OK] All standards are fresh.")
+
+
+@standards.command('diff')
+@click.argument('source')
+@click.option(
+    '--timeout', default=15, type=int, show_default=True,
+    help='HTTP timeout in seconds for fetching remote content.'
+)
+def standards_diff(source, timeout):
+    """Compare cached version of SOURCE against live remote content.
+
+    Shows whether the remote has changed since the last sync, the hash
+    difference, and a byte-size delta.
+
+    SOURCE must be one of: gsf, ecocode, owasp, cwe, epss
+
+    Example:
+      green-ai standards diff owasp
+      green-ai standards diff cwe
+    """
+    if source not in _SOURCE_MAP:
+        click.echo(
+            f"[ERROR] Unknown source '{source}'. "
+            f"Valid: {', '.join(_SOURCE_MAP.keys())}",
+            err=True
+        )
+        sys.exit(1)
+
+    engine = StandardsSyncEngine(timeout=timeout)
+    spec = _SOURCE_MAP[source]
+
+    # Load cached version
+    cached = engine.get_cached(source)
+    entry = engine.manifest.entries.get(source)
+    cached_hash = entry.content_hash if entry else None
+    cached_size = entry.size_bytes if entry else 0
+    cached_version = entry.version_tag if entry else None
+
+    click.echo(f"\n=== Standards Diff: {spec.display_name} ===\n")
+
+    if cached is None:
+        click.echo("[!] No cached version. Run: green-ai standards sync")
+        sys.exit(1)
+
+    click.echo(f"  Cached version : {cached_version or '—'}")
+    click.echo(f"  Cached hash    : {cached_hash or '—'}")
+    click.echo(f"  Cached size    : {cached_size:,} bytes")
+    click.echo(f"  Last sync      : {entry.last_sync if entry else 'never'}")
+    click.echo()
+
+    # Fetch live version
+    click.echo(f"  Fetching live from {spec.url[:60]}...")
+    try:
+        import requests as _req
+        headers = {"Accept": "application/vnd.github.v3+json"}
+        resp = _req.get(spec.url, headers=headers, timeout=timeout)
+        resp.raise_for_status()
+        live_raw = resp.content
+    except Exception as exc:
+        click.echo(f"  [FAIL] Could not fetch live content: {exc}", err=True)
+        sys.exit(1)
+
+    live_hash = hashlib.sha256(live_raw).hexdigest()
+    live_size = len(live_raw)
+
+    click.echo(f"  Live hash      : {live_hash}")
+    click.echo(f"  Live size      : {live_size:,} bytes")
+    click.echo()
+
+    if live_hash == cached_hash:
+        click.echo("[OK] No changes — cached version matches live remote.")
+    else:
+        size_delta = live_size - cached_size
+        sign = "+" if size_delta >= 0 else ""
+        click.echo(
+            f"[CHANGED] Remote has new content since last sync.\n"
+            f"  Size delta : {sign}{size_delta:,} bytes\n"
+            f"  Old hash   : {(cached_hash or '—')[:16]}…\n"
+            f"  New hash   : {live_hash[:16]}…\n\n"
+            f"  Run: green-ai standards sync --source {source} --force"
+        )

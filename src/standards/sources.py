@@ -4,10 +4,12 @@ Handles fetching and parsing of green software standards from remote sources.
 Extended (EPIC-29) with OWASP Top 10, CWE/MITRE, and EPSS sources.
 """
 
+import io
 import json
 import re
 import requests
 import yaml
+import zipfile
 from abc import ABC, abstractmethod
 from typing import List, Dict
 
@@ -252,9 +254,10 @@ class CWESource(StandardSource):
         return "cwe"
 
     def fetch(self) -> List[StandardRule]:
-        # CWE JSON zip is large; use embedded fallback directly for offline-first
-        # approach. Full zip parsing is opt-in via force sync.
-        entries = self._FALLBACK
+        """Fetch CWE data from MITRE zip; fall back to embedded Top 25."""
+        entries = self._fetch_from_zip()
+        if not entries:
+            entries = self._FALLBACK
         rules = []
         for entry in entries:
             rules.append(StandardRule(
@@ -268,6 +271,56 @@ class CWESource(StandardSource):
                 source="CWE"
             ))
         return rules
+
+    def _fetch_from_zip(self) -> List[dict]:
+        """Download and parse the MITRE CWE JSON zip.
+
+        Extracts Weakness entries from the top-level JSON file.
+        Returns empty list on any failure so the caller uses the fallback.
+        """
+        try:
+            resp = requests.get(self._URL, timeout=30, stream=True)
+            resp.raise_for_status()
+            raw = resp.content
+        except requests.RequestException:
+            return []
+
+        try:
+            with zipfile.ZipFile(io.BytesIO(raw)) as zf:
+                json_names = [n for n in zf.namelist() if n.endswith('.json')]
+                if not json_names:
+                    return []
+                with zf.open(json_names[0]) as jf:
+                    data = json.load(jf)
+        except (zipfile.BadZipFile, json.JSONDecodeError, KeyError):
+            return []
+
+        entries = []
+        try:
+            weaknesses = (
+                data.get("Weakness_Catalog", {})
+                    .get("Weaknesses", {})
+                    .get("Weakness", [])
+            )
+            for w in weaknesses[:200]:  # cap at 200 to limit memory usage
+                cwe_id = f"CWE-{w.get('@ID', '0')}"
+                name = w.get("@Name", "Unknown")
+                desc = w.get("Description", name)
+                # Classify severity by likelihood/impact if available
+                severity = "major"
+                likelihood = w.get("Likelihood_Of_Exploit", "").lower()
+                if likelihood in ("high", "very high"):
+                    severity = "critical"
+                elif likelihood in ("low", "very low"):
+                    severity = "minor"
+                entries.append({
+                    "id": cwe_id, "name": name,
+                    "description": desc, "severity": severity,
+                })
+        except (TypeError, AttributeError):
+            return []
+
+        return entries if entries else []
 
 
 class EPSSSource(StandardSource):
