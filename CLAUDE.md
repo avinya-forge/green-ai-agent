@@ -128,9 +128,11 @@ Before marking any task done, apply the triad:
 ## Dependency Constraints
 
 - `pydantic-core==2.41.5` — pinned exactly (pydantic 2.12.5 requires this exact version)
-- `python-socketio==2.0.1` — ASGI mode for FastAPI
-- No eventlet or Flask (fully migrated to FastAPI/Uvicorn)
-- tree-sitter bindings must match `tree-sitter==0.24.0+`
+- `fastapi==0.136.0` + `starlette==1.0.0` — pinned; Starlette 1.0 changed `TemplateResponse` signature
+- `python-socketio==5.16.1` — ASGI mode for FastAPI; pinned to avoid silent API breakage
+- `uvicorn[standard]==0.45.0` — pinned ASGI server
+- No Flask, no eventlet (fully migrated to FastAPI/Uvicorn as of v0.7.0)
+- tree-sitter bindings must match `tree-sitter>=0.24.0`
 
 ## Common Pitfalls
 

@@ -1,37 +1,18 @@
-# Strict folder protection: Only allow canonical documentation files
-# Reject all other files to maintain documentation cleanliness
+# Allow only canonical documentation files — flat structure
+# All other files in docs/ are rejected
 
-# Deny all files by default
 *
 
-# Allow .gitignore itself
 !.gitignore
 
-# API Contracts
+# Flat canonical docs
+!roadmap.md
+!backlog.md
+!standards.md
+!architecture.md
+!release.md
+
+# API contracts
 !api/
 !api/swagger.yaml
 !api/mock_data.json
-
-# SSOT
-!planning/
-!planning/backlog.md
-!planning/map.md
-!planning/doubts.md
-
-!architecture/
-!architecture/vision.md
-!architecture/arch.md
-!architecture/decisions.md
-
-!testing/
-!testing/test-cases.md
-!testing/coverage.md
-
-!release/
-!release/release-notes.md
-!release/metrics.md
-
-!rules/
-!rules/standards.md
-!rules/hygiene.md
-!rules/habits.md

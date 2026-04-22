@@ -140,9 +140,9 @@ async def dashboard(request: Request):
     if state.last_scan_results:
         insights = state.generate_insights(state.last_scan_results)
         return templates.TemplateResponse(
-            "dashboard.html",
-            {
-                "request": request,
+            request=request,
+            name="dashboard.html",
+            context={
                 "results": state.last_scan_results,
                 "insights": insights,
                 "charts": state.last_charts
@@ -157,9 +157,9 @@ async def dashboard(request: Request):
         recent_projects = sorted(projects, key=lambda p: p.last_scan or "", reverse=True)[:5]
 
         return templates.TemplateResponse(
-            "landing.html",
-            {
-                "request": request,
+            request=request,
+            name="landing.html",
+            context={
                 "projects": projects,
                 "total_violations": total_violations,
                 "avg_grade": avg_grade,
@@ -497,12 +497,21 @@ async def api_remediation_preview(
     issue_id: str = Query(...)
 ):
     try:
-        # Read the original file content
-        with open(file, 'r', encoding='utf-8') as f:
+        from pathlib import Path
+        # Resolve and validate the file path to prevent path traversal
+        project_root = Path(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+        resolved = Path(file).resolve()
+        if not str(resolved).startswith(str(project_root)):
+            raise HTTPException(status_code=400, detail="File path outside project root")
+
+        if not resolved.is_file():
+            raise HTTPException(status_code=404, detail="File not found")
+
+        with open(resolved, 'r', encoding='utf-8') as f:
             content = f.read()
 
         engine = state.get_remediation_engine()
-        diff = engine.get_diff(file, content, line, issue_id)
+        diff = engine.get_diff(str(resolved), content, line, issue_id)
         description = engine.get_suggestion(issue_id)
 
         return {
@@ -510,6 +519,8 @@ async def api_remediation_preview(
             'diff': diff or "No automated fix available.",
             'description': description
         }
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"Error in api_remediation_preview: {e}", file=sys.stderr)
         raise HTTPException(status_code=500, detail="Internal Server Error")
