@@ -80,15 +80,34 @@ from src.utils.security import sanitize_path, sanitize_project_name, \
     type=click.Choice(['critical', 'high', 'medium', 'low'], case_sensitive=False),
     help='Exit with error code 1 if issues of this severity or higher are found.'
 )
+@click.option(
+    '--checks',
+    default='all',
+    show_default=True,
+    help=(
+        'Comma-separated check categories to run: '
+        'energy, security, quality, ai, all. '
+        'Example: --checks energy,ai'
+    )
+)
 def scan(
     paths, git_url, branch, project_name, language, config, disable_rule,
     enable_rule, runtime, profile, perf_profile, fix_all, fix_specific,
-    manual, export, format, output, telemetry, fail_on
+    manual, export, format, output, telemetry, fail_on, checks
 ):
     """Scan a codebase for green software violations.
 
     PATHS can be one or more local directories/files, or omitted if using
     --git-url.
+
+    Use --checks to limit which categories run:
+      energy     Energy efficiency + carbon rules (default)
+      security   SAST security rules (OWASP/CWE)
+      quality    Code quality and debt rules
+      ai         Sustainable AI usage analyzer (EPIC-28)
+      all        All categories (default)
+
+    Example: green-ai scan ./src --checks energy,ai
     """
     try:
         # Handle backward compatibility for --format and --output
@@ -150,6 +169,10 @@ def scan(
         config_loader = ConfigLoader(config)
         cfg = config_loader.load()
 
+        # Parse --checks into a list and inject into config
+        checks_list = [c.strip().lower() for c in checks.split(',') if c.strip()]
+        cfg['checks'] = checks_list
+
         # Override telemetry setting if flag is explicitly set
         import os
         if telemetry is False:
@@ -175,6 +198,9 @@ def scan(
             language=language, runtime=runtime, config_path=config,
             profile=profile
         )
+
+        # Inject checks list into scanner config so workers receive it
+        scanner.config['checks'] = checks_list
 
         # Apply CLI rule overrides if provided
         if disable_rule or enable_rule:
