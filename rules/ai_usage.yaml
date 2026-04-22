@@ -1,0 +1,208 @@
+# AI Sustainability Rules (EPIC-28)
+# Flags unsustainable AI/LLM SDK usage patterns across all major providers.
+# Source: Green Software Foundation AI guidelines + Anthropic sustainability docs
+#
+# Providers covered:
+#   Anthropic (claude-*)  |  OpenAI (gpt-*, o1-*, o3-*)  |  Google (gemini-*)
+#   Azure OpenAI          |  AWS Bedrock                   |  Groq
+#   Ollama (local)        |  Mistral                       |  Cohere
+#   LangChain             |  LlamaIndex                    |  LiteLLM
+
+rules:
+
+  # ── Model Selection ──────────────────────────────────────────────────────────
+
+  - id: ai_overkill_model_in_loop
+    name: Heavy Model in Loop
+    description: >
+      Heavy AI model (opus, gpt-4, o1, gemini-ultra) called inside a loop.
+      Each iteration multiplies CO2 by N. Use a light model or batch API.
+    severity: major
+    category: ai_sustainability
+    languages: [python, javascript, typescript]
+    tags: [ai, energy, carbon, model-selection]
+    co2_tier: heavy
+    co2_estimate_g_per_1k_tokens: 10.0
+    remediation: >
+      Replace with claude-haiku, gpt-4o-mini, or gemini-flash for batch work.
+      Use the Batch API (Anthropic/OpenAI) for offline processing.
+    source: GSF-AI
+
+  - id: ai_overkill_model_classification
+    name: Heavy Model for Classification/Extraction
+    description: >
+      A heavy model handles a simple classify/extract/label/sentiment task.
+      Light models match accuracy at ~3% of the CO2 cost.
+    severity: major
+    category: ai_sustainability
+    languages: [python, javascript, typescript]
+    tags: [ai, energy, model-selection]
+    co2_tier: heavy
+    co2_estimate_g_per_1k_tokens: 10.0
+    remediation: >
+      Use claude-haiku-*, gpt-4o-mini, or gemini-flash for classification.
+      Benchmark first — smaller models often match accuracy on structured tasks.
+    source: GSF-AI
+
+  # ── Token Budget ─────────────────────────────────────────────────────────────
+
+  - id: ai_missing_max_tokens
+    name: No Token Budget Set
+    description: >
+      AI API call without max_tokens / max_output_tokens. Unbounded responses
+      waste tokens, increase latency, and emit unnecessary CO2.
+    severity: minor
+    category: ai_sustainability
+    languages: [python, javascript, typescript]
+    tags: [ai, energy, token-budget]
+    remediation: >
+      Always set max_tokens. For exploratory work: 512. For summaries: 256.
+      Use Anthropic's token counting API to profile actual usage first.
+    source: GSF-AI
+
+  - id: ai_streaming_disabled_large_output
+    name: Large Output Without Streaming
+    description: >
+      max_tokens >= 500 but stream=False. Large buffered responses increase
+      memory pressure, GC pauses, and time-to-first-token latency.
+    severity: minor
+    category: ai_sustainability
+    languages: [python, javascript, typescript]
+    tags: [ai, performance, memory]
+    remediation: >
+      Enable stream=True for outputs > 500 tokens. Process chunks as they arrive.
+    source: GSF-AI
+
+  # ── Prompt Efficiency ────────────────────────────────────────────────────────
+
+  - id: ai_no_prompt_caching
+    name: No Prompt Caching (Anthropic)
+    description: >
+      Anthropic messages.create called without cache_control on the system
+      prompt. Prompt caching reduces input token cost by up to 90% for
+      repeated prompts and cuts CO2 proportionally.
+    severity: minor
+    category: ai_sustainability
+    languages: [python, javascript, typescript]
+    tags: [ai, energy, caching, anthropic]
+    providers: [anthropic]
+    remediation: >
+      Add cache_control: {"type": "ephemeral"} to your system prompt block.
+      Cache hits save ~90% input token processing CO2.
+      Minimum 1024 tokens required for cache eligibility.
+    source: Anthropic-Docs
+
+  - id: ai_redundant_system_prompt_in_loop
+    name: System Prompt Rebuilt in Loop
+    description: >
+      The system prompt dict/string is constructed inside a loop.
+      Static prompts should be defined once outside the loop and cached.
+    severity: major
+    category: ai_sustainability
+    languages: [python, javascript, typescript]
+    tags: [ai, energy, prompt-efficiency]
+    remediation: >
+      Move the system prompt definition outside the loop.
+      Use prompt caching (Anthropic) or a single pre-built messages list.
+    source: GSF-AI
+
+  # ── API Call Patterns ────────────────────────────────────────────────────────
+
+  - id: ai_call_in_loop
+    name: AI API Call Inside Loop
+    description: >
+      LLM API called per-iteration in a loop. For N items this is N × API
+      latency and N × CO2. Use batch APIs or vector search instead.
+    severity: critical
+    category: ai_sustainability
+    languages: [python, javascript, typescript]
+    tags: [ai, energy, performance, api-efficiency]
+    remediation: >
+      Use Anthropic Batch API, OpenAI Batch API, or LiteLLM batch mode.
+      For retrieval tasks, replace per-item LLM calls with embeddings + vector search.
+    source: GSF-AI
+
+  - id: ai_no_retry_handling
+    name: No Retry/Backoff on AI API Call
+    description: >
+      AI API called without retry logic or error handling for rate limits.
+      Silent failures cause caller retries that multiply total API calls and CO2.
+    severity: minor
+    category: ai_sustainability
+    languages: [python, javascript, typescript]
+    tags: [ai, reliability, rate-limiting]
+    remediation: >
+      Use tenacity (@retry) or the SDK's built-in max_retries parameter.
+      Anthropic SDK: client = Anthropic(max_retries=3)
+      OpenAI SDK: client = OpenAI(max_retries=3)
+    source: GSF-AI
+
+  # ── Security & Privacy ───────────────────────────────────────────────────────
+
+  - id: ai_pii_in_prompt
+    name: PII Pattern in AI Prompt
+    description: >
+      A PII pattern (SSN, credit card, password, API key) appears to be
+      interpolated into a prompt string sent to an external AI API.
+      This is a data privacy violation and inflates prompt token cost.
+    severity: critical
+    category: ai_sustainability
+    languages: [python, javascript, typescript]
+    tags: [ai, security, privacy, pii]
+    remediation: >
+      Strip or pseudonymize PII before sending to any external LLM API.
+      Use a local model (Ollama) for processing sensitive data.
+      Audit prompts with a PII detection library (presidio, spaCy NER).
+    source: OWASP-LLM01
+
+  - id: ai_prompt_injection_risk
+    name: Unsanitized User Input in AI Prompt
+    description: >
+      Raw user input (request params, form data, stdin) is directly
+      interpolated into an AI prompt without sanitization.
+      Adversarial prompts can hijack AI behaviour and inflate token usage.
+    severity: critical
+    category: ai_sustainability
+    languages: [python, javascript, typescript]
+    tags: [ai, security, prompt-injection, owasp-llm01]
+    remediation: >
+      Validate and escape user input before adding to prompts.
+      Use a structured system/user message separation — never concatenate
+      user content directly into the system prompt.
+      Consider a prompt firewall (LLM Guard, Rebuff).
+    source: OWASP-LLM01
+
+  # ── Runtime Patterns ─────────────────────────────────────────────────────────
+
+  - id: ai_sync_client_in_async
+    name: Sync AI Client in Async Function
+    description: >
+      Synchronous AI client instantiated inside an async function blocks
+      the event loop during the HTTP call, preventing concurrent requests.
+    severity: major
+    category: ai_sustainability
+    languages: [python]
+    tags: [ai, performance, async]
+    remediation: >
+      Replace with the async client:
+        anthropic.AsyncAnthropic()
+        openai.AsyncOpenAI()
+        AsyncGroq()
+      Await the API call to allow the event loop to handle other tasks.
+    source: GSF-AI
+
+  - id: ai_unvalidated_output
+    name: AI Output Used Without Validation
+    description: >
+      LLM response content accessed directly without try/except, schema
+      validation, or conditional checks. LLM outputs are non-deterministic
+      and can return malformed JSON, empty strings, or unexpected structure.
+    severity: major
+    category: ai_sustainability
+    languages: [python, javascript, typescript]
+    tags: [ai, reliability, validation]
+    remediation: >
+      Wrap response parsing in try/except. For JSON: use json.loads() in a
+      try block. Use Pydantic or zod schemas to validate response structure.
+      Implement fallback behaviour for parse failures to avoid retry storms.
+    source: OWASP-LLM02

@@ -3,11 +3,20 @@ import ast
 from src.core.remediation.engine import RemediationEngine
 from src.core.analyzer import EmissionAnalyzer
 from src.core.detectors import detect_violations
+from src.core.detectors.ai_usage_detector import scan_file_for_ai_usage
 from src.core.cache import DiskCache
 import os
 
 # Global cache instance for worker reuse
 _disk_cache_instance = None
+
+
+def _checks_include(config: Dict, check: str) -> bool:
+    """Return True if the given check category is enabled in config."""
+    checks = config.get('checks', ['all'])
+    if isinstance(checks, str):
+        checks = [checks]
+    return 'all' in checks or check in checks
 
 
 def scan_file_worker(
@@ -106,6 +115,38 @@ def scan_file_worker(
                             'name': rule.get('name', rule_id)
                         }
                         issues.append(issue)
+
+            # AI sustainability analysis (EPIC-28)
+            if _checks_include(config, 'ai'):
+                ai_violations = scan_file_for_ai_usage(file_path)
+                for av in ai_violations:
+                    enabled_rules = config.get('rules', {}).get('enabled', [])
+                    disabled_rules = config.get('rules', {}).get('disabled', [])
+                    rule_id = av['rule_id']
+                    is_enabled = rule_id not in disabled_rules and (
+                        not enabled_rules or rule_id in enabled_rules
+                    )
+                    if is_enabled:
+                        issues.append({
+                            'id': rule_id,
+                            'type': 'ai_sustainability',
+                            'severity': av['severity'],
+                            'message': av['message'],
+                            'file': av['file'],
+                            'line': av['line'],
+                            'remediation': av.get('co2_note', ''),
+                            'ai_suggestion': None,
+                            'effort': 'Medium',
+                            'tags': ['ai', 'sustainability', av.get('provider', 'ai')],
+                            'carbon_impact': av.get('estimated_co2_g', 0) * 1e-6,
+                            'energy_factor': 1,
+                            'name': rule_id.replace('_', ' ').title(),
+                            'category': 'ai_sustainability',
+                            'co2_note': av.get('co2_note', ''),
+                            'provider': av.get('provider'),
+                            'model_tier': av.get('model_tier', 'unknown'),
+                            'estimated_co2_g': av.get('estimated_co2_g', 0),
+                        })
 
             # Analyze emissions
             metrics = analyzer.analyze_file(file_path, content)

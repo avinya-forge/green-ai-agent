@@ -1,39 +1,54 @@
 # Green-AI
-> To empower every developer to write energy-efficient code by default, making software sustainability as fundamental as performance and security.
+> Empower every developer to write energy-efficient code by default.
+
 ![Version](https://img.shields.io/badge/version-v0.9.1-blue.svg)
 
-## Pulse-Table
-| Milestone | Version | Phase | Status | Debt% |
-|-----------|---------|-------|--------|-------|
-| Stability Gate | v0.9.1 | Phase 2 | ACTIVE | Low |
+## Status
 
-## Visual-Index
-- **Config**: [Execution Logic](./scripts/skills.sh)
-- **Planning**:
-  - [Backlog](./docs/planning/backlog.md)
-  - [Map](./docs/planning/map.md)
-  - [Doubts](./docs/planning/doubts.md)
-  - [Roadmap](./docs/planning/roadmap.md)
-- **Architecture**:
-  - [Vision](./docs/architecture/vision.md)
-  - [Architecture](./docs/architecture/arch.md)
-  - [Decisions](./docs/architecture/decisions.md)
-  - [System Design](./docs/architecture/system-design.md)
-- **Engineering**:
-  - [Conventions](./docs/engineering/conventions.md)
-- **Testing**:
-  - [Test Cases](./docs/testing/test-cases.md)
-  - [Coverage](./docs/testing/coverage.md)
-- **Release**:
-  - [Release Notes](./docs/release/release-notes.md)
-  - [Metrics](./docs/release/metrics.md)
-- **Rules**:
-  - [Standards](./docs/rules/standards.md)
-  - [Hygiene](./docs/rules/hygiene.md)
-  - [Habits](./docs/rules/habits.md)
+| Milestone | Version | Phase | State | Health |
+|---|---|---|---|---|
+| Stability Gate | v0.9.1 | 2 — Action & Expansion | ACTIVE | Green |
+
+## Docs
+
+| Document | Purpose |
+|---|---|
+| [roadmap.md](./docs/roadmap.md) | Phased roadmap and milestones |
+| [backlog.md](./docs/backlog.md) | Active task list by epic |
+| [standards.md](./docs/standards.md) | Coding standards, rules, and quality gates |
+| [architecture.md](./docs/architecture.md) | System design, decisions, and deployment |
+| [release.md](./docs/release.md) | Release notes and health metrics |
+| [CLAUDE.md](./CLAUDE.md) | Claude AI agent configuration |
 
 ## Quick Start
-**Current Active Milestone: [EPIC-00] STABILITY GATE**
-Resolving all known bugs, deprecations, and outdated dependencies before feature work resumes. Ensures the repository maintains a 94% Cleanliness Score and is fully prepared for Phase 2 feature expansion.
 
----
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Scan a directory
+python -m src.cli scan ./src
+
+# Start the dashboard
+python -m src.cli dashboard --host 0.0.0.0 --port 5000
+
+# Auto-fix with LLM
+python -m src.cli fix_ai ./src
+
+# Run tests
+python -m pytest tests/ -v
+
+# Docker
+docker-compose up
+```
+
+## Languages Supported
+
+Python · JavaScript · TypeScript · Java · Go · C#
+
+## Active Work
+
+**[EPIC-09] IDE Plugins** — VS Code extension + LSP server  
+**[EPIC-18] Audit** — Automated security test expansion  
+
+See [backlog.md](./docs/backlog.md) for full task list.

@@ -1,5 +1,8 @@
+import sys
+import hashlib
 import click
 from src.standards.registry import StandardsRegistry
+from src.standards.sync_engine import StandardsSyncEngine, _STALE_THRESHOLD_DAYS, _SOURCE_MAP
 
 
 @click.group()
@@ -42,7 +45,7 @@ def standards_disable(standard_name):
 
 @standards.command('update')
 def standards_update():
-    """Sync standards from online sources"""
+    """Sync standards from online sources (legacy alias for 'sync')"""
     registry = StandardsRegistry()
     result = registry.sync_standards()
     click.echo("[OK] Standards updated from online sources")
@@ -59,5 +62,194 @@ def standards_export(format):
         output = registry.export_rules_json()
     else:
         output = registry.export_rules_yaml()
-
     click.echo(output)
+
+
+# ── EPIC-29: Standards Sync Engine commands ───────────────────────────────────
+
+@standards.command('sync')
+@click.option('--source', default=None, help='Sync a specific source (gsf|ecocode|owasp|cwe|epss)')
+@click.option('--force', is_flag=True, default=False, help='Force sync even if cache is fresh')
+@click.option('--interval', default=24, type=int, show_default=True,
+              help='Sync interval in hours (controls cache freshness)')
+def standards_sync(source, force, interval):
+    """
+    Sync live standards from remote sources.
+
+    Sources: gsf, ecocode, owasp, cwe, epss
+
+    Fetched content is cached locally with SHA-256 hash verification.
+    Re-sync is skipped if the cache is fresher than --interval hours.
+    Use --force to bypass the interval check.
+    """
+    engine = StandardsSyncEngine(sync_interval_hours=interval)
+
+    if source:
+        try:
+            entry = engine.sync_source(source, force=force)
+        except ValueError as exc:
+            click.echo(f"[ERROR] {exc}", err=True)
+            sys.exit(1)
+        _print_sync_entry(entry)
+    else:
+        results = engine.sync_all(force=force)
+        click.echo("\n=== Standards Sync Results ===\n")
+        for entry in results.values():
+            _print_sync_entry(entry)
+
+    click.echo()
+    click.echo("Run 'green-ai standards versions' to see manifest details.")
+
+
+def _print_sync_entry(entry) -> None:
+    status = "[OK]" if entry.sync_ok else "[FAIL]"
+    click.echo(f"  {status} {entry.display_name}")
+    if entry.sync_ok:
+        click.echo(f"       version : {entry.version_tag}")
+        click.echo(f"       hash    : {entry.content_hash[:16]}…" if entry.content_hash else "")
+        click.echo(f"       size    : {entry.size_bytes:,} bytes")
+        click.echo(f"       synced  : {entry.last_sync}")
+    else:
+        click.echo(f"       error   : {entry.error}")
+
+
+@standards.command('versions')
+def standards_versions():
+    """
+    Show version manifest for all synced standards.
+
+    Displays last sync timestamp, content hash, and size for each source.
+    """
+    engine = StandardsSyncEngine()
+    rows = engine.versions()
+
+    click.echo("\n=== Standards Version Manifest ===\n")
+    click.echo(f"{'Source':<12} {'Display Name':<42} {'Version':<12} {'Hash':<16} {'OK':<6} {'Last Sync'}")
+    click.echo("-" * 110)
+    for row in rows:
+        ok = "YES" if row['sync_ok'] else "NO"
+        version = row['version_tag'] or "—"
+        h = row['content_hash'] or "—"
+        last = row['last_sync'] or "never"
+        click.echo(
+            f"{row['name']:<12} {row['display_name']:<42} {version:<12} {h:<16} {ok:<6} {last}"
+        )
+    click.echo()
+
+
+@standards.command('check')
+@click.option('--max-age-days', default=_STALE_THRESHOLD_DAYS, type=int, show_default=True,
+              help='Maximum age in days before a source is considered stale')
+@click.option('--fail-on-stale', is_flag=True, default=False,
+              help='Exit with code 1 if any source is stale (for CI gates)')
+def standards_check(max_age_days, fail_on_stale):
+    """
+    Check whether synced standards are up to date.
+
+    Use --fail-on-stale in CI pipelines to gate builds on fresh standards.
+    Exit code 1 when stale sources are found and --fail-on-stale is set.
+
+    Example (CI):
+      green-ai standards check --max-age-days 7 --fail-on-stale
+    """
+    engine = StandardsSyncEngine()
+    stale_map = engine.check_stale(max_age_days=max_age_days)
+
+    click.echo(f"\n=== Standards Freshness Check (max age: {max_age_days} days) ===\n")
+    any_stale = False
+    for name, is_stale in stale_map.items():
+        entry = engine.manifest.entries.get(name)
+        last = entry.last_sync if entry and entry.last_sync else "never"
+        flag = "[STALE]" if is_stale else "[OK]   "
+        if is_stale:
+            any_stale = True
+        click.echo(f"  {flag} {name:<12} last synced: {last}")
+
+    click.echo()
+    if any_stale:
+        click.echo("[!] Some standards are stale. Run: green-ai standards sync")
+        if fail_on_stale:
+            sys.exit(1)
+    else:
+        click.echo("[OK] All standards are fresh.")
+
+
+@standards.command('diff')
+@click.argument('source')
+@click.option(
+    '--timeout', default=15, type=int, show_default=True,
+    help='HTTP timeout in seconds for fetching remote content.'
+)
+def standards_diff(source, timeout):
+    """Compare cached version of SOURCE against live remote content.
+
+    Shows whether the remote has changed since the last sync, the hash
+    difference, and a byte-size delta.
+
+    SOURCE must be one of: gsf, ecocode, owasp, cwe, epss
+
+    Example:
+      green-ai standards diff owasp
+      green-ai standards diff cwe
+    """
+    if source not in _SOURCE_MAP:
+        click.echo(
+            f"[ERROR] Unknown source '{source}'. "
+            f"Valid: {', '.join(_SOURCE_MAP.keys())}",
+            err=True
+        )
+        sys.exit(1)
+
+    engine = StandardsSyncEngine(timeout=timeout)
+    spec = _SOURCE_MAP[source]
+
+    # Load cached version
+    cached = engine.get_cached(source)
+    entry = engine.manifest.entries.get(source)
+    cached_hash = entry.content_hash if entry else None
+    cached_size = entry.size_bytes if entry else 0
+    cached_version = entry.version_tag if entry else None
+
+    click.echo(f"\n=== Standards Diff: {spec.display_name} ===\n")
+
+    if cached is None:
+        click.echo("[!] No cached version. Run: green-ai standards sync")
+        sys.exit(1)
+
+    click.echo(f"  Cached version : {cached_version or '—'}")
+    click.echo(f"  Cached hash    : {cached_hash or '—'}")
+    click.echo(f"  Cached size    : {cached_size:,} bytes")
+    click.echo(f"  Last sync      : {entry.last_sync if entry else 'never'}")
+    click.echo()
+
+    # Fetch live version
+    click.echo(f"  Fetching live from {spec.url[:60]}...")
+    try:
+        import requests as _req
+        headers = {"Accept": "application/vnd.github.v3+json"}
+        resp = _req.get(spec.url, headers=headers, timeout=timeout)
+        resp.raise_for_status()
+        live_raw = resp.content
+    except Exception as exc:
+        click.echo(f"  [FAIL] Could not fetch live content: {exc}", err=True)
+        sys.exit(1)
+
+    live_hash = hashlib.sha256(live_raw).hexdigest()
+    live_size = len(live_raw)
+
+    click.echo(f"  Live hash      : {live_hash}")
+    click.echo(f"  Live size      : {live_size:,} bytes")
+    click.echo()
+
+    if live_hash == cached_hash:
+        click.echo("[OK] No changes — cached version matches live remote.")
+    else:
+        size_delta = live_size - cached_size
+        sign = "+" if size_delta >= 0 else ""
+        click.echo(
+            f"[CHANGED] Remote has new content since last sync.\n"
+            f"  Size delta : {sign}{size_delta:,} bytes\n"
+            f"  Old hash   : {(cached_hash or '—')[:16]}…\n"
+            f"  New hash   : {live_hash[:16]}…\n\n"
+            f"  Run: green-ai standards sync --source {source} --force"
+        )
