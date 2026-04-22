@@ -349,6 +349,52 @@ ESG = 0.4×E + 0.4×S + 0.2×G  (weights configurable)
 
 ---
 
+## EPIC-28: Sustainable AI Usage Analyzer (v1.0.4)
+
+**Goal:** Detect AI/LLM SDK usage across all major providers and flag 12 unsustainable patterns — overkill model selection, missing token budgets, no prompt caching, API calls in loops, PII leakage, prompt injection, unvalidated output, and more. Estimate CO2 per detected call by model tier.
+
+**Market gap:** No static analysis tool currently scans for unsustainable AI usage. As LLM calls become ubiquitous, this is the next frontier of energy-aware code review.
+
+**Providers supported:** Anthropic, OpenAI, LangChain, Ollama, AWS Bedrock, Vertex AI, Groq, Mistral, Cohere, LlamaIndex, LiteLLM, Google Gemini.
+
+| Task | Spec | Status |
+|---|---|---|
+| AI-001 | `src/core/detectors/ai_usage_detector.py` — text/regex detector for AI SDK imports and 12 unsustainable patterns. `AIUsageDetector.detect_all()` returns `AIViolation` list. CO2 tier estimate per model class. | **DONE** |
+| AI-002 | `rules/ai_usage.yaml` — 12 YAML rule definitions (ai_call_in_loop, ai_missing_max_tokens, ai_no_prompt_caching, ai_pii_in_prompt, ai_prompt_injection_risk, ai_sync_client_in_async, ai_unvalidated_output, ai_overkill_model_in_loop, ai_overkill_model_classification, ai_redundant_system_prompt_in_loop, ai_no_retry_handling, ai_streaming_disabled_large_output). Source tags: GSF-AI, OWASP-LLM01/02. | **DONE** |
+| AI-003 | Tests: `tests/test_ai_usage_detector.py` — 28 tests covering provider detection, all 12 patterns, violation metadata, file scanning. 0 lint errors. | **DONE** |
+| AI-004 | Wire `AIUsageDetector` into the main scan flow via `scan_file_worker`. Add `category: ai_sustainability` to violations so they appear in dashboard and exports. | TODO |
+| AI-005 | Add `--checks ai` CLI flag to `src/cli/commands/scan.py`. Update `.green-ai.yaml` schema with `checks.ai: true/false`. | TODO |
+| AI-006 | Add AI sustainability section to the dashboard: per-file AI call count, CO2 estimate, top patterns. Add `GET /api/ai` endpoint returning AI violation summary. | TODO |
+| AI-007 | Add AI violations to all export formats (CSV column, JSON array, HTML section, PDF section). Include total estimated CO2 from AI usage. | TODO |
+| AI-008 | Add JS/TS pattern support: detect `@anthropic-ai/sdk`, `openai` npm imports and equivalent unsustainable patterns in TypeScript/JavaScript AST context. | TODO |
+
+---
+
+## EPIC-29: Standards Sync Engine (v1.0.4)
+
+**Goal:** Automated fetch-validate-store pipeline for 5 live standards sources. Version manifest with SHA-256 hash verification, configurable sync interval, offline fallback, and a `fail_on_stale` CI gate. Like an antivirus database updater, but for code health standards.
+
+**Standards sources:**
+- `gsf` — Green Software Foundation Patterns
+- `ecocode` — ecoCode Rules (green-code-initiative)
+- `owasp` — OWASP Top 10 (2021, live)
+- `cwe` — CWE/MITRE Top 25 Most Dangerous Weaknesses
+- `epss` — FIRST.org EPSS Exploit Probability Scores (top 100)
+
+| Task | Spec | Status |
+|---|---|---|
+| STD-001 | `src/standards/sync_engine.py` — `StandardsSyncEngine` with version manifest (`manifest.json`), SHA-256 hash verification per source, configurable `sync_interval_hours`, offline fallback to cached content, `check_stale()` / `any_stale()` for CI gate. | **DONE** |
+| STD-002 | `src/standards/sources.py` — Extended with `OWASPTop10Source` (10 rules + embedded fallback), `CWESource` (25 CWE Top 25 rules + embedded fallback), `EPSSSource` (FIRST.org API, top 100 CVEs by exploit probability). | **DONE** |
+| STD-003 | `src/cli/commands/standards.py` — New commands: `green-ai standards sync [--source X] [--force] [--interval N]`, `green-ai standards versions` (manifest table), `green-ai standards check [--max-age-days N] [--fail-on-stale]`. | **DONE** |
+| STD-004 | Tests: `tests/test_standards_sync_engine.py` — 37 tests covering source registry, manifest persistence, hash verification, sync behaviour, offline fallback, stale check, versions output, OWASP/CWE/EPSS sources. All passing. | **DONE** |
+| STD-005 | Wire `StandardsSyncEngine.sync_all()` into the scan startup path. Add config key `standards.auto_sync: true` and `standards.sync_interval_hours: 24` to `.green-ai.yaml`. Log sync status at scan start. | TODO |
+| STD-006 | Add `fail_on_stale` support to CI command: `green-ai ci --fail-on-stale-standards`. Exits with code 2 if any standard is older than configured threshold. | TODO |
+| STD-007 | Add `GET /api/standards/versions` endpoint exposing manifest as JSON. Add standards freshness badge to dashboard header. | TODO |
+| STD-008 | Implement full CWE JSON zip download and parse in `CWESource.fetch()` for production (currently uses embedded Top 25 fallback). Cache parsed result. | TODO |
+| STD-009 | Add `green-ai standards diff <source>` CLI command — compares current cached version against live remote, showing added/removed rules since last sync. | TODO |
+
+---
+
 ## Completed Epics (Vaulted)
 
 | Epic | Completion |
@@ -390,6 +436,8 @@ ESG = 0.4×E + 0.4×S + 0.2×G  (weights configurable)
 | Phase 2 | Active TODO tasks | 32 |
 | Phase 2 | Bug fixes TODO | 2 (AUDIT-005, AUDIT-006) |
 | Phase 3 | New epics (EPIC-19–27) | 9 epics / 90 tasks |
-| All | Done (this milestone) | 7 |
+| Phase 3+ | EPIC-28 AI Usage Analyzer (AI-004–008) | 5 tasks |
+| Phase 3+ | EPIC-29 Standards Sync Engine (STD-005–009) | 5 tasks |
+| All | Done (this milestone) | 14 (EPIC-28 AI-001–003, EPIC-29 STD-001–004, BUG-001–006, AUDIT-004) |
 
-**Total available WU: 124** — above the 100 WU minimum threshold.
+**Total available WU: 134** — above the 100 WU minimum threshold.

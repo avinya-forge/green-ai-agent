@@ -193,8 +193,39 @@ No tool today combines:
 
 | Epic | Description | Target |
 |---|---|---|
-| EPIC-27: Baseline & Suppression | `green-ai baseline create` exports current violations as accepted baseline. New scans only report delta. Per-violation suppress with reason and expiry. | v1.0.3 |
-| EPIC-28: SBOM & Compliance | Generate CycloneDX and SPDX format SBOMs. License compliance report. Export for audit (SOC2, CSRD, ISO 14001). SCI (Software Carbon Intensity) score per GSF spec. | v1.0.3 |
+| EPIC-26: Baseline & Suppression | `green-ai baseline create` exports current violations as accepted baseline. New scans only report delta. Per-violation suppress with reason and expiry. | v1.0.3 |
+| EPIC-27: SBOM & Compliance | Generate CycloneDX and SPDX format SBOMs. License compliance report. Export for audit (SOC2, CSRD, ISO 14001). SCI (Software Carbon Intensity) score per GSF spec. | v1.0.3 |
+
+### Milestone M10 — Sustainable AI & Living Standards (v1.0.4)
+**Gate:** AI usage detector covers 10+ providers | Standards sync operational with ≥4 sources | Auto-update verified in CI
+
+#### Why This Milestone Exists
+
+AI-generated and AI-assisted code is now ubiquitous. But **using AI sustainably is itself a code quality problem** — wasteful model choices, missing token budgets, redundant API calls in loops, PII leaking into prompts. No tool currently scans for this.
+
+Simultaneously, every standard this tool enforces (GSF, OWASP, CWE, ecoCode) is a **living document** that updates. Without an automated sync mechanism, rules become stale — like an antivirus with a year-old database.
+
+| Epic | Description | Target |
+|---|---|---|
+| EPIC-28: Sustainable AI Usage Analyzer | Detect AI/LLM SDK usage (Anthropic, OpenAI, LangChain, Ollama, Bedrock, Vertex, Groq, Mistral, Cohere, LlamaIndex, LiteLLM). Flag 12 unsustainable patterns: overkill model selection, missing token budget, no prompt caching, API calls in loops, PII in prompts, prompt injection risk, unvalidated output, sync client in async context. Estimate CO2 per detected call by model tier. | v1.0.4 |
+| EPIC-29: Standards Sync Engine | Automated fetch-validate-store pipeline for live standards: GSF patterns, ecoCode rules, OWASP Top 10, CWE/MITRE, EPSS. Version manifest with hash verification. `green-ai standards sync/list/versions/check` CLI. Auto-sync on scan start (configurable interval, offline fallback). `fail_on_stale` CI gate. | v1.0.4 |
+
+**Supported AI providers (EPIC-28):**
+```
+Anthropic (claude-*)  │  OpenAI (gpt-*, o1-*, o3-*)  │  Google (gemini-*)
+Azure OpenAI          │  AWS Bedrock                   │  Groq
+Ollama (local)        │  Mistral                       │  Cohere
+LangChain             │  LlamaIndex                    │  LiteLLM (universal)
+```
+
+**Standards sources (EPIC-29):**
+```
+GSF Patterns       → api.github.com/repos/Green-Software-Foundation/patterns
+ecoCode Rules      → api.github.com/repos/green-code-initiative/ecoCode
+OWASP Top 10       → github.com/OWASP/www-project-top-ten
+CWE/MITRE          → cwe.mitre.org/data/json/ (NVD data feed)
+EPSS Scores        → api.first.org/data/v1/epss (exploit probability)
+```
 
 ---
 
