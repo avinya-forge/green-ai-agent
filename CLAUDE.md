@@ -2,11 +2,16 @@
 
 ## Project Context
 
-Green-AI is an energy-efficiency code scanner that detects and remediates inefficient code patterns across Python, JavaScript, TypeScript, Java, Go, and C#. It uses AST-based analysis (tree-sitter), a YAML-driven rule engine, a FastAPI web dashboard, LLM-powered auto-fix, and CI/CD integrations.
+Green-AI is a code intelligence platform covering the full ESG+S spectrum:
+- **E — Environmental:** Energy efficiency rules (GSF/ecoCode), carbon emissions model, SCI scoring
+- **S — Security:** SAST (OWASP Top 10), secret scanning, dependency/SCA, supply chain
+- **G — Governance:** Code quality, technical debt, duplication, license compliance, SBOM
+
+It uses AST-based analysis (tree-sitter), a YAML-driven rule engine, LLM-powered auto-fix (the core differentiator), a FastAPI web dashboard, and CI/CD integrations. No other tool on the market combines all four dimensions in a single open-source tool.
 
 **Current version:** v0.9.1  
-**Current phase:** Phase 2 — Action & Expansion (ACTIVE)  
-**Active milestone:** EPIC-00 STABILITY GATE (94% cleanliness score target)
+**Current phase:** Phase 2 — Action & Expansion (ACTIVE) → Phase 3 (Security, Quality & ESG) next  
+**Active milestone:** M1 Stability Gate complete → M2 IDE Release in progress
 
 ## Key Entry Points
 
@@ -101,18 +106,22 @@ A task is complete only when all four gates pass:
 
 ```
 src/
-├── cli/          # Click CLI (8 commands: scan, project, dashboard, standards, calibrate, fix_ai, init, ci, lsp)
+├── cli/          # Click CLI (scan --checks energy|security|quality|dependencies|all, dashboard, fix_ai, …)
 ├── core/
 │   ├── scanner/  # ProcessPoolExecutor-based multi-file scanner
-│   ├── detectors/# tree-sitter AST detectors per language
-│   ├── rules.py  # YAML rule loader and registry
-│   ├── domain.py # Pydantic models (Violation, Project, ViolationSeverity)
-│   ├── export/   # CSV, HTML, PDF, JSON exporters
+│   ├── detectors/# tree-sitter AST detectors per language + secrets_detector
+│   ├── rules.py  # YAML rule loader (built-in + user-defined)
+│   ├── domain.py # Pydantic models (Violation, Project, ESGScore, …)
+│   ├── export/   # CSV, HTML, PDF, JSON, XML, SBOM exporters
 │   ├── llm/      # OpenAI + Ollama provider abstraction
 │   ├── remediation/ # LibCST-based auto-fix transformers
-│   ├── security/ # Middleware: rate limiting, security headers
+│   ├── security/ # Middleware + SAST rules (OWASP/CWE)
+│   ├── sca/      # [Phase 3] Dependency scanning + OSV CVE lookup + license
+│   ├── quality/  # [Phase 3] Duplication, dead code, complexity, debt
+│   ├── esg/      # [Phase 3] ESG score engine
+│   ├── sbom/     # [Phase 3] CycloneDX/SPDX SBOM + SCI calculation
 │   └── config.py # Configuration management
-├── ui/           # FastAPI + Uvicorn dashboard with Socket.IO
+├── ui/           # FastAPI + Uvicorn dashboard (ESG score + 4-pillar view)
 ├── ide/          # VS Code extension + pygls LSP server
 ├── standards/    # GSF + ecoCode standard registry
 └── agents/       # Runtime monitoring agents

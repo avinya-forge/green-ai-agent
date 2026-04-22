@@ -2,9 +2,18 @@
 
 ## Vision
 
-Empower every developer to write energy-efficient code by default — making software sustainability as fundamental as performance and security.
+**One tool. Every dimension of code health.**
 
-Green-AI is a lightweight, real-time utility that detects and remediates energy-inefficient code patterns. It bridges software development and environmental impact by providing actionable insights, automated fixes, and quantifiable emissions metrics.
+Green-AI is a code intelligence platform that covers the full ESG+S spectrum: Environmental (energy efficiency, carbon intensity), Security (SAST, secrets, dependencies), and Governance (code quality, technical debt, license compliance) — with AI-powered remediation and a single unified dashboard.
+
+> Origin: Started as a Green Software Foundation energy scanner. Evolved to cover the complete ESG surface because no single market tool does it all. The AI-powered fix capability remains the core differentiator.
+
+**Delivery modes (one install, all modes):**
+- `green-ai scan` — CLI with `--checks energy|security|quality|dependencies|all`
+- `green-ai dashboard` — web UI with ESG score and per-pillar drill-down
+- VS Code extension — inline diagnostics and quick-fix for all check categories
+- GitHub / GitLab / Jenkins Action — CI/CD gate with configurable thresholds per dimension
+- REST API — integrate with any external system
 
 ---
 
@@ -28,7 +37,7 @@ Green-AI is a lightweight, real-time utility that detects and remediates energy-
 
 ---
 
-## System Layout
+## Target System Layout (Phase 3 complete)
 
 ```
 src/
@@ -61,7 +70,20 @@ src/
 │   ├── telemetry/          # Usage metrics and emissions tracking
 │   ├── ci/                 # CI/CD integration (PR comments, exit codes)
 │   ├── cache.py            # LRU + disk cache for scan results
-│   └── history.py          # Scan history persistence
+│   ├── history.py          # Scan history persistence
+│   ├── sca/                # [Phase 3] Dependency + license scanning
+│   │   ├── manifest_parser.py
+│   │   ├── osv_client.py   # OSV.dev CVE lookup
+│   │   ├── version_checker.py
+│   │   └── license_detector.py
+│   ├── quality/            # [Phase 3] Code quality + debt
+│   │   ├── duplication.py  # Rabin-Karp clone detection
+│   │   ├── dead_code.py    # Vulture integration
+│   │   └── debt.py         # Remediation effort estimation
+│   ├── esg/                # [Phase 3] ESG scoring
+│   │   └── scorer.py
+│   └── sbom/               # [Phase 3] SBOM + SCI
+│       └── generator.py
 │
 ├── ui/                     # Web dashboard
 │   ├── app_fastapi.py      # FastAPI application (primary entry)
