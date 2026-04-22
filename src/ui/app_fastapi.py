@@ -585,3 +585,105 @@ async def api_export_csv(project: str = 'Scan'):
 @app.get("/api/export/html")
 async def api_export_html(project: str = 'Scan'):
     return _handle_export(HTMLReporter, 'text/html', 'html', project)
+
+
+# ── Standards Sync Engine API (STD-007) ───────────────────────────────────────
+
+@app.get("/api/standards/versions")
+async def api_standards_versions() -> Any:
+    """Return the version manifest for all synced standards sources.
+
+    Used by the dashboard freshness badge and CI checks.
+    """
+    try:
+        from src.standards.sync_engine import StandardsSyncEngine
+        engine = StandardsSyncEngine()
+        rows = engine.versions()
+        stale_map = engine.check_stale()
+        return {
+            "status": "ok",
+            "sources": rows,
+            "any_stale": any(stale_map.values()),
+            "stale_sources": [n for n, s in stale_map.items() if s],
+        }
+    except Exception as e:
+        print(f"Error in api_standards_versions: {e}", file=sys.stderr)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
+@app.post("/api/standards/sync")
+async def api_standards_sync(force: bool = False) -> Any:
+    """Trigger a standards sync from all remote sources.
+
+    Set force=true to bypass the freshness interval check.
+    """
+    try:
+        from src.standards.sync_engine import StandardsSyncEngine
+        engine = StandardsSyncEngine()
+
+        def _sync():
+            return engine.sync_all(force=force)
+
+        import asyncio
+        loop = asyncio.get_event_loop()
+        results = await loop.run_in_executor(None, _sync)
+
+        summary = {
+            name: {"ok": entry.sync_ok, "error": entry.error, "hash": entry.content_hash}
+            for name, entry in results.items()
+        }
+        ok_count = sum(1 for e in results.values() if e.sync_ok)
+        return {
+            "status": "ok",
+            "synced": ok_count,
+            "total": len(results),
+            "sources": summary,
+        }
+    except Exception as e:
+        print(f"Error in api_standards_sync: {e}", file=sys.stderr)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
+# ── AI Sustainability API (AI-006) ────────────────────────────────────────────
+
+@app.get("/api/ai")
+async def api_ai_violations() -> Any:
+    """Return AI sustainability violation summary from the last scan.
+
+    Groups violations by rule_id, provider, and model_tier.
+    Includes total estimated CO2 from AI usage.
+    """
+    try:
+        results = state.get_last_scan_results()
+        issues = results.get("issues", []) if results else []
+
+        ai_issues = [i for i in issues if i.get("category") == "ai_sustainability"]
+
+        by_rule: dict = {}
+        for issue in ai_issues:
+            rule_id = issue.get("id", "unknown")
+            if rule_id not in by_rule:
+                by_rule[rule_id] = {
+                    "rule_id": rule_id,
+                    "name": issue.get("name", rule_id),
+                    "severity": issue.get("severity", "minor"),
+                    "count": 0,
+                    "files": [],
+                    "total_co2_g": 0.0,
+                }
+            by_rule[rule_id]["count"] += 1
+            by_rule[rule_id]["files"].append(issue.get("file", ""))
+            by_rule[rule_id]["total_co2_g"] += issue.get("estimated_co2_g", 0.0)
+
+        total_co2_g = sum(i.get("estimated_co2_g", 0.0) for i in ai_issues)
+
+        return {
+            "status": "ok",
+            "total_ai_violations": len(ai_issues),
+            "total_estimated_co2_g": total_co2_g,
+            "by_rule": list(by_rule.values()),
+            "providers": list({i.get("provider") for i in ai_issues if i.get("provider")}),
+        }
+    except Exception as e:
+        print(f"Error in api_ai_violations: {e}", file=sys.stderr)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
