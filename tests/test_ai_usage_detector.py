@@ -52,6 +52,42 @@ class TestProviderDetection:
         assert "anthropic" in providers
         assert "openai" in providers
 
+    # JS/TS import styles
+    def test_detects_anthropic_ts_require(self):
+        d = _detector(
+            "const Anthropic = require('@anthropic-ai/sdk');\n",
+            path="app.ts"
+        )
+        assert "anthropic" in d.detect_providers()
+
+    def test_detects_anthropic_ts_esm(self):
+        d = _detector(
+            "import Anthropic from '@anthropic-ai/sdk';\n",
+            path="app.ts"
+        )
+        assert "anthropic" in d.detect_providers()
+
+    def test_detects_openai_ts_esm(self):
+        d = _detector(
+            "import OpenAI from 'openai';\n",
+            path="app.ts"
+        )
+        assert "openai" in d.detect_providers()
+
+    def test_detects_groq_ts(self):
+        d = _detector(
+            "import Groq from 'groq-sdk';\n",
+            path="service.ts"
+        )
+        assert "groq" in d.detect_providers()
+
+    def test_detects_gemini_ts(self):
+        d = _detector(
+            "import { GoogleGenerativeAI } from '@google/generative-ai';\n",
+            path="ai.ts"
+        )
+        assert "gemini" in d.detect_providers()
+
 
 # ── Pattern detection ─────────────────────────────────────────────────────────
 

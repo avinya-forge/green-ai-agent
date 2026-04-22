@@ -35,7 +35,9 @@ _LIGHT_MODELS = re.compile(
 )
 
 # Provider import signatures → provider name
+# Python and JS/TS import styles both covered.
 _PROVIDER_IMPORTS: List[tuple] = [
+    # Python
     (re.compile(r"\bimport\s+anthropic\b|from\s+anthropic\b"), "anthropic"),
     (re.compile(r"\bimport\s+openai\b|from\s+openai\b"), "openai"),
     (re.compile(r"\bfrom\s+langchain\b|from\s+langchain_"), "langchain"),
@@ -45,11 +47,28 @@ _PROVIDER_IMPORTS: List[tuple] = [
     (re.compile(r"\bimport\s+groq\b|from\s+groq\b"), "groq"),
     (re.compile(r"\bimport\s+mistralai\b|from\s+mistralai\b"), "mistral"),
     (re.compile(r"\bimport\s+cohere\b|from\s+cohere\b"), "cohere"),
-    (re.compile(r"\bfrom\s+llama_index\b|from\s+llama-index\b"), "llamaindex"),
+    (re.compile(r"\bfrom\s+llama_index\b|from\s+llama.index\b"), "llamaindex"),
     (re.compile(r"\bimport\s+litellm\b|from\s+litellm\b"), "litellm"),
     (re.compile(r"\bimport\s+google\.generativeai\b|from\s+google\.generativeai\b"), "gemini"),
-    (re.compile(r"@anthropic-ai/sdk|@openai/openai|openai/openai"), "openai_ts"),
-    (re.compile(r"@anthropic-ai/sdk"), "anthropic_ts"),
+    # JS / TS — require() and import styles
+    (re.compile(r"""require\s*\(\s*['"]@anthropic-ai/sdk['"]\s*\)"""
+                r"""|from\s+['"]@anthropic-ai/sdk['"]"""), "anthropic"),
+    (re.compile(r"""require\s*\(\s*['"]openai['"]\s*\)"""
+                r"""|from\s+['"]openai['"]"""), "openai"),
+    (re.compile(r"""require\s*\(\s*['"]@langchain/""" r"""['"]\s*\)"""
+                r"""|from\s+['"]@langchain/""" r"""['"]"""), "langchain"),
+    (re.compile(r"""require\s*\(\s*['"]@google/generative-ai['"]\s*\)"""
+                r"""|from\s+['"]@google/generative-ai['"]"""), "gemini"),
+    (re.compile(r"""require\s*\(\s*['"]groq-sdk['"]\s*\)"""
+                r"""|from\s+['"]groq-sdk['"]"""), "groq"),
+    (re.compile(r"""require\s*\(\s*['"]@mistralai/mistralai['"]\s*\)"""
+                r"""|from\s+['"]@mistralai/mistralai['"]"""), "mistral"),
+    (re.compile(r"""require\s*\(\s*['"]cohere-ai['"]\s*\)"""
+                r"""|from\s+['"]cohere-ai['"]"""), "cohere"),
+    (re.compile(r"""require\s*\(\s*['"]llamaindex['"]\s*\)"""
+                r"""|from\s+['"]llamaindex['"]"""), "llamaindex"),
+    (re.compile(r"""require\s*\(\s*['"]litellm['"]\s*\)"""
+                r"""|from\s+['"]litellm['"]"""), "litellm"),
 ]
 
 # Unsustainable pattern definitions
