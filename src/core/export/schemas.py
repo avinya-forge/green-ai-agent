@@ -28,6 +28,12 @@ class Issue(BaseModel):
     carbon_impact: Optional[float] = None
     energy_factor: Optional[Union[float, int, str]] = None
     name: Optional[str] = None
+    # AI sustainability fields (EPIC-28)
+    category: Optional[str] = None
+    co2_note: Optional[str] = None
+    provider: Optional[str] = None
+    model_tier: Optional[str] = None
+    estimated_co2_g: Optional[float] = None
 
     model_config = ConfigDict(extra='ignore')
 

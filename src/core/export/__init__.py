@@ -196,9 +196,16 @@ class CSVExporter:
         except Exception:
             remediation_engine = None
 
+        has_ai = any(i.get('category') == 'ai_sustainability' for i in sorted_issues)
+        fieldnames = [
+            'file', 'line', 'rule_id', 'severity', 'message',
+            'energy_factor', 'effort', 'snippet', 'remediation',
+        ]
+        if has_ai:
+            fieldnames += ['category', 'provider', 'model_tier', 'estimated_co2_g', 'co2_note']
+
         with open(self.output_path, 'w', newline='', encoding='utf-8-sig') as csvfile:
-            fieldnames = ['file', 'line', 'rule_id', 'severity', 'message', 'energy_factor', 'effort', 'snippet', 'remediation']
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore')
 
             # Write header
             writer.writeheader()
@@ -213,7 +220,7 @@ class CSVExporter:
                 if remediation_engine:
                     remediation = remediation_engine.get_suggestion(issue.get('id', ''))
 
-                writer.writerow({
+                row = {
                     'file': issue.get('file', 'unknown'),
                     'line': issue.get('line', 0),
                     'rule_id': issue.get('id', 'unknown_rule'),
@@ -222,24 +229,42 @@ class CSVExporter:
                     'energy_factor': self._get_energy_factor(issue),
                     'effort': self._get_effort(issue),
                     'snippet': snippet,
-                    'remediation': remediation
-                })
+                    'remediation': remediation,
+                }
+                if has_ai:
+                    row['category'] = issue.get('category', '')
+                    row['provider'] = issue.get('provider', '')
+                    row['model_tier'] = issue.get('model_tier', '')
+                    row['estimated_co2_g'] = issue.get('estimated_co2_g', '')
+                    row['co2_note'] = issue.get('co2_note', '')
+                writer.writerow(row)
 
             # Write summary row
             codebase_emissions = results.get('codebase_emissions', 0)
             scanning_emissions = results.get('scanning_emissions', 0)
             total_emissions = codebase_emissions + scanning_emissions
+            ai_co2 = sum(i.get('estimated_co2_g', 0) for i in sorted_issues
+                         if i.get('category') == 'ai_sustainability')
+
+            summary_msg = (
+                f'Total Violations: {total_violations} | '
+                f'Critical: {critical_count} | High: {high_count} | '
+                f'Medium: {medium_count} | Low: {low_count} | '
+                f'Avg Effort: {avg_effort} | CO2: {codebase_emissions:.9f}kg'
+            )
+            if has_ai:
+                summary_msg += f' | AI CO2 est.: {ai_co2:.4f}g'
 
             writer.writerow({
                 'file': 'SUMMARY',
                 'line': '',
                 'rule_id': '',
                 'severity': '',
-                'message': f'Total Violations: {total_violations} | Critical: {critical_count} | High: {high_count} | Medium: {medium_count} | Low: {low_count} | Avg Effort: {avg_effort} | CO2: {codebase_emissions:.9f}kg',
+                'message': summary_msg,
                 'energy_factor': f'{total_emissions:.9f}kg',
                 'effort': 'varies',
                 'snippet': '',
-                'remediation': ''
+                'remediation': '',
             })
 
         return self.output_path
