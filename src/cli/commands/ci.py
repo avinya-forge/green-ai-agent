@@ -3,6 +3,7 @@ import sys
 import json
 from src.core.ci.github_client import GitHubClient
 from src.core.ci.reporter import CIReporter
+from src.standards.sync_engine import StandardsSyncEngine, _STALE_THRESHOLD_DAYS
 
 
 @click.group()
@@ -93,3 +94,52 @@ def report(scan_results, repo, pr, token, filter_diff):
     except Exception as e:
         click.echo(f"Failed to post report: {e}", err=True)
         sys.exit(1)
+
+
+@ci.command('check-standards')
+@click.option(
+    '--max-age-days', default=_STALE_THRESHOLD_DAYS, type=int, show_default=True,
+    help='Maximum age in days before a standards source is stale.'
+)
+@click.option(
+    '--fail-on-stale', is_flag=True, default=False,
+    help='Exit with code 2 if any source is stale (for CI gates).'
+)
+def ci_check_standards(max_age_days, fail_on_stale):
+    """Check that synced standards are within the freshness threshold.
+
+    Designed for CI pipelines — pair with --fail-on-stale to gate builds
+    on fresh standards:
+
+    \b
+      green-ai ci check-standards --max-age-days 7 --fail-on-stale
+
+    Exit codes:
+      0  All sources fresh
+      2  One or more sources stale (only when --fail-on-stale set)
+    """
+    engine = StandardsSyncEngine()
+    stale_map = engine.check_stale(max_age_days=max_age_days)
+
+    click.echo(
+        f"\n=== Standards Freshness (max age: {max_age_days} days) ===\n"
+    )
+    any_stale = False
+    for name, is_stale in stale_map.items():
+        entry = engine.manifest.entries.get(name)
+        last = entry.last_sync if entry and entry.last_sync else "never"
+        flag = "[STALE]" if is_stale else "[OK]   "
+        if is_stale:
+            any_stale = True
+        click.echo(f"  {flag} {name:<12} last synced: {last}")
+
+    click.echo()
+    if any_stale:
+        click.echo(
+            "[!] Stale standards detected. Run: green-ai standards sync",
+            err=True
+        )
+        if fail_on_stale:
+            sys.exit(2)
+    else:
+        click.echo("[OK] All standards are within the freshness threshold.")

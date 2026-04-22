@@ -1,5 +1,6 @@
 import click
 import sys
+from typing import Dict, Any
 from src.core.scanner import Scanner
 from src.core.config import ConfigLoader
 from src.core.git_operations import GitOperations, GitException
@@ -10,6 +11,44 @@ from src.core.export.pdf_exporter import PDFExporter
 from src.ui.state import set_last_scan_results
 from src.utils.security import sanitize_path, sanitize_project_name, \
     is_safe_git_url
+
+
+def _run_standards_sync(cfg: Dict[str, Any], fail_on_stale: bool, max_age_days: int) -> None:
+    """Auto-sync standards if configured; enforce fail_on_stale if requested."""
+    try:
+        from src.standards.sync_engine import StandardsSyncEngine
+        # Use 'standards_sync' key to avoid clash with existing 'standards' List[str]
+        standards_cfg = cfg.get('standards_sync', {})
+        if not isinstance(standards_cfg, dict):
+            standards_cfg = {}
+        auto_sync = standards_cfg.get('auto_sync', False)
+        interval = int(standards_cfg.get('sync_interval_hours', 24))
+
+        engine = StandardsSyncEngine(sync_interval_hours=interval)
+
+        if auto_sync:
+            click.echo("[standards] Auto-syncing standards...", err=True)
+            results = engine.sync_all(force=False)
+            ok = sum(1 for e in results.values() if e.sync_ok)
+            total = len(results)
+            click.echo(f"[standards] {ok}/{total} sources synced.", err=True)
+
+        if fail_on_stale:
+            stale = engine.check_stale(max_age_days=max_age_days)
+            stale_names = [n for n, s in stale.items() if s]
+            if stale_names:
+                click.echo(
+                    f"[standards] STALE sources (>{max_age_days}d): "
+                    f"{', '.join(stale_names)}",
+                    err=True
+                )
+                click.echo(
+                    "[standards] Run: green-ai standards sync",
+                    err=True
+                )
+                sys.exit(2)
+    except ImportError:
+        pass  # Standards engine optional dependency
 
 
 @click.command()
@@ -90,10 +129,23 @@ from src.utils.security import sanitize_path, sanitize_project_name, \
         'Example: --checks energy,ai'
     )
 )
+@click.option(
+    '--fail-on-stale-standards',
+    is_flag=True, default=False,
+    help=(
+        'Exit with code 2 if any standards source is older than 7 days. '
+        'Use with --standards-max-age to customise the threshold.'
+    )
+)
+@click.option(
+    '--standards-max-age', default=7, type=int, show_default=True,
+    help='Max age in days for standards before they are considered stale.'
+)
 def scan(
     paths, git_url, branch, project_name, language, config, disable_rule,
     enable_rule, runtime, profile, perf_profile, fix_all, fix_specific,
-    manual, export, format, output, telemetry, fail_on, checks
+    manual, export, format, output, telemetry, fail_on, checks,
+    fail_on_stale_standards, standards_max_age
 ):
     """Scan a codebase for green software violations.
 
@@ -172,6 +224,9 @@ def scan(
         # Parse --checks into a list and inject into config
         checks_list = [c.strip().lower() for c in checks.split(',') if c.strip()]
         cfg['checks'] = checks_list
+
+        # Standards auto-sync (STD-005)
+        _run_standards_sync(cfg, fail_on_stale_standards, standards_max_age)
 
         # Override telemetry setting if flag is explicitly set
         import os
