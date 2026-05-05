@@ -200,6 +200,33 @@ class TestCheckoutBranch:
         GitOperations.checkout_branch("/path/to/repo", "")
 
 
+class TestArgvInjectionGuard:
+    """Regression for BUG-013: reject argument-like inputs to git subcommands."""
+
+    def test_clone_rejects_option_like_url(self):
+        with pytest.raises(GitException, match="argument-like"):
+            GitOperations.clone_repository("--upload-pack=evil", "/tmp/x")
+
+    def test_clone_rejects_option_like_target_dir(self):
+        with pytest.raises(GitException, match="argument-like"):
+            GitOperations.clone_repository("https://example.com/r.git", "--config=evil")
+
+    def test_checkout_rejects_option_like_branch(self):
+        with pytest.raises(GitException, match="argument-like"):
+            GitOperations.checkout_branch("/path/to/repo", "--orphan")
+
+    @patch('subprocess.run')
+    def test_clone_uses_double_dash_separator(self, mock_run, tmp_path):
+        """clone command must include `--` end-of-options separator."""
+        target_dir = str(tmp_path / "repo")
+        mock_run.return_value = MagicMock(returncode=0, stderr="")
+        GitOperations.clone_repository("https://github.com/user/repo.git", target_dir)
+        argv = mock_run.call_args[0][0]
+        assert argv[:3] == ['git', 'clone', '--']
+        assert argv[3] == "https://github.com/user/repo.git"
+        assert argv[4] == target_dir
+
+
 class TestCleanup:
     """Test repository cleanup"""
     
