@@ -20,7 +20,6 @@ Findings from automated audit against the live codebase. Status `OPEN` requires 
 
 | ID | Severity | File / Area | Description |
 |---|---|---|---|
-| BUG-008 | CRITICAL | `src/benchmarks/benchmark.py:26,35,41,42` | (a) Calls `sys.executable, 'src/main.py', ...` but the real CLI entry is `src/cli/main.py` — benchmark cannot run. (b) `print(".2f")` and `print(".6f")` print the literal format-spec strings instead of formatted numbers (missing f-string). Whole module is non-functional. |
 | BUG-013 | HIGH | `src/core/git_operations.py:99,136,149,190` | `subprocess.run(['git', '<verb>', repo_url_or_branch, ...])` calls do not include the `--` end-of-options separator. A repo URL or branch name beginning with `-` (e.g. `--upload-pack=<cmd>`) becomes a git option, enabling argument injection. Add `--` and validate inputs via `parse_git_url` before invocation. |
 | BUG-015 | HIGH | `requirements.txt` | Framework deps with documented breaking-change history are unpinned: `pydantic`, `tree-sitter-python/javascript/typescript/java/go/c-sharp`, `codecarbon`, `weasyprint`, `matplotlib`, `libcst`, `requests`, `httpx`, `jinja2`, `pyyaml`, `click`. Standards rule: any dep that has caused a breaking-change incident must have an exact pin. |
 | BUG-007 | LOW | `tests/` warnings | `websockets.legacy` deprecation warnings emitted by uvicorn appear in test output. Upstream uvicorn issue; track release. |
@@ -35,6 +34,7 @@ Findings from automated audit against the live codebase. Status `OPEN` requires 
 
 | ID | Severity | File | Description | Fix |
 |---|---|---|---|---|
+| BUG-008 | CRITICAL | `src/benchmarks/benchmark.py` | Called nonexistent `src/main.py`; `print(".2f")` literals printed format-spec strings instead of formatted numbers. Whole module was non-functional. | Re-pointed at `python -m src.cli scan`, replaced literals with f-strings (`{avg_time:.2f}s`), added type hints, ran from `REPO_ROOT`. |
 | BUG-009 | HIGH | `run.sh` | Script wrote to nonexistent `docs/planning/backlog.md` and would have created forbidden subdirectories `docs/planning/`, `docs/architecture/`, `docs/engineering/`. CLI flags also documented as `./run.sh sync` in CLAUDE.md but script accepted only `--sync`. | Rewrote `run.sh` to target the flat `docs/` tree, log blockers to `output/logs/blockers.log`, and accept both `sync` and `--sync` forms. |
 | BUG-010 | HIGH | `.gitignore` | Whitelist referenced 8 nonexistent docs (`vision.md`, `release-notes.md`, `development-standards.md`, `eventlet-migration.md`, `PRD.md`, `ROADMAP.md`, `CONSOLIDATION_REPORT.md`, `cloud-deployment.md`) and excluded the actual canonical docs (`architecture.md`, `standards.md`, `release.md`). New canonical docs would silently be ignored. | Replaced the whitelist with the 7 real canonical paths (`roadmap.md`, `backlog.md`, `standards.md`, `architecture.md`, `release.md`, `swagger.yaml`, `mock_data.json`). |
 | BUG-011 | MEDIUM | repo root | Stray dead scripts: `test_show_message8.py`, `test_show_message9.py`, `test_show_message10.py` (pygls API exploration) and `mark_complete.py` (one-off mutator pointing at the nonexistent `docs/planning/backlog.md`). | Removed all four files. |
@@ -411,8 +411,8 @@ ESG = 0.4×E + 0.4×S + 0.2×G  (weights configurable)
 
 | Phase / Track | State | Count |
 |---|---|---|
-| Bug hunt — OPEN | Pending fix | 10 (BUG-007, BUG-008, BUG-012–017, BUG-019, BUG-020) |
-| Bug hunt — FIXED this milestone | Vaulted | 10 (BUG-001–006, BUG-009–011, BUG-018, AUDIT-004) |
+| Bug hunt — OPEN | Pending fix | 9 (BUG-007, BUG-012–017, BUG-019, BUG-020) |
+| Bug hunt — FIXED this milestone | Vaulted | 11 (BUG-001–006, BUG-008–011, BUG-018, AUDIT-004) |
 | ENG granular tasks | TODO | 17 (ENG-001 through ENG-017) |
 | Phase 2 active | Active TODO tasks | 32 (IDE/AUDIT/TEAM/ML/RUST) |
 | Phase 3 epics | New tasks (EPIC-19–27) | 9 epics / ~70 tasks |
