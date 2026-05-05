@@ -1,6 +1,6 @@
 # runtime_monitor/main.py
 """
-Main entry point for runtime monitoring in GASA.
+Main entry point for runtime monitoring in Green-AI.
 """
 
 from .data_collector import RuntimeDataCollector

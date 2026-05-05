@@ -1,5 +1,5 @@
 """
-Export module for GASA - Violation data export to multiple formats
+Export module for Green-AI — violation data export to multiple formats.
 
 Supports CSV and HTML export with comprehensive violation and metrics data.
 """

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Green AI Software Analyzer (GASA) - CLI Tool
+Green-AI Agent — CLI tool.
 """
 
 import click
@@ -8,7 +8,7 @@ import click
 
 @click.group()
 def cli():
-    """Green AI Software Analyzer"""
+    """Green-AI Agent."""
 
 
 # Register commands
