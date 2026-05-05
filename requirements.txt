@@ -1,31 +1,47 @@
-codecarbon
-psutil
-tree-sitter>=0.24.0
-tree-sitter-python
-tree-sitter-javascript
-requests
-click
-pytest
-pyyaml
-pydantic>=2.0.0
+# Runtime dependencies for Green-AI Agent.
+# Dev tooling (pytest, flake8, playwright) lives in requirements-dev.txt.
+
+# Core models and config
+pydantic==2.12.5
+pydantic-core==2.41.5
+pyyaml>=6.0,<7.0
+
+# Web framework (pinned — Starlette 1.0 broke TemplateResponse on silent upgrade)
 fastapi==0.136.0
 starlette==1.0.0
 uvicorn[standard]==0.45.0
 python-socketio==5.16.1
-jinja2
-httpx
-libcst>=1.0.0
+jinja2>=3.1,<4.0
+httpx>=0.27,<1.0
+
+# CLI + utilities
+click>=8.1,<9.0
+requests>=2.31,<3.0
+
+# Scanner — tree-sitter and language bindings (must stay compatible with tree-sitter==0.25.2)
+tree-sitter==0.25.2
+tree-sitter-python
+tree-sitter-javascript
 tree-sitter-typescript
 tree-sitter-java
 tree-sitter-go
-weasyprint>=60.0
-matplotlib>=3.7.0
-pygls==2.0.1
 tree-sitter-c-sharp
-greenlet==3.3.2
+
+# LSP server
+pygls==2.0.1
 lsprotocol==2025.0.0
-playwright==1.58.0
-pydantic-core==2.41.5
+
+# Async / event-loop bridge for socketio
+greenlet==3.3.2
 pyee==13.0.1
-pytest-cov
-flake8
+
+# Code remediation (LibCST preserves whitespace/comments)
+libcst>=1.0,<2.0
+
+# Reporting (PDF + charts)
+weasyprint>=60.0,<70.0
+matplotlib>=3.7,<4.0
+
+# Telemetry / runtime emissions
+codecarbon>=2.4,<3.0
+psutil>=5.9,<7.0

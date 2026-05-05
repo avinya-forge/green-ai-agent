@@ -22,11 +22,20 @@ No new `docs/` subdirectories — the flat structure is canonical.
 
 ## Dependency Management
 
+Runtime deps live in `requirements.txt`; dev tooling (pytest, flake8, playwright, pytest-cov) lives in `requirements-dev.txt`. Local dev installs both:
+
+```bash
+pip install -r requirements-dev.txt   # pulls in requirements.txt automatically
+```
+
+CI installs `requirements-dev.txt` so test/lint tooling is always present without polluting production images.
+
 Pin all runtime dependencies that have proven to cause breaking changes on silent upgrades:
 
 ```
 # Exact pins (breaking-change history)
-pydantic-core==2.41.5     # pydantic 2.12.5 requires exactly this
+pydantic==2.12.5           # last known working pair with pydantic-core
+pydantic-core==2.41.5      # pydantic 2.12.5 requires exactly this
 fastapi==0.136.0           # Starlette 1.0 TemplateResponse API broke on upgrade
 starlette==1.0.0           # Listed explicitly to prevent transitive upgrades
 uvicorn[standard]==0.45.0  # Pinned to match fastapi/starlette tested set
@@ -34,8 +43,21 @@ python-socketio==5.16.1    # ASGI mode; interface stable across 5.x
 pygls==2.0.1               # LSP server; 3.x has breaking protocol changes
 greenlet==3.3.2            # Required by asyncio bridge
 lsprotocol==2025.0.0       # LSP protocol definitions
-playwright==1.58.0         # Browser automation; test fixtures depend on exact version
+tree-sitter==0.25.2        # Bindings depend on this exact version
+playwright==1.58.0         # (dev) Browser automation; test fixtures depend on exact version
 pyee==13.0.1               # Event emitter pinned with socketio
+
+# Caret pins (allow patch upgrades only)
+pyyaml>=6.0,<7.0
+jinja2>=3.1,<4.0
+httpx>=0.27,<1.0
+click>=8.1,<9.0
+requests>=2.31,<3.0
+libcst>=1.0,<2.0
+weasyprint>=60.0,<70.0
+matplotlib>=3.7,<4.0
+codecarbon>=2.4,<3.0
+psutil>=5.9,<7.0
 
 # Never pin these in requirements.txt
 # pip — managed by the OS/virtualenv, not application deps
