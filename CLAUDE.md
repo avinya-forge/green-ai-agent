@@ -69,17 +69,17 @@ python -m src.cli fix_ai ./src
 - Source code → `src/`
 - Tests → `tests/`
 - Rules → `rules/` (YAML, one file per language)
-- Docs → `docs/` (only the 5 canonical files + `docs/api/`)
+- Docs → `docs/` (flat — no subdirectories)
 - No new markdown files unless explicitly requested
 
-**Canonical docs (do not add subdirectories):**
+**Canonical docs (flat structure, no subdirectories):**
 - `docs/roadmap.md` — phased roadmap and milestones
-- `docs/backlog.md` — active task list by epic
+- `docs/backlog.md` — bug-prioritised task list (bugs first, epics by priority)
 - `docs/standards.md` — coding standards, rules, and quality gates
 - `docs/architecture.md` — vision, design decisions, deployment
 - `docs/release.md` — release notes and metrics
-- `docs/api/swagger.yaml` — OpenAPI schema
-- `docs/api/mock_data.json` — mock response data
+- `docs/swagger.yaml` — OpenAPI schema
+- `docs/mock_data.json` — mock response data
 
 ## Code Standards (summary)
 

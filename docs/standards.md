@@ -7,7 +7,7 @@ green-ai-agent/
 ├── src/          # All source code
 ├── tests/        # pytest test suite
 ├── rules/        # YAML rule definitions (one file per language)
-├── docs/         # Documentation (5 canonical files + docs/api/)
+├── docs/         # Documentation (flat — 5 canonical .md files + swagger.yaml + mock_data.json)
 ├── output/       # ALL generated reports, logs, CSVs
 ├── deploy/       # Kubernetes + Helm manifests
 ├── prompts/      # AI agent prompt templates
@@ -169,8 +169,8 @@ Current baseline: **597 passed, 2 skipped, 0 failed.**
 ## API Schema Rule
 
 No API endpoint goes to production without:
-1. A verified entry in `docs/api/swagger.yaml`
-2. A corresponding mock response in `docs/api/mock_data.json`
+1. A verified entry in `docs/swagger.yaml`
+2. A corresponding mock response in `docs/mock_data.json`
 
 ---
 

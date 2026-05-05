@@ -1,18 +1,17 @@
-# Allow only canonical documentation files — flat structure
+# Allow only canonical documentation files — flat structure (no subdirectories)
 # All other files in docs/ are rejected
 
 *
 
 !.gitignore
 
-# Flat canonical docs
+# Flat canonical docs (Markdown)
 !roadmap.md
 !backlog.md
 !standards.md
 !architecture.md
 !release.md
 
-# API contracts
-!api/
-!api/swagger.yaml
-!api/mock_data.json
+# Flat API contracts
+!swagger.yaml
+!mock_data.json

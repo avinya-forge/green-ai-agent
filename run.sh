@@ -1,54 +1,55 @@
 #!/bin/bash
-# Master Controller [Sync | Test | Backlog | Start]
+# Master Controller [sync | test | start | backlog | skills]
+# Aligned with the flat docs/ structure documented in CLAUDE.md.
 
+set -u
 MODE="IDEMPOTENT | TERSE | 100%-INTEGRITY"
 
+BACKLOG="docs/backlog.md"
+
 log_blocker() {
-    echo "- [RESOLVE] Blocker encountered: $1" >> docs/planning/backlog.md
+    mkdir -p output/logs
+    echo "- [RESOLVE] Blocker encountered: $1" >> output/logs/blockers.log
 }
 
-case "$1" in
-    --sync)
-        echo "[PHASE: 1-Strategy] | [SCENARIO: S1-S5] | [STATUS: syncing file-tree]"
-        mkdir -p docs/planning docs/architecture docs/engineering || log_blocker "Failed to create dirs"
-        touch docs/planning/backlog.md || log_blocker "Failed to touch backlog"
-        if [ ! -f docs/planning/roadmap.md ]; then
-            echo "# Roadmap" > docs/planning/roadmap.md
+# Accept both 'sync' and '--sync' for backward compatibility.
+SUBCOMMAND="${1:-}"
+SUBCOMMAND="${SUBCOMMAND#--}"
+
+case "$SUBCOMMAND" in
+    sync)
+        echo "[PHASE: 1-Strategy] | [STATUS: verifying flat docs/ tree]"
+        if [ ! -f "$BACKLOG" ]; then
+            log_blocker "Missing $BACKLOG"
         fi
-        if [ ! -f docs/architecture/system-design.md ]; then
-            echo "# System Design" > docs/architecture/system-design.md
-        fi
-        if [ ! -f docs/engineering/conventions.md ]; then
-            echo "# Engineering Conventions" > docs/engineering/conventions.md
-        fi
+        for canonical in docs/roadmap.md docs/standards.md docs/architecture.md docs/release.md; do
+            [ -f "$canonical" ] || log_blocker "Missing $canonical"
+        done
         ;;
-    --test)
-        echo "[PHASE: 1-Strategy] | [SCENARIO: S1-S5] | [STATUS: running tests]"
+    test)
+        echo "[PHASE: 1-Strategy] | [STATUS: running tests]"
         pytest --cov=src || log_blocker "pytest failed"
         flake8 src || log_blocker "flake8 failed"
         ;;
-    --backlog)
-        echo "[PHASE: 1-Strategy] | [SCENARIO: S1-S5] | [STATUS: parsing backlog]"
-        grep -r -E "\[EPIC|DEBT\]" docs/planning/ || log_blocker "grep backlog failed"
-        # Recursive expansion of backlog items
-        while IFS= read -r epic; do
-            echo "Expanding: $epic"
-            grep -r -E "TASK" docs/planning/ | grep -v "\[x\]" || true
-        done < <(grep -r -E "\[EPIC|DEBT\]" docs/planning/)
-        if [ -f docs/engineering/skills-patterns.txt ]; then
-            echo "Applying skills patterns to backlog..."
-            grep -f docs/engineering/skills-patterns.txt docs/planning/backlog.md || true
-        fi
+    backlog)
+        echo "[PHASE: 1-Strategy] | [STATUS: parsing backlog]"
+        grep -E "^\| (BUG|EPIC|TASK|AUDIT|SEC|SCA|QUAL|ESG|DASH|RULE|BASE|SBOM|AI|STD|IDE|TEAM|ML|RUST)-" "$BACKLOG" \
+            || log_blocker "no backlog rows matched"
         ;;
-    --start)
-        echo "[PHASE: 1-Strategy] | [SCENARIO: S1-S5] | [STATUS: env initialization]"
-        echo "Environment initialized."
+    start)
+        echo "[PHASE: 1-Strategy] | [STATUS: env initialization]"
+        echo "Environment initialized. Use: python -m src.cli dashboard"
         ;;
-    --skills)
-        echo "[PHASE: 1-Strategy] | [SCENARIO: S1-S5] | [STATUS: injecting patterns]"
-        curl -s https://skills.sh/ | grep -o '"skillId":"[^"]*"' | cut -d '"' -f 4 > docs/engineering/skills-patterns.txt || log_blocker "skills fetch failed"
+    skills)
+        echo "[PHASE: 1-Strategy] | [STATUS: refreshing skills patterns]"
+        mkdir -p output
+        curl -fsS https://skills.sh/ \
+            | grep -o '"skillId":"[^"]*"' \
+            | cut -d '"' -f 4 > output/skills-patterns.txt \
+            || log_blocker "skills fetch failed"
         ;;
     *)
-        echo "Usage: \$0 {--sync|--test|--backlog|--start|--skills}"
+        echo "Usage: $0 {sync|test|backlog|start|skills}"
+        exit 1
         ;;
 esac
