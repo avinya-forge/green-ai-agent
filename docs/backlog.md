@@ -22,7 +22,6 @@ Findings from automated audit against the live codebase. Status `OPEN` requires 
 |---|---|---|---|
 | BUG-007 | LOW | `tests/` warnings | `websockets.legacy` deprecation warnings emitted by uvicorn appear in test output. Upstream uvicorn issue; track release. |
 | BUG-017 | MEDIUM | `tests/` | 50+ flat test files (e.g. `test_python.py`, `test_dashboard_*.py`, `test_export*.py`) live at `tests/` root with no SoC. Re-group under `tests/core/`, `tests/cli/`, `tests/ui/`, `tests/security/`, `tests/standards/`, `tests/llm/` mirroring `src/`. Pure organisational refactor — no behaviour change. |
-| BUG-012 | LOW | `src/cli/main.py:43-45` | Dead `try / except ImportError as e: raise e` block — re-raising bare is identical to letting the import propagate. Remove the wrapper. |
 
 ### 1.2 FIXED in this milestone (kept for traceability)
 
@@ -35,6 +34,7 @@ Findings from automated audit against the live codebase. Status `OPEN` requires 
 | BUG-020 | MEDIUM | `src/core/config.py`, `src/core/telemetry/service.py` | Inline `# TODO` markers described missing functionality (cache TTL/ETag, user identification) instead of being tracked work. | Converted both TODOs to short, intent-explaining comments that reference the matching backlog tasks (ENG-016, ENG-017). |
 | BUG-016 | LOW | docstrings + CLI help | Stale `GASA` (Green AI Software Analyzer) branding in 6 module docstrings + Click group help. | Renamed to `Green-AI` across `src/cli/main.py`, `src/agents/runtime_monitor/__init__.py`, `src/agents/runtime_monitor/main.py`, `src/benchmarks/benchmark.py` (already done in BUG-008 commit), `src/core/export/__init__.py`, `src/core/export/pdf_exporter.py`. `grep -rn GASA src/` is now empty. |
 | BUG-019 | LOW | `src/ui/templates/dashboard.html:1749,1752` | Used `innerHTML` with template-literal interpolation — fragile pattern that AUDIT-002 tried to eliminate. | Replaced with `document.createElement('strong')` + `textContent` + `createTextNode`. No interpolation into HTML. |
+| BUG-012 | LOW | `src/cli/main.py:43-45` | Dead `try / except ImportError as e: raise e` wrapper — re-raising is identical to letting the exception propagate. | Hoisted imports to module top, dropped the try/except, dropped per-import indentation. Imports now propagate naturally. |
 | BUG-009 | HIGH | `run.sh` | Script wrote to nonexistent `docs/planning/backlog.md` and would have created forbidden subdirectories `docs/planning/`, `docs/architecture/`, `docs/engineering/`. CLI flags also documented as `./run.sh sync` in CLAUDE.md but script accepted only `--sync`. | Rewrote `run.sh` to target the flat `docs/` tree, log blockers to `output/logs/blockers.log`, and accept both `sync` and `--sync` forms. |
 | BUG-010 | HIGH | `.gitignore` | Whitelist referenced 8 nonexistent docs (`vision.md`, `release-notes.md`, `development-standards.md`, `eventlet-migration.md`, `PRD.md`, `ROADMAP.md`, `CONSOLIDATION_REPORT.md`, `cloud-deployment.md`) and excluded the actual canonical docs (`architecture.md`, `standards.md`, `release.md`). New canonical docs would silently be ignored. | Replaced the whitelist with the 7 real canonical paths (`roadmap.md`, `backlog.md`, `standards.md`, `architecture.md`, `release.md`, `swagger.yaml`, `mock_data.json`). |
 | BUG-011 | MEDIUM | repo root | Stray dead scripts: `test_show_message8.py`, `test_show_message9.py`, `test_show_message10.py` (pygls API exploration) and `mark_complete.py` (one-off mutator pointing at the nonexistent `docs/planning/backlog.md`). | Removed all four files. |
@@ -411,8 +411,8 @@ ESG = 0.4×E + 0.4×S + 0.2×G  (weights configurable)
 
 | Phase / Track | State | Count |
 |---|---|---|
-| Bug hunt — OPEN | Pending fix | 3 (BUG-007, BUG-012, BUG-017) |
-| Bug hunt — FIXED this milestone | Vaulted | 17 (BUG-001–006, BUG-008–011, BUG-013–016, BUG-018–020, AUDIT-004) |
+| Bug hunt — OPEN | Pending fix | 2 (BUG-007 upstream, BUG-017 large refactor) |
+| Bug hunt — FIXED this milestone | Vaulted | 18 (BUG-001–006, BUG-008–016, BUG-018–020, AUDIT-004) |
 | ENG granular tasks | TODO | 17 (ENG-001 through ENG-017) |
 | Phase 2 active | Active TODO tasks | 32 (IDE/AUDIT/TEAM/ML/RUST) |
 | Phase 3 epics | New tasks (EPIC-19–27) | 9 epics / ~70 tasks |
