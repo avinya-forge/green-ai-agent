@@ -25,7 +25,6 @@ Findings from automated audit against the live codebase. Status `OPEN` requires 
 | BUG-017 | MEDIUM | `tests/` | 50+ flat test files (e.g. `test_python.py`, `test_dashboard_*.py`, `test_export*.py`) live at `tests/` root with no SoC. Re-group under `tests/core/`, `tests/cli/`, `tests/ui/`, `tests/security/`, `tests/standards/`, `tests/llm/` mirroring `src/`. Pure organisational refactor — no behaviour change. |
 | BUG-019 | LOW | `src/ui/templates/dashboard.html:1749,1752` | Uses `innerHTML` with template-literal interpolation. Values are numeric today but the pattern is fragile and is the kind of thing AUDIT-002 tried to eliminate. Replace with `textContent` + child element creation. |
 | BUG-012 | LOW | `src/cli/main.py:43-45` | Dead `try / except ImportError as e: raise e` block — re-raising bare is identical to letting the import propagate. Remove the wrapper. |
-| BUG-020 | MEDIUM | `src/core/config.py:162`, `src/core/telemetry/service.py:98` | `# TODO` markers describe missing functionality (cache TTL/ETag, user identification). Convert to backlog tasks (ENG-016, ENG-017) and remove the inline TODO. |
 
 ### 1.2 FIXED in this milestone (kept for traceability)
 
@@ -35,6 +34,7 @@ Findings from automated audit against the live codebase. Status `OPEN` requires 
 | BUG-013 | HIGH | `src/core/git_operations.py` | `git clone` / `git checkout` invocations did not block argument-like inputs (e.g. `--upload-pack=<cmd>`) and lacked the `--` end-of-options separator on `clone`. Argv-injection vector. | Added `startswith('-')` guard on `repo_url`, `target_dir`, `branch`; added `--` separator on `git clone`. Documented why `git checkout` cannot use `--` (treats arg as pathspec). Regression test in `tests/test_git_operations.py::TestArgvInjectionGuard`. |
 | BUG-014 | MEDIUM | `requirements.txt` | Mixed runtime deps with dev tooling (`pytest`, `pytest-cov`, `flake8`, `playwright`). | Created `requirements-dev.txt` (`-r requirements.txt` + dev tools); CI installs `requirements-dev.txt`. Production Dockerfiles unchanged. |
 | BUG-015 | HIGH | `requirements.txt` | Framework deps with breaking-change history were unpinned. | Added exact pins for `pydantic`, `tree-sitter`; added caret bounds (`>=X,<Y+1`) for the rest. Documented in `docs/standards.md` Dependency Management. Also removed `pip==26.0.1` reincarnations in `Dockerfile`, `Dockerfile.action`, and `.github/workflows/ci.yml` — replaced with `pip install --upgrade pip`. |
+| BUG-020 | MEDIUM | `src/core/config.py`, `src/core/telemetry/service.py` | Inline `# TODO` markers described missing functionality (cache TTL/ETag, user identification) instead of being tracked work. | Converted both TODOs to short, intent-explaining comments that reference the matching backlog tasks (ENG-016, ENG-017). |
 | BUG-009 | HIGH | `run.sh` | Script wrote to nonexistent `docs/planning/backlog.md` and would have created forbidden subdirectories `docs/planning/`, `docs/architecture/`, `docs/engineering/`. CLI flags also documented as `./run.sh sync` in CLAUDE.md but script accepted only `--sync`. | Rewrote `run.sh` to target the flat `docs/` tree, log blockers to `output/logs/blockers.log`, and accept both `sync` and `--sync` forms. |
 | BUG-010 | HIGH | `.gitignore` | Whitelist referenced 8 nonexistent docs (`vision.md`, `release-notes.md`, `development-standards.md`, `eventlet-migration.md`, `PRD.md`, `ROADMAP.md`, `CONSOLIDATION_REPORT.md`, `cloud-deployment.md`) and excluded the actual canonical docs (`architecture.md`, `standards.md`, `release.md`). New canonical docs would silently be ignored. | Replaced the whitelist with the 7 real canonical paths (`roadmap.md`, `backlog.md`, `standards.md`, `architecture.md`, `release.md`, `swagger.yaml`, `mock_data.json`). |
 | BUG-011 | MEDIUM | repo root | Stray dead scripts: `test_show_message8.py`, `test_show_message9.py`, `test_show_message10.py` (pygls API exploration) and `mark_complete.py` (one-off mutator pointing at the nonexistent `docs/planning/backlog.md`). | Removed all four files. |
@@ -411,8 +411,8 @@ ESG = 0.4×E + 0.4×S + 0.2×G  (weights configurable)
 
 | Phase / Track | State | Count |
 |---|---|---|
-| Bug hunt — OPEN | Pending fix | 6 (BUG-007, BUG-012, BUG-016, BUG-017, BUG-019, BUG-020) |
-| Bug hunt — FIXED this milestone | Vaulted | 14 (BUG-001–006, BUG-008–011, BUG-013–015, BUG-018, AUDIT-004) |
+| Bug hunt — OPEN | Pending fix | 5 (BUG-007, BUG-012, BUG-016, BUG-017, BUG-019) |
+| Bug hunt — FIXED this milestone | Vaulted | 15 (BUG-001–006, BUG-008–011, BUG-013–015, BUG-018, BUG-020, AUDIT-004) |
 | ENG granular tasks | TODO | 17 (ENG-001 through ENG-017) |
 | Phase 2 active | Active TODO tasks | 32 (IDE/AUDIT/TEAM/ML/RUST) |
 | Phase 3 epics | New tasks (EPIC-19–27) | 9 epics / ~70 tasks |
