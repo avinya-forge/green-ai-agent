@@ -7,14 +7,13 @@ def generate_openapi():
     # Generate OpenAPI schema
     openapi_schema = app.openapi()
 
-    # Create docs/api directory if it doesn't exist
-    os.makedirs("docs/api", exist_ok=True)
+    os.makedirs("docs", exist_ok=True)
 
-    # Save to yaml
-    with open("docs/api/swagger.yaml", "w") as f:
+    # Save to yaml (flat docs/ structure — no docs/api/ subdirectory)
+    with open("docs/swagger.yaml", "w") as f:
         yaml.dump(openapi_schema, f, default_flow_style=False)
 
-    print("Generated docs/api/swagger.yaml")
+    print("Generated docs/swagger.yaml")
 
     # Generate Mock Data
     mock_data = {}
@@ -25,11 +24,10 @@ def generate_openapi():
         for schema_name, schema_props in schemas.items():
             mock_data[schema_name] = generate_mock_from_schema(schema_props)
 
-    # Save mock data
-    with open("docs/api/mock_data.json", "w") as f:
+    with open("docs/mock_data.json", "w") as f:
         json.dump(mock_data, f, indent=2)
 
-    print("Generated docs/api/mock_data.json")
+    print("Generated docs/mock_data.json")
 
 def generate_mock_from_schema(schema):
     mock = {}

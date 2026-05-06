@@ -1,48 +1,36 @@
 #!/usr/bin/env python3
 """
-Green AI Software Analyzer (GASA) - CLI Tool
+Green-AI Agent — CLI tool.
 """
 
 import click
 
+from src.cli.commands.scan import scan
+from src.cli.commands.project import project
+from src.cli.commands.dashboard import dashboard
+from src.cli.commands.standards import standards
+from src.cli.commands.calibrate import calibrate
+from src.cli.commands.fix_ai import fix_ai
+from src.cli.commands.init import init
+from src.cli.commands.ci import ci
+from src.cli.commands.lsp import lsp
+
 
 @click.group()
 def cli():
-    """Green AI Software Analyzer"""
+    """Green-AI Agent."""
 
 
-# Register commands
-try:
-    from src.cli.commands.scan import scan
-    cli.add_command(scan)
+cli.add_command(scan)
+cli.add_command(project)
+cli.add_command(dashboard)
+cli.add_command(standards)
+cli.add_command(calibrate)
+cli.add_command(fix_ai)
+cli.add_command(init)
+cli.add_command(ci)
+cli.add_command(lsp)
 
-    from src.cli.commands.project import project
-    cli.add_command(project)
-
-    from src.cli.commands.dashboard import dashboard
-    cli.add_command(dashboard)
-
-    from src.cli.commands.standards import standards
-    cli.add_command(standards)
-
-    from src.cli.commands.calibrate import calibrate
-    cli.add_command(calibrate)
-
-    from src.cli.commands.fix_ai import fix_ai
-    cli.add_command(fix_ai)
-
-    from src.cli.commands.init import init
-    cli.add_command(init)
-
-    from src.cli.commands.ci import ci
-    cli.add_command(ci)
-
-    from src.cli.commands.lsp import lsp
-    cli.add_command(lsp)
-
-except ImportError as e:
-    # Fail fast during development
-    raise e
 
 if __name__ == "__main__":
     cli()

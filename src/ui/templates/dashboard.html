@@ -1745,11 +1745,18 @@
 
                 const totalDiv = document.createElement('div');
                 totalDiv.style.marginBottom = '5px';
-                // Using innerHTML with controlled content for <strong> tag
-                totalDiv.innerHTML = `<strong>Total Violations:</strong> ${project.violation_count}`;
+                const totalLabel = document.createElement('strong');
+                totalLabel.textContent = 'Total Violations:';
+                totalDiv.appendChild(totalLabel);
+                totalDiv.appendChild(document.createTextNode(' ' + project.violation_count));
 
                 const emissionsDiv = document.createElement('div');
-                emissionsDiv.innerHTML = `<strong>Emissions:</strong> ${(project.total_emissions * 1e6).toFixed(2)} µg CO₂`;
+                const emissionsLabel = document.createElement('strong');
+                emissionsLabel.textContent = 'Emissions:';
+                emissionsDiv.appendChild(emissionsLabel);
+                emissionsDiv.appendChild(document.createTextNode(
+                    ' ' + (project.total_emissions * 1e6).toFixed(2) + ' µg CO₂'
+                ));
 
                 metricsDiv.appendChild(totalDiv);
                 metricsDiv.appendChild(emissionsDiv);

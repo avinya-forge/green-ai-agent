@@ -158,8 +158,8 @@ class ConfigLoader:
         url_hash = hashlib.md5(url.encode('utf-8')).hexdigest()
         cache_file = cache_dir / f"{url_hash}.yaml"
 
-        # Check cache (simple check: if exists, use it)
-        # TODO: Implement TTL or ETag check for smarter caching
+        # Cache lookup: use cached file if present. Smarter TTL/ETag caching
+        # is tracked as ENG-016 in docs/backlog.md.
         if cache_file.exists():
             return str(cache_file)
 

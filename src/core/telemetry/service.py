@@ -92,10 +92,12 @@ class TelemetryService:
 
     def _record_event(self, event_type: str, payload: Dict[str, Any]):
         """Internal method to store event."""
+        # user_id is intentionally None until anonymised user identification
+        # ships — tracked as ENG-017 in docs/backlog.md.
         event = TelemetryEvent(
             event_type=event_type,
             payload=payload,
-            user_id=None  # TODO: Implement user identification logic
+            user_id=None,
         )
         self.events.append(event)
 

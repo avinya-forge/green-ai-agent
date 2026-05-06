@@ -93,10 +93,17 @@ class GitOperations:
             import uuid
             target_dir = str(cls.TEMP_BASE_DIR / f"{repo_name}_{uuid.uuid4().hex[:8]}")
 
+        # Reject inputs that look like CLI options to prevent argument
+        # injection (e.g. --upload-pack=<cmd>).
+        if repo_url.startswith('-') or target_dir.startswith('-'):
+            raise GitException(
+                f"Refusing to clone with argument-like input: {repo_url!r}"
+            )
+
         try:
             logger.info(f"Cloning repository: {repo_url} to {target_dir}")
             result = subprocess.run(
-                ['git', 'clone', repo_url, target_dir],
+                ['git', 'clone', '--', repo_url, target_dir],
                 capture_output=True,
                 text=True,
                 timeout=300  # 5 minute timeout
@@ -185,6 +192,14 @@ class GitOperations:
         if not branch:
             return
 
+        if branch.startswith('-'):
+            raise GitException(
+                f"Refusing to checkout argument-like branch: {branch!r}"
+            )
+
+        # Note: `git checkout -- <name>` would treat `<name>` as a pathspec,
+        # not a ref, so we cannot use the `--` end-of-options separator here.
+        # The `branch.startswith('-')` guard above prevents argv injection.
         try:
             logger.info(f"Checking out branch '{branch}' in {repo_dir}")
             result = subprocess.run(

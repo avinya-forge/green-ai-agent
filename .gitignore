@@ -81,17 +81,16 @@ reports/               # Generated reports (keep .gitkeep)
 /data/*
 !/data/.gitkeep
 
-# /docs/ - HARDCODED WHITELIST: Only these strategic docs are committed
+# /docs/ — flat whitelist (no subdirectories). Detailed allow-list lives in docs/.gitignore.
 /docs/*
+!/docs/.gitignore
+!/docs/roadmap.md
 !/docs/backlog.md
-!/docs/release-notes.md
-!/docs/vision.md
-!/docs/development-standards.md
-!/docs/eventlet-migration.md
-!/docs/PRD.md
-!/docs/ROADMAP.md
-!/docs/CONSOLIDATION_REPORT.md
-!/docs/cloud-deployment.md
+!/docs/standards.md
+!/docs/architecture.md
+!/docs/release.md
+!/docs/swagger.yaml
+!/docs/mock_data.json
 
 # Archive (intentionally ignored)
 archive/               # Old story files, deprecated docs

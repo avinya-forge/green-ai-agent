@@ -1,5 +1,5 @@
 """
-PDF Export module for GASA using WeasyPrint.
+PDF Export module for Green-AI using WeasyPrint.
 """
 
 from datetime import datetime, timezone

@@ -1,6 +1,6 @@
 # runtime_monitor/__init__.py
 """
-Runtime monitoring module for GASA.
+Runtime monitoring module for Green-AI.
 Provides energy consumption tracking during code execution.
 """
 
