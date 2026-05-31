@@ -1,13 +1,13 @@
 # Green-AI
 > Empower every developer to write energy-efficient code by default.
 
-![Version](https://img.shields.io/badge/version-v0.9.1-blue.svg)
+![Version](https://img.shields.io/badge/version-v1.0.3-blue.svg)
 
 ## Status
 
 | Milestone | Version | Phase | State | Health |
 |---|---|---|---|---|
-| Stability Gate | v0.9.1 | 2 — Action & Expansion | ACTIVE | Green |
+| Stability Gate | v1.0.3 | 2 — Action & Expansion | ACTIVE | Green |
 
 ## Docs
 

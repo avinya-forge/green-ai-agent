@@ -14,54 +14,40 @@ from src.utils.logger import logger
 
 from src.core.scanner.worker import scan_file_worker
 from src.core.scanner.discovery import FileDiscoverer
+from src.core.scanner.baseline_helper import load_baseline, filter_with_baseline
 
 
 class Scanner:
     def __init__(
-        self, language: Optional[str] = None, runtime: bool = False,
-        config_path: Optional[str] = None, profile: bool = False
+        self,
+        language: str = 'python',
+        runtime: bool = False,
+        config_path: Optional[str] = None,
+        profile: bool = False
     ):
-        """
-        Initialize scanner.
-
-        Args:
-            language: Language to scan (python, javascript).
-            runtime: Enable runtime monitoring.
-            config_path: Path to .green-ai.yaml config file.
-            profile: Enable emissions profiling.
-        """
-        # Load configuration
-        self.config_loader = ConfigLoader(config_path)
-        self.config = self.config_loader.load()
-
-        # Use provided language or load from config
-        self.language = language or \
-            self.config_loader.get_enabled_languages()[0]
+        self.language = language
         self.runtime = runtime
         self.profile = profile
+        self.config_loader = ConfigLoader(config_path)
+        self.config = self.config_loader.load()
         self.rule_repo = RuleRepository()
+        self.emission_analyzer = EmissionAnalyzer()
+        self.file_discoverer = FileDiscoverer(
+            config_loader=self.config_loader
+        )
         self.remediation_engine = RemediationEngine()
 
-        # Load system calibration
-        self.calibration_agent = CalibrationAgent()
-        self.emission_analyzer = EmissionAnalyzer(
-            calibration_coefficient=self.calibration_agent.get_coefficient()
-        )
-
-        self.file_discoverer = FileDiscoverer(self.config_loader)
-
-    def scan(self, path: Union[str, List[str]], progress_callback=None):
+    def scan(self, path: Union[str, List[str]], progress_callback=None) -> dict:
         """
-        Scan a directory, file, or list of paths.
+        Run a full scan on the given path.
 
         Args:
-            path: Path or list of paths to scan.
-            progress_callback: Optional function(message, percentage).
+            path: Path to scan (file or directory) or list of paths
+            progress_callback: Optional function(message, percentage) for progress
 
         Returns:
-            Dictionary with scan results.
+            Dictionary of scan results
         """
-        # Create appropriate tracker
         tracker = create_tracker(enable_profiling=self.profile)
         tracker.start()
 
@@ -69,9 +55,6 @@ class Scanner:
 
         scan_metadata_path = ""
 
-        # Iterate over generator to find files, avoiding full list loading early on,
-        # but we do need the length for total_files and progress tracking.
-        # Actually, let's just use the generator to get supported files.
         if isinstance(path, str):
             files_gen = self.file_discoverer.get_files(path)
             scan_metadata_path = path
@@ -99,14 +82,10 @@ class Scanner:
         per_file_emissions = {}
         total_codebase_emissions = 0.0
 
-        # Determine number of workers
-        # Use os.cpu_count() explicitly if config not set
         config_concurrency = self.config.get('concurrency')
         if config_concurrency:
             num_workers = int(config_concurrency)
         else:
-            # Default to CPU count, capped at 32 for safety
-            # Reserve 1 core for the main process if possible
             cpus = os.cpu_count() or 1
             num_workers = max(1, min(32, cpus - 1)) if cpus > 1 else 1
 
@@ -114,16 +93,8 @@ class Scanner:
             progress_callback("Scanning files...", 10)
 
         processed_count = 0
-
-        # Get rules for the language
         language_rules = self.rule_repo.get_rules(self.language)
 
-        # Calculate chunksize for executor.map
-        # A simple heuristic: ensure each worker gets a reasonable batch
-        # to minimize IPC overhead.
-        # If total files is small, chunksize=1 is fine.
-        # If large, try to give each worker at least 4 items per chunk,
-        # but balance load.
         config_chunk_size = self.config.get('chunk_size')
         if config_chunk_size:
             chunksize = int(config_chunk_size)
@@ -131,17 +102,7 @@ class Scanner:
             cpus = os.cpu_count() or 1
             chunksize = max(1, total_files // (cpus * 4))
 
-        # Use 'spawn' context
         mp_context = multiprocessing.get_context('spawn')
-
-        # Helper for map
-        # We need a wrapper function that unpacks arguments for map
-        # since scan_file_worker takes multiple args
-        # But wait, we can't pickle a local lambda easily.
-        # So we define a partial or use starmap if available (ProcessPoolExecutor doesn't support starmap directly until 3.11+ maybe?)
-        # Actually executor.map takes *iterables.
-        # So we can pass iterables for each argument.
-
         total_scan_files = len(files_to_scan)
 
         if total_scan_files > 0:
@@ -152,17 +113,6 @@ class Scanner:
             with concurrent.futures.ProcessPoolExecutor(
                 max_workers=num_workers, mp_context=mp_context, **kwargs
             ) as executor:
-                # Use executor.map with chunksize
-                # We need to pass constant arguments as repeated iterables
-                # OR better: make scan_file_worker take a single tuple/dict and unpack it?
-                # Changing worker signature might break tests or other calls if any.
-                # Let's check worker.py. It's a top level function.
-                # We can wrap it here locally? No, pickling issues.
-                # We can use a list comprehension with submit as before but that doesn't support chunksize directly in submit.
-                # executor.map supports chunksize.
-
-                # To use executor.map with multiple arguments, we pass multiple iterables.
-                # itertools.repeat can be used for constant arguments.
                 import itertools
 
                 results_iterator = executor.map(
@@ -195,18 +145,20 @@ class Scanner:
         if progress_callback:
             progress_callback("Finalizing scan results...", 95)
 
+        # Apply baseline filtering (BASE-002)
+        baseline = load_baseline()
+        issues, skipped_count, fixed_count = filter_with_baseline(issues, baseline)
+
         # Distribute codebase emissions across issues
         issues = self.emission_analyzer.get_per_line_emissions(
             issues, total_codebase_emissions
         )
 
-        # Runtime monitoring if enabled
         runtime_metrics = {}
         if self.runtime and self.language == 'python':
             runtime_metrics = self._run_with_monitoring(path)
 
         tracking_result = tracker.stop()
-        # Extract emissions value for backward compatibility
         scanning_emissions = tracking_result.get('emissions', 0.0) \
             if isinstance(tracking_result, dict) else tracking_result
 
@@ -220,9 +172,14 @@ class Scanner:
             'metadata': {
                 'total_files': total_files,
                 'language': self.language,
-                'path': scan_metadata_path
+                'path': scan_metadata_path,
+                'baseline_skipped': skipped_count,
+                'baseline_fixed': fixed_count
             }
         }
+
+        if skipped_count > 0 or fixed_count > 0:
+            logger.info(f"Baseline Delta: {len(issues)} new, {skipped_count} ignored, {fixed_count} fixed.")
 
         if progress_callback:
             progress_callback("Scan complete", 100)
@@ -230,11 +187,9 @@ class Scanner:
         return results
 
     def _run_with_monitoring(self, path):
-        """Safely execute code and monitor basic runtime metrics."""
         if isinstance(path, list):
             return {
-                'error': 'Runtime monitoring requires a single entry point '
-                         'path, not a list.'
+                'error': 'Runtime monitoring requires a single entry point path'
             }
 
         if not os.path.isfile(path):
@@ -243,21 +198,17 @@ class Scanner:
         command = self._get_run_command(path)
         if not command:
             return {
-                'error': f'Runtime monitoring not supported for language '
-                f'{self.language}'
+                'error': f'Runtime monitoring not supported for language {self.language}'
             }
 
         try:
             import subprocess
             import time
 
-            # Use profiling tracker for runtime monitoring
             runtime_tracker = create_tracker(enable_profiling=True)
             runtime_tracker.start()
 
             start_time = time.time()
-
-            # Execute the script with timeout
             result = subprocess.run(
                 command, capture_output=True, text=True, timeout=30
             )
@@ -274,7 +225,7 @@ class Scanner:
             }
 
         except subprocess.TimeoutExpired:
-            runtime_tracker.stop()  # Stop tracker even on timeout
+            runtime_tracker.stop()
             return {
                 'error': 'Execution timed out after 30 seconds',
                 'execution_time': '>30s',

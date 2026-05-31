@@ -8,7 +8,7 @@ class TestCLIRefactored:
         runner = CliRunner()
         result = runner.invoke(cli, ['--help'])
         assert result.exit_code == 0
-        assert 'Green AI Software Analyzer' in result.output
+        assert 'Green-AI Agent' in result.output
         assert 'scan' in result.output
         assert 'project' in result.output
         assert 'dashboard' in result.output
