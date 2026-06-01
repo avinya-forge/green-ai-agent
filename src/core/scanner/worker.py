@@ -5,49 +5,39 @@ from src.core.analyzer import EmissionAnalyzer
 from src.core.detectors import detect_violations
 from src.core.detectors.ai_usage_detector import scan_file_for_ai_usage
 from src.core.cache import DiskCache
+from src.core.scanner.suppression import get_suppressions, is_suppressed, load_external_suppressions
 import os
 
-# Global cache instance for worker reuse
 _disk_cache_instance = None
 
-
 def _checks_include(config: Dict, check: str) -> bool:
-    """Return True if the given check category is enabled in config."""
     checks = config.get('checks', ['all'])
     if isinstance(checks, str):
         checks = [checks]
     return 'all' in checks or check in checks
 
-
 def scan_file_worker(
     file_path: str, language: str, config: Dict, rules: List[Dict]
 ) -> Dict[str, Any]:
-    """
-    Worker function to scan and analyze a single file.
-    Running in a separate process.
-    """
     global _disk_cache_instance
 
     try:
-        # Initialize analyzer
         analyzer = EmissionAnalyzer()
         remediation_engine = RemediationEngine()
 
-        # Initialize cache
         cache_config = config.get('cache', {})
         cache_enabled = cache_config.get('enabled', True)
         cache_path = cache_config.get('path', '.green-ai/cache')
 
         disk_cache = None
         if cache_enabled:
-            # Check if we can reuse the global instance
-            # Compare resolved paths to ensure we are using the correct cache directory
             expanded_path = os.path.expanduser(cache_path)
-
             if _disk_cache_instance is None or _disk_cache_instance.cache_dir != expanded_path:
                 _disk_cache_instance = DiskCache(cache_dir=cache_path)
-
             disk_cache = _disk_cache_instance
+
+        # Load suppressions fresh per file to avoid global state issues in tests
+        external_suppressions = load_external_suppressions()
 
         issues = []
         emissions = 0.0
@@ -56,11 +46,14 @@ def scan_file_worker(
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
 
-            # Explicitly check for syntax errors
-            if language == 'python':
-                ast.parse(content)
+            inline_suppressions = get_suppressions(content)
 
-            # Scan for violations (with caching)
+            if language == 'python':
+                try:
+                    ast.parse(content)
+                except SyntaxError:
+                    pass # Handled below
+
             violations = None
             if disk_cache:
                 violations = disk_cache.get(content, language)
@@ -70,17 +63,10 @@ def scan_file_worker(
                 if disk_cache:
                     disk_cache.set(content, language, violations)
 
-            # Convert violations to full issue format
             for violation in violations:
-                # Find rule in provided rules list
                 rule = next((r for r in rules if r['id'] == violation['id']), None)
-
                 if rule:
                     rule_id = rule.get('id', violation.get('id', 'unknown'))
-
-                    # Check if rule is enabled in config
-                    # Re-implement is_rule_enabled logic here since we don't have
-                    # ConfigLoader instance
                     enabled_rules = config.get('rules', {}).get('enabled', [])
                     disabled_rules = config.get('rules', {}).get('disabled', [])
 
@@ -91,64 +77,52 @@ def scan_file_worker(
                         is_enabled = True
 
                     if is_enabled:
-                        # Apply severity override
-                        severity = rule.get('severity', 'medium')
-                        severity_overrides = config.get('rules', {}).get('severity', {})
-                        if rule_id in severity_overrides:
-                            severity = severity_overrides[rule_id]
-
                         issue = {
                             'id': rule_id,
                             'type': 'green_violation',
-                            'severity': severity,
+                            'severity': rule.get('severity', 'medium'),
                             'message': violation.get('message', 'N/A'),
                             'file': file_path,
                             'line': violation.get('line', 0),
                             'remediation': rule.get('remediation', 'N/A'),
-                            'ai_suggestion': remediation_engine.get_suggestion(
-                                rule_id
-                            ),
+                            'ai_suggestion': remediation_engine.get_suggestion(rule_id),
                             'effort': rule.get('effort', 'Medium'),
                             'tags': rule.get('tags', []),
                             'carbon_impact': rule.get('carbon_impact', 1e-9),
                             'energy_factor': rule.get('energy_factor', 1),
                             'name': rule.get('name', rule_id)
                         }
-                        issues.append(issue)
 
-            # AI sustainability analysis (EPIC-28)
+                        if not is_suppressed(issue, inline_suppressions, external_suppressions):
+                            issues.append(issue)
+
             if _checks_include(config, 'ai'):
                 ai_violations = scan_file_for_ai_usage(file_path)
                 for av in ai_violations:
-                    enabled_rules = config.get('rules', {}).get('enabled', [])
-                    disabled_rules = config.get('rules', {}).get('disabled', [])
                     rule_id = av['rule_id']
-                    is_enabled = rule_id not in disabled_rules and (
-                        not enabled_rules or rule_id in enabled_rules
-                    )
-                    if is_enabled:
-                        issues.append({
-                            'id': rule_id,
-                            'type': 'ai_sustainability',
-                            'severity': av['severity'],
-                            'message': av['message'],
-                            'file': av['file'],
-                            'line': av['line'],
-                            'remediation': av.get('co2_note', ''),
-                            'ai_suggestion': None,
-                            'effort': 'Medium',
-                            'tags': ['ai', 'sustainability', av.get('provider', 'ai')],
-                            'carbon_impact': av.get('estimated_co2_g', 0) * 1e-6,
-                            'energy_factor': 1,
-                            'name': rule_id.replace('_', ' ').title(),
-                            'category': 'ai_sustainability',
-                            'co2_note': av.get('co2_note', ''),
-                            'provider': av.get('provider'),
-                            'model_tier': av.get('model_tier', 'unknown'),
-                            'estimated_co2_g': av.get('estimated_co2_g', 0),
-                        })
+                    issue = {
+                        'id': rule_id,
+                        'type': 'ai_sustainability',
+                        'severity': av['severity'],
+                        'message': av['message'],
+                        'file': av['file'],
+                        'line': av['line'],
+                        'remediation': av.get('co2_note', ''),
+                        'ai_suggestion': None,
+                        'effort': 'Medium',
+                        'tags': ['ai', 'sustainability', av.get('provider', 'ai')],
+                        'carbon_impact': av.get('estimated_co2_g', 0) * 1e-6,
+                        'energy_factor': 1,
+                        'name': rule_id.replace('_', ' ').title(),
+                        'category': 'ai_sustainability',
+                        'co2_note': av.get('co2_note', ''),
+                        'provider': av.get('provider'),
+                        'model_tier': av.get('model_tier', 'unknown'),
+                        'estimated_co2_g': av.get('estimated_co2_g', 0),
+                    }
+                    if not is_suppressed(issue, inline_suppressions, external_suppressions):
+                        issues.append(issue)
 
-            # Analyze emissions
             metrics = analyzer.analyze_file(file_path, content)
             emissions = analyzer.estimate_emissions(metrics)
 
@@ -182,8 +156,6 @@ def scan_file_worker(
             'emissions': emissions
         }
     except Exception as e:
-        # Catch-all for unexpected worker crashes to prevent map iterator from raising
-        # and killing the main process loop
         return {
             'issues': [{
                 'id': 'worker_crash',

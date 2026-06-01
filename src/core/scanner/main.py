@@ -11,6 +11,7 @@ from src.core.config import ConfigLoader
 from src.core.tracking import create_tracker
 from src.core.calibration import CalibrationAgent
 from src.utils.logger import logger
+import click
 
 from src.core.scanner.worker import scan_file_worker
 from src.core.scanner.discovery import FileDiscoverer
@@ -179,7 +180,7 @@ class Scanner:
         }
 
         if skipped_count > 0 or fixed_count > 0:
-            logger.info(f"Baseline Delta: {len(issues)} new, {skipped_count} ignored, {fixed_count} fixed.")
+            click.echo(f"Baseline Delta: {len(issues)} new, {skipped_count} ignored, {fixed_count} fixed.")
 
         if progress_callback:
             progress_callback("Scan complete", 100)
