@@ -1,0 +1,30 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:980ab67a-a094-43b7-b4f1-3316bb593ed7",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-05-31T22:43:25.255468Z",
+    "component": {
+      "name": "",
+      "version": "1.0.0",
+      "type": "application"
+    }
+  },
+  "components": [
+    {
+      "name": "sample-python-pkg",
+      "version": "1.0.0",
+      "type": "library",
+      "purl": "pkg:pip/sample-python-pkg@1.0.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "externalReferences": []
+    }
+  ]
+}

@@ -14,6 +14,8 @@ from src.cli.commands.fix_ai import fix_ai
 from src.cli.commands.init import init
 from src.cli.commands.ci import ci
 from src.cli.commands.lsp import lsp
+from src.cli.commands.baseline import baseline
+from src.cli.commands.sbom import sbom
 
 
 @click.group()
@@ -30,6 +32,8 @@ cli.add_command(fix_ai)
 cli.add_command(init)
 cli.add_command(ci)
 cli.add_command(lsp)
+cli.add_command(baseline)
+cli.add_command(sbom)
 
 
 if __name__ == "__main__":
