@@ -9,7 +9,6 @@ from src.core.remediation.engine import RemediationEngine
 from src.core.analyzer import EmissionAnalyzer
 from src.core.config import ConfigLoader
 from src.core.tracking import create_tracker
-from src.core.calibration import CalibrationAgent
 from src.utils.logger import logger
 import click
 
@@ -96,17 +95,9 @@ class Scanner:
         processed_count = 0
         language_rules = self.rule_repo.get_rules(self.language)
 
-        config_chunk_size = self.config.get('chunk_size')
-        if config_chunk_size:
-            chunksize = int(config_chunk_size)
-        else:
-            cpus = os.cpu_count() or 1
-            chunksize = max(1, total_files // (cpus * 4))
-
         mp_context = multiprocessing.get_context('spawn')
-        total_scan_files = len(files_to_scan)
 
-        if total_scan_files > 0:
+        if total_files > 0:
             kwargs = {}
             if sys.version_info >= (3, 11):
                 kwargs['max_tasks_per_child'] = 50
@@ -114,19 +105,21 @@ class Scanner:
             with concurrent.futures.ProcessPoolExecutor(
                 max_workers=num_workers, mp_context=mp_context, **kwargs
             ) as executor:
-                import itertools
+                # Use executor.submit and as_completed for accurate progress state sync
+                futures = {
+                    executor.submit(
+                        scan_file_worker,
+                        file_path,
+                        self.language,
+                        self.config,
+                        language_rules
+                    ): file_path for file_path in files_to_scan
+                }
 
-                results_iterator = executor.map(
-                    scan_file_worker,
-                    files_to_scan,
-                    itertools.repeat(self.language),
-                    itertools.repeat(self.config),
-                    itertools.repeat(language_rules),
-                    chunksize=chunksize
-                )
-
-                for file_path, file_result in zip(files_to_scan, results_iterator):
+                for future in concurrent.futures.as_completed(futures):
+                    file_path = futures[future]
                     try:
+                        file_result = future.result()
                         issues.extend(file_result['issues'])
                         per_file_emissions[file_path] = file_result['emissions']
                         total_codebase_emissions += file_result['emissions']
@@ -187,6 +180,19 @@ class Scanner:
 
         return results
 
+    def _is_supported_file(self, file_path: str) -> bool:
+        """Check if file extension matches current language."""
+        ext_map = {
+            'python': ['.py'],
+            'javascript': ['.js', '.jsx'],
+            'typescript': ['.ts', '.tsx'],
+            'java': ['.java'],
+            'go': ['.go'],
+            'c-sharp': ['.cs']
+        }
+        ext = os.path.splitext(file_path)[1].lower()
+        return ext in ext_map.get(self.language, [])
+
     def _run_with_monitoring(self, path):
         if isinstance(path, list):
             return {
@@ -199,77 +205,17 @@ class Scanner:
         command = self._get_run_command(path)
         if not command:
             return {
-                'error': f'Runtime monitoring not supported for language {self.language}'
+                'error': f'Could not determine run command for {self.language}'
             }
 
-        try:
-            import subprocess
-            import time
+        from src.agents.runtime_monitor.main import RuntimeMonitor
+        monitor = RuntimeMonitor()
+        return monitor.monitor_execution(command)
 
-            runtime_tracker = create_tracker(enable_profiling=True)
-            runtime_tracker.start()
-
-            start_time = time.time()
-            result = subprocess.run(
-                command, capture_output=True, text=True, timeout=30
-            )
-
-            execution_time = time.time() - start_time
-            runtime_emissions = runtime_tracker.stop()
-
-            return {
-                'output': result.stdout.strip(),
-                'error': result.stderr.strip(),
-                'return_code': result.returncode,
-                'execution_time': f"{execution_time:.2f}s",
-                'emissions': runtime_emissions
-            }
-
-        except subprocess.TimeoutExpired:
-            runtime_tracker.stop()
-            return {
-                'error': 'Execution timed out after 30 seconds',
-                'execution_time': '>30s',
-                'emissions': 0.0
-            }
-        except Exception as e:
-            try:
-                runtime_tracker.stop()
-            except Exception:
-                pass
-            return {
-                'error': str(e),
-                'execution_time': 'N/A',
-                'emissions': 0.0
-            }
-
-    def _get_run_command(self, path):
+    def _get_run_command(self, path: str) -> Optional[List[str]]:
+        """Determine command to run the script."""
         if self.language == 'python':
             return [sys.executable, path]
-        elif self.language == 'javascript':
-            return ['node', path]
-        elif self.language == 'typescript':
-            return ['npx', 'ts-node', path]
-        elif self.language == 'java':
-            return ['java', path]
-        elif self.language == 'go':
-            return ['go', 'run', path]
-        elif self.language == 'csharp':
-            return ['dotnet', 'script', path]
-        else:
-            return None
-
-    def _is_supported_file(self, file_path):
-        if self.language == 'python':
-            return file_path.endswith('.py')
-        elif self.language == 'javascript':
-            return file_path.endswith('.js')
-        elif self.language == 'typescript':
-            return file_path.endswith('.ts') or file_path.endswith('.tsx')
-        elif self.language == 'java':
-            return file_path.endswith('.java')
-        elif self.language == 'go':
-            return file_path.endswith('.go')
-        elif self.language == 'csharp':
-            return file_path.endswith('.cs')
-        return False
+        if self.language == "javascript":
+            return ["node", path]
+        return None

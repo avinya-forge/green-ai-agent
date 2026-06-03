@@ -1,4 +1,4 @@
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import ast
 from src.core.remediation.engine import RemediationEngine
 from src.core.analyzer import EmissionAnalyzer
@@ -10,16 +10,22 @@ import os
 
 _disk_cache_instance = None
 
+
 def _checks_include(config: Dict, check: str) -> bool:
+    if not config:
+        return check != 'ai'
     checks = config.get('checks', ['all'])
     if isinstance(checks, str):
         checks = [checks]
     return 'all' in checks or check in checks
 
+
 def scan_file_worker(
-    file_path: str, language: str, config: Dict, rules: List[Dict]
+    file_path: str, language: str, config: Optional[Dict], rules: List[Dict]
 ) -> Dict[str, Any]:
     global _disk_cache_instance
+    if config is None:
+        config = {}
 
     try:
         analyzer = EmissionAnalyzer()
@@ -52,7 +58,7 @@ def scan_file_worker(
                 try:
                     ast.parse(content)
                 except SyntaxError:
-                    pass # Handled below
+                    raise
 
             violations = None
             if disk_cache:
@@ -67,8 +73,10 @@ def scan_file_worker(
                 rule = next((r for r in rules if r['id'] == violation['id']), None)
                 if rule:
                     rule_id = rule.get('id', violation.get('id', 'unknown'))
-                    enabled_rules = config.get('rules', {}).get('enabled', [])
-                    disabled_rules = config.get('rules', {}).get('disabled', [])
+                    rules_config = config.get('rules', {})
+                    enabled_rules = rules_config.get('enabled', [])
+                    disabled_rules = rules_config.get('disabled', [])
+                    severity_overrides = rules_config.get('severity', {})
 
                     is_enabled = True
                     if rule_id in disabled_rules:
@@ -77,10 +85,13 @@ def scan_file_worker(
                         is_enabled = True
 
                     if is_enabled:
+                        # Apply severity override if present
+                        issue_severity = severity_overrides.get(rule_id, rule.get('severity', 'medium'))
+
                         issue = {
                             'id': rule_id,
                             'type': 'green_violation',
-                            'severity': rule.get('severity', 'medium'),
+                            'severity': issue_severity,
                             'message': violation.get('message', 'N/A'),
                             'file': file_path,
                             'line': violation.get('line', 0),

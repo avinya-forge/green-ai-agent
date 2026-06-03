@@ -1,47 +1,62 @@
 import json
-import hashlib
-import os
 from pathlib import Path
+from typing import Optional, List, Dict, Any, Tuple
 
-def get_violation_fingerprint(issue):
-    """Create a unique fingerprint for a violation"""
-    return hashlib.sha256(f"{issue.get('id')}:{issue.get('file')}:{issue.get('line')}".encode()).hexdigest()
 
-def load_baseline():
-    """Load baseline if it exists"""
-    baseline_file = Path('.green-ai/baseline.json')
-    if baseline_file.exists():
-        try:
-            with open(baseline_file, 'r') as f:
-                return json.load(f)
-        except Exception:
-            return None
-    return None
+def load_baseline(baseline_path: str = '.green-ai/baseline.json') -> Optional[Dict]:
+    """Load baseline data from file."""
+    path = Path(baseline_path)
+    if not path.exists():
+        return None
+    try:
+        with open(path, 'r') as f:
+            return json.load(f)
+    except Exception:
+        return None
 
-def filter_with_baseline(issues, baseline):
-    """Filter out issues that are present in the baseline and calculate delta"""
+
+def filter_with_baseline(
+    issues: List[Dict], baseline: Optional[Dict]
+) -> Tuple[List[Dict], int, int]:
+    """
+    Filter out issues that are already in the baseline.
+    Returns (filtered_issues, skipped_count, fixed_count)
+    """
     if not baseline:
         return issues, 0, 0
 
-    baseline_violations = baseline.get('violations', [])
-    baseline_fingerprints = {v['fingerprint'] for v in baseline_violations}
+    baseline_fingerprints = {v['fingerprint'] for v in baseline.get('violations', [])}
+    filtered = []
+    skipped = 0
 
-    new_issues = []
-    baseline_skipped_count = 0
-
-    current_fingerprints = set()
     for issue in issues:
-        fp = get_violation_fingerprint(issue)
-        current_fingerprints.add(fp)
-        if fp in baseline_fingerprints:
-            baseline_skipped_count += 1
+        import hashlib
+        fingerprint = hashlib.sha256(
+            f"{issue.get('id')}:{issue.get('file')}:{issue.get('line')}".encode()
+        ).hexdigest()
+
+        if fingerprint in baseline_fingerprints:
+            skipped += 1
         else:
-            new_issues.append(issue)
+            filtered.append(issue)
 
-    # Calculate "fixed" issues (present in baseline but not in current scan)
-    fixed_count = 0
-    for bv in baseline_violations:
-        if bv['fingerprint'] not in current_fingerprints:
-            fixed_count += 1
+    # Simple fixed count estimation: items in baseline not in current scan
+    # This is a very rough estimate as lines change
+    current_fingerprints = {
+        hashlib.sha256(
+            f"{issue.get('id')}:{issue.get('file')}:{issue.get('line')}".encode()
+        ).hexdigest()
+        for issue in issues
+    }
+    fixed = 0
+    for bf in baseline_fingerprints:
+        if bf not in current_fingerprints:
+            fixed += 1
 
-    return new_issues, baseline_skipped_count, fixed_count
+    return filtered, skipped, fixed
+
+
+def get_violation_fingerprint(issue: Dict[str, Any]) -> str:
+    """Create a unique fingerprint for a violation"""
+    import hashlib
+    return hashlib.sha256(f"{issue.get('id')}:{issue.get('file')}:{issue.get('line')}".encode()).hexdigest()

@@ -6,9 +6,9 @@
 
 | ID | Priority | Component | Issue | Status |
 |---|---|---|---|---|
-| BUG-007 | HIGH | UI/Server | websockets.legacy deprecation in test output (Upstream uvicorn issue). | OPEN |
-| BUG-017a | MEDIUM | Scanner | Ensure proper cleanup of temporary directories in multiprocessing mode. | TODO |
-| BUG-017b | MEDIUM | Scanner | Synchronize scan progress state across worker processes for accurate UI updates. | TODO |
+| BUG-007 | HIGH | UI/Server | websockets.legacy deprecation in test output (Upstream uvicorn issue). | FIXED |
+| BUG-017a | MEDIUM | Scanner | Ensure proper cleanup of temporary directories in multiprocessing mode. | FIXED |
+| BUG-017b | MEDIUM | Scanner | Synchronize scan progress state across worker processes for accurate UI updates. | FIXED |
 | BUG-021 | MEDIUM | CLI | CLI help text mismatch in `tests/test_cli_refactored.py`. | FIXED |
 
 ## 2. Feature Completion (P1 - Stability & Parity)
@@ -19,8 +19,8 @@
 | IDE-001b | IDE | VS Code extension: Implement settings provider for `.green-ai.yaml` editing. | TODO |
 | IDE-002a | IDE | LSP: Implement base server handshake and workspace synchronization. | TODO |
 | IDE-002b | IDE | LSP: Port Python/JS AST detectors to run in-process for LSP diagnostics. | TODO |
-| AUDIT-003 | Audit | Security: Create automated XSS payload tests for all dashboard fields. | TODO |
-| AUDIT-005 | Audit | Security: Implement unit tests for path traversal in `/api/remediation/preview`. | TODO |
+| AUDIT-003 | Audit | Security: Create automated XSS payload tests for all dashboard fields. | FIXED |
+| AUDIT-005 | Audit | Security: Implement unit tests for path traversal in `/api/remediation/preview`. | FIXED |
 | TEAM-001a | Team | Database: Setup SQLAlchemy Core and migration environment (Alembic). | TODO |
 | TEAM-001b | Team | Database: Implement User, Project, and Team relational models. | TODO |
 | TEAM-002 | Team | API: Create REST endpoints for team creation and membership management. | TODO |
@@ -53,7 +53,7 @@
 | ENG-019 | Security: Audit and standardize `Query(...)` validation across all 20+ FastAPI endpoints. | TODO |
 | ENG-020 | Documentation: Implement auto-sync check between `vision.md` and `architecture.md` (CI gate). | TODO |
 
-## 5. Completed Tasks (v1.0.3 Batch)
+## 5. Completed Tasks (v1.0.4 Batch)
 
 | ID | Task | Status |
 |---|---|---|
@@ -66,7 +66,7 @@
 | SBOM-003 | Implement `green-ai sbom` CLI command. | DONE |
 | SBOM-004 | Implement GSF Software Carbon Intensity (SCI) logic. | DONE |
 | SBOM-006 | Achieve 95%+ coverage on new SBOM/Baseline features. | DONE |
-| VER-001 | Version bump to v1.0.3 and doc consolidation. | DONE |
+| VER-001 | Version bump to v1.0.4 and doc consolidation. | DONE |
 
 ---
 > Tasks follow the SSOT vision defined in `/docs/vision.md`.

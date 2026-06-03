@@ -5,14 +5,17 @@ import hashlib
 from pathlib import Path
 from src.core.scanner.main import Scanner
 
+
 @click.group()
 def baseline():
     """Manage scan baselines to acknowledge technical debt"""
     pass
 
+
 def _get_violation_fingerprint(issue):
     """Create a unique fingerprint for a violation"""
     return hashlib.sha256(f"{issue.get('id')}:{issue.get('file')}:{issue.get('line')}".encode()).hexdigest()
+
 
 @baseline.command('create')
 @click.argument('path', type=click.Path(exists=True))
@@ -54,9 +57,10 @@ def baseline_create(path, language):
     finally:
         if Path('.green-ai/baseline.json.bak').exists():
             if not Path('.green-ai/baseline.json').exists():
-                 os.rename('.green-ai/baseline.json.bak', '.green-ai/baseline.json')
+                os.rename('.green-ai/baseline.json.bak', '.green-ai/baseline.json')
             else:
-                 os.remove('.green-ai/baseline.json.bak')
+                os.remove('.green-ai/baseline.json.bak')
+
 
 @baseline.command('update')
 @click.argument('path', type=click.Path(exists=True))

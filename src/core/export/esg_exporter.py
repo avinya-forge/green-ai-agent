@@ -8,6 +8,7 @@ from src.utils.logger import logger
 TEMPLATE_DIR = Path(__file__).parent / 'templates'
 OUTPUT_DIR = Path(__file__).parent.parent.parent.parent / 'output'
 
+
 class ESGExporter:
     """Generates ESG compliance reports"""
 
@@ -33,7 +34,7 @@ class ESGExporter:
         secret_count = sum(1 for i in issues if 'secret' in i.get('tags', []))
 
         # Governance metrics
-        debt_hours = len(issues) * 0.5 # Simple heuristic: 30 mins per issue
+        debt_hours = len(issues) * 0.5  # Simple heuristic: 30 mins per issue
 
         context = {
             'project_name': project_name,
