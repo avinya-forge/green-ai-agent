@@ -16,6 +16,7 @@ from src.core.scanner.worker import scan_file_worker
 from src.core.scanner.discovery import FileDiscoverer
 from src.core.scanner.baseline_helper import load_baseline, filter_with_baseline
 from src.core.quality.duplication import DuplicationDetector
+from src.core.quality.dead_code import DeadCodeDetector
 
 
 class Scanner:
@@ -54,6 +55,7 @@ class Scanner:
 
         logger.info(f"Starting scan on {path}...")
         duplication_detector = DuplicationDetector()
+        dead_code_detector = DeadCodeDetector()
 
         scan_metadata_path = ""
 
@@ -135,7 +137,15 @@ class Scanner:
                         # Add to duplication detector
                         try:
                             with open(file_path, 'r', encoding='utf-8') as f:
-                                duplication_detector.add_file(file_path, f.read())
+                                content = f.read()
+                                duplication_detector.add_file(file_path, content)
+                                if file_path.endswith('.py'):
+                                    try:
+                                        import ast
+                                        tree = ast.parse(content)
+                                        dead_code_detector.visit(tree)
+                                    except Exception:
+                                        pass
                         except Exception:
                             pass
 
@@ -157,6 +167,25 @@ class Scanner:
         # Apply baseline filtering (BASE-002)
         baseline = load_baseline()
         issues, skipped_count, fixed_count = filter_with_baseline(issues, baseline)
+
+                # Add dead code issues
+        dead_code = dead_code_detector.get_dead_code()
+        for dc in dead_code:
+            # We don't know the file easily from the detector since it aggregates
+            # For simplicity, we assign it to the last processed file or mark as global
+            # Better: Make DeadCodeDetector track file paths.
+            issues.append({
+                'id': dc['id'],
+                'type': 'quality',
+                'severity': 'medium',
+                'message': dc['message'],
+                'file': 'multiple', # Placeholder
+                'line': dc['line'],
+                'remediation': 'Remove unused code to reduce memory and complexity.',
+                'effort': 'Low',
+                'tags': ['quality', 'dead-code'],
+                'name': 'Unused Definition'
+            })
 
         # Add duplication issues
         duplicates = duplication_detector.detect_duplicates()

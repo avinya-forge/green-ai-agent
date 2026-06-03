@@ -52,3 +52,39 @@ rules:
       - algorithmic
     energy_factor: 10
     carbon_impact: 0.000005
+
+  - id: insecure_hash_go
+    name: Insecure Hash Algorithm (Go)
+    severity: critical
+    message: "md5 or sha1 detected. These are cryptographically broken."
+    pattern: |
+      crypto/md5|crypto/sha1
+    remediation: "Use crypto/sha256 or crypto/sha512 instead."
+    effort: Medium
+    tags:
+      - security
+      - cryptography
+
+  - id: hardcoded_secret_go
+    name: Potential Hardcoded Secret (Go)
+    severity: critical
+    message: "Potential hardcoded secret or API key detected."
+    pattern: |
+      (?i)(password|secret|key|token)\s*:=\s*".{8,}"
+    remediation: "Use environment variables (os.Getenv) or secret management services."
+    effort: Medium
+    tags:
+      - security
+      - secrets
+
+  - id: http_no_timeout
+    name: HTTP Client without Timeout
+    severity: major
+    message: "http.Client without timeout can lead to resource exhaustion."
+    pattern: |
+      &http\.Client\s*{\s*}
+    remediation: "Specify a Timeout in the http.Client configuration."
+    effort: Low
+    tags:
+      - security
+      - performance

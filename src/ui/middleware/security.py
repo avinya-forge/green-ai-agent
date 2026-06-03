@@ -13,6 +13,8 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         # Security Headers
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Permissions-Policy"] = "geolocation=(), camera=(), microphone=()"
 
         # CSP: Allow self, data (for charts), and CDN for Chart.js
         # We need 'unsafe-inline' and 'unsafe-eval' because Chart.js and some inline scripts are used in templates.
@@ -21,7 +23,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             "default-src 'self'; "
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
             "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
-            "img-src 'self' data: https:; "
+            "img-src 'self' data: https:; object-src 'none'; "
             "font-src 'self' https: data:;"
         )
         response.headers["Content-Security-Policy"] = csp

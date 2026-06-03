@@ -6,7 +6,7 @@ from typing import List, Dict
 from tree_sitter import Query, QueryCursor
 import tree_sitter_typescript
 from src.utils.logger import logger
-from .javascript_detector import JavaScriptASTDetector
+from src.core.detectors.javascript_detector import JavaScriptASTDetector
 
 
 class TypeScriptASTDetector(JavaScriptASTDetector):

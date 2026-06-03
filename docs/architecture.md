@@ -261,3 +261,10 @@ helm install green-ai ./deploy/helm/green-ai -f custom-values.yaml
 **Decision:** Pin `fastapi==0.136.0`, `starlette==1.0.0`, `uvicorn==0.45.0`, `python-socketio==5.16.1`.  
 **Reason:** Starlette 1.0.0 changed `TemplateResponse` signature, silently breaking 8 tests on fresh install. Unpinned framework deps are a reliability risk.  
 **Status:** Added to `requirements.txt`. See BUG-004 in backlog.
+
+## Alignment with Vision
+The architecture implements the four pillars defined in vision.md:
+1. **Environmental**: Focused in `src/core/analyzer.py` and `src/agents/`.
+2. **Security**: Implemented via YAML rules and `src/core/detectors/`.
+3. **Governance**: Managed in `src/core/quality/` and dashboard.
+4. **AI-Fix**: Core logic in `src/core/remediation/`.

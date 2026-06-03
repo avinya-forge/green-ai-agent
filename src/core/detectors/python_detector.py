@@ -4,7 +4,6 @@ Python-specific detection strategies for green software violations.
 
 import ast
 from typing import List, Dict
-from src.utils.entropy import calculate_shannon_entropy
 
 
 class PythonViolationDetector(ast.NodeVisitor):

@@ -38,3 +38,33 @@ rules:
     tags: [code_quality]
     carbon_impact: 0
     energy_factor: 0
+
+  - id: insecure_crypto
+    name: Insecure Cryptographic Algorithm
+    severity: critical
+    message: Use of MD5 or DES detected. These algorithms are considered broken.
+    pattern: |
+      MessageDigest\.getInstance\(["'](MD5|SHA-1)["']\)|Cipher\.getInstance\(["']DES["']\)
+    remediation: Use SHA-256 or AES for cryptographic operations.
+    effort: Medium
+    tags: [security, cryptography]
+
+  - id: hardcoded_password
+    name: Potential Hardcoded Password
+    severity: critical
+    message: Potential hardcoded password or secret detected in assignment.
+    pattern: |
+      (password|secret|key|token)\s*=\s*["'][^"']{8,}["']
+    remediation: Use environment variables or a secret management service.
+    effort: Medium
+    tags: [security, secrets]
+
+  - id: trust_all_certs
+    name: Insecure Trust Manager
+    severity: critical
+    message: Trusting all SSL certificates is a security risk (Man-in-the-Middle).
+    pattern: |
+      checkClientTrusted|checkServerTrusted|X509TrustManager
+    remediation: Implement proper certificate validation logic.
+    effort: High
+    tags: [security, network]

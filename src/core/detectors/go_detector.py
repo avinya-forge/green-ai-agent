@@ -6,7 +6,7 @@ from typing import List, Dict, Set
 from tree_sitter import Language, Query, QueryCursor
 import tree_sitter_go
 from src.utils.logger import logger
-from .base_detector import BaseTreeSitterDetector
+from src.core.detectors.base_detector import BaseTreeSitterDetector
 
 # Query Constants
 QUERY_FORMATTED_PRINT = """

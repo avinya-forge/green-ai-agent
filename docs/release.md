@@ -18,3 +18,9 @@ v1.0.4 introduces advanced quality metrics, code duplication detection, and enha
 - **LOC Target**: 500
 - **Final LOC Delta**: ~500+
 - **Test Coverage**: >95% (Project-wide)
+
+## Alignment
+Verified against vision.md:
+- E: Cognitive Complexity & Duplication Detection reduce wasted execution.
+- S: Expanded SAST rules for Java, Go, Python, and JS.
+- G: Standardized code structure and absolute imports.

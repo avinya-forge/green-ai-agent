@@ -1,11 +1,12 @@
 import json
 import hashlib
-import os
 from pathlib import Path
+
 
 def get_violation_fingerprint(issue):
     """Create a unique fingerprint for a violation"""
     return hashlib.sha256(f"{issue.get('id')}:{issue.get('file')}:{issue.get('line')}".encode()).hexdigest()
+
 
 def load_baseline():
     """Load baseline if it exists"""
@@ -17,6 +18,7 @@ def load_baseline():
         except Exception:
             return None
     return None
+
 
 def filter_with_baseline(issues, baseline):
     """Filter out issues that are present in the baseline and calculate delta"""

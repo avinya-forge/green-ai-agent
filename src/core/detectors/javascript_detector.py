@@ -8,7 +8,7 @@ from tree_sitter import Query, QueryCursor
 import tree_sitter_javascript
 from src.utils.logger import logger
 from src.utils.entropy import calculate_shannon_entropy
-from .base_detector import BaseTreeSitterDetector
+from src.core.detectors.base_detector import BaseTreeSitterDetector
 
 
 class JavaScriptASTDetector(BaseTreeSitterDetector):

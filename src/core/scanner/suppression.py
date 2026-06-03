@@ -1,7 +1,7 @@
 import re
 import yaml
-import os
 from pathlib import Path
+
 
 def get_suppressions(content):
     suppressions = {}
@@ -17,6 +17,7 @@ def get_suppressions(content):
                     suppressions[target_line] = []
                 suppressions[target_line].append(rid)
     return suppressions
+
 
 def load_external_suppressions():
     suppress_file = Path('.green-ai/suppress.yaml')
@@ -40,6 +41,7 @@ def load_external_suppressions():
         except Exception:
             return []
     return []
+
 
 def is_suppressed(issue, inline_suppressions, external_suppressions=None):
     line = issue.get('line')

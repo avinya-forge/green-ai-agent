@@ -6,13 +6,13 @@ This module exports detector classes and the main `detect_violations` function.
 
 from typing import List, Dict
 
-from .python_detector import PythonViolationDetector
-from .javascript_detector import JavaScriptASTDetector, JavaScriptViolationDetector
-from .typescript_detector import TypeScriptASTDetector
-from .java_detector import JavaASTDetector
-from .go_detector import GoASTDetector
-from .csharp_detector import CSharpASTDetector
-from .pattern_detector import PatternBasedDetector
+from src.core.detectors.python_detector import PythonViolationDetector
+from src.core.detectors.javascript_detector import JavaScriptASTDetector, JavaScriptViolationDetector
+from src.core.detectors.typescript_detector import TypeScriptASTDetector
+from src.core.detectors.java_detector import JavaASTDetector
+from src.core.detectors.go_detector import GoASTDetector
+from src.core.detectors.csharp_detector import CSharpASTDetector
+from src.core.detectors.pattern_detector import PatternBasedDetector
 from src.core.detectors.cache import detection_cache
 
 
