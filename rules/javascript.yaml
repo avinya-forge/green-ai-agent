@@ -180,3 +180,36 @@ rules:
     remediation: Use textContent or DOM node manipulation methods.
     source: ecoCode
     tags: [performance, security]
+
+  - id: new_function_usage
+    name: Unsafe Function Constructor
+    description: The Function constructor can be used to execute arbitrary code similar to eval().
+    severity: critical
+    languages: [javascript]
+    pattern: |
+      new\s+Function\(
+    remediation: Avoid dynamic code execution from strings.
+    source: OWASP
+    tags: [security, performance]
+
+  - id: insecure_random
+    name: Insecure Random Number Generation
+    description: Math.random() is not cryptographically secure.
+    severity: major
+    languages: [javascript]
+    pattern: |
+      Math\.random\(
+    remediation: Use crypto.getRandomValues() for security-sensitive random numbers.
+    source: OWASP
+    tags: [security, cryptography]
+
+  - id: dangerously_set_inner_html
+    name: React Dangerously Set innerHTML
+    description: Using dangerouslySetInnerHTML can expose XSS vulnerabilities.
+    severity: critical
+    languages: [javascript]
+    pattern: |
+      dangerouslySetInnerHTML
+    remediation: Use standard JSX or sanitize input before rendering.
+    source: OWASP
+    tags: [security, framework]

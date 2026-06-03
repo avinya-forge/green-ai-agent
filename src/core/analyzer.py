@@ -24,6 +24,7 @@ class ComplexityMetrics:
     loop_iterations_estimate: int  # Estimated total iterations
     has_io_operations: bool  # File/network I/O detected
     has_expensive_operations: bool  # Sorting, searching, regex
+    cognitive_complexity: int = 0
 
     def calculate_complexity_score(self) -> float:
         """Calculate a composite complexity score (0-100)."""
@@ -48,6 +49,10 @@ class ComplexityMetrics:
         # Function/class count contribution (max 10 points)
         entity_score = min(10, ((self.function_count + self.class_count) / 100) * 10)
         score += entity_score
+
+        # Cognitive complexity contribution (max 20 points)
+        cog_score = min(20, (self.cognitive_complexity / 50) * 20)
+        score += cog_score
 
         # I/O operations bonus (5 points)
         if self.has_io_operations:
@@ -171,6 +176,45 @@ class CodeComplexityAnalyzer(ast.NodeVisitor):
         self.generic_visit(node)
 
 
+class CognitiveComplexityAnalyzer(ast.NodeVisitor):
+    """AST visitor to calculate cognitive complexity (SonarQube-style)."""
+    def __init__(self):
+        self.complexity = 0
+        self.nesting = 0
+
+    def visit_If(self, node):
+        self.complexity += (1 + self.nesting)
+        self.nesting += 1
+        self.generic_visit(node)
+        self.nesting -= 1
+
+    def visit_IfExp(self, node):
+        self.complexity += (1 + self.nesting)
+        self.generic_visit(node)
+
+    def visit_For(self, node):
+        self.complexity += (1 + self.nesting)
+        self.nesting += 1
+        self.generic_visit(node)
+        self.nesting -= 1
+
+    def visit_While(self, node):
+        self.complexity += (1 + self.nesting)
+        self.nesting += 1
+        self.generic_visit(node)
+        self.nesting -= 1
+
+    def visit_ExceptHandler(self, node):
+        self.complexity += (1 + self.nesting)
+        self.nesting += 1
+        self.generic_visit(node)
+        self.nesting -= 1
+
+    def visit_BoolOp(self, node):
+        self.complexity += len(node.values) - 1
+        self.generic_visit(node)
+
+
 class EmissionAnalyzer:
     """
     Analyzes code to estimate carbon emissions from execution.
@@ -227,6 +271,9 @@ class EmissionAnalyzer:
         # Estimate memory usage
         memory_estimate = self._estimate_memory_usage(content)
 
+        cog_analyzer = CognitiveComplexityAnalyzer()
+        cog_analyzer.visit(tree)
+
         metrics = ComplexityMetrics(
             lines_of_code=content.count('\n') + 1,
             cyclomatic_complexity=analyzer.cyclomatic_complexity,
@@ -237,7 +284,8 @@ class EmissionAnalyzer:
             memory_usage_estimate=memory_estimate,
             loop_iterations_estimate=analyzer.loop_iterations_estimate,
             has_io_operations=analyzer.has_io_operations,
-            has_expensive_operations=analyzer.has_expensive_operations
+            has_expensive_operations=analyzer.has_expensive_operations,
+            cognitive_complexity=cog_analyzer.complexity
         )
 
         return metrics

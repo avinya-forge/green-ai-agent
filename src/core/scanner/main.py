@@ -9,13 +9,13 @@ from src.core.remediation.engine import RemediationEngine
 from src.core.analyzer import EmissionAnalyzer
 from src.core.config import ConfigLoader
 from src.core.tracking import create_tracker
-from src.core.calibration import CalibrationAgent
 from src.utils.logger import logger
 import click
 
 from src.core.scanner.worker import scan_file_worker
 from src.core.scanner.discovery import FileDiscoverer
 from src.core.scanner.baseline_helper import load_baseline, filter_with_baseline
+from src.core.quality.duplication import DuplicationDetector
 
 
 class Scanner:
@@ -53,6 +53,7 @@ class Scanner:
         tracker.start()
 
         logger.info(f"Starting scan on {path}...")
+        duplication_detector = DuplicationDetector()
 
         scan_metadata_path = ""
 
@@ -131,6 +132,13 @@ class Scanner:
                         per_file_emissions[file_path] = file_result['emissions']
                         total_codebase_emissions += file_result['emissions']
 
+                        # Add to duplication detector
+                        try:
+                            with open(file_path, 'r', encoding='utf-8') as f:
+                                duplication_detector.add_file(file_path, f.read())
+                        except Exception:
+                            pass
+
                         processed_count += 1
                         if progress_callback and total_files > 0:
                             percentage = 10 + int(
@@ -149,6 +157,26 @@ class Scanner:
         # Apply baseline filtering (BASE-002)
         baseline = load_baseline()
         issues, skipped_count, fixed_count = filter_with_baseline(issues, baseline)
+
+        # Add duplication issues
+        duplicates = duplication_detector.detect_duplicates()
+        for dupe in duplicates:
+            # Create a synthetic issue for duplication
+            first_occ = dupe['occurrences'][0]
+            other_occs = [f"{o['file']}:{o['start']}" for o in dupe['occurrences'][1:]]
+            issues.append({
+                'id': 'code_duplication',
+                'type': 'quality',
+                'severity': 'medium',
+                'message': f"Duplicate code block found in {len(dupe['occurrences'])} locations. Others: {', '.join(other_occs)}",
+                'file': first_occ['file'],
+                'line': first_occ['start'],
+                'remediation': 'Refactor duplicate code into a shared function or module.',
+                'effort': 'Medium',
+                'tags': ['quality', 'duplication'],
+                'carbon_impact': 1e-7,
+                'name': 'Code Duplication'
+            })
 
         # Distribute codebase emissions across issues
         issues = self.emission_analyzer.get_per_line_emissions(

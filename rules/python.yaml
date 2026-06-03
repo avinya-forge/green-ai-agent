@@ -290,3 +290,36 @@ rules:
     remediation: Add timeout argument.
     source: python-guide
     tags: [reliability, resource-management]
+
+  - id: insecure_hash
+    name: Insecure Hash Algorithm
+    description: MD5 and SHA1 are cryptographically broken and should not be used for security. (OWASP Top 10)
+    severity: critical
+    languages: [python]
+    pattern: |
+      hashlib\.(md5|sha1)\(
+    remediation: Use SHA256 or stronger algorithms.
+    source: OWASP
+    tags: [security, cryptography]
+
+  - id: unsafe_yaml_load
+    name: Unsafe YAML Load
+    description: yaml.load() without a Loader is vulnerable to arbitrary code execution.
+    severity: critical
+    languages: [python]
+    pattern: |
+      yaml\.load\(
+    remediation: Use yaml.safe_load() or specify a SafeLoader.
+    source: OWASP
+    tags: [security, serialization]
+
+  - id: bind_all_interfaces
+    name: Binding to All Interfaces
+    description: Binding to 0.0.0.0 makes the service accessible from any network interface.
+    severity: major
+    languages: [python]
+    pattern: |
+      ["']0\.0\.0\.0["']
+    remediation: Bind to specific interfaces or 127.0.0.1 for local services.
+    source: OWASP
+    tags: [security, network]

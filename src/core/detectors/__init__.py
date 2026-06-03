@@ -16,7 +16,7 @@ from .pattern_detector import PatternBasedDetector
 from src.core.detectors.cache import detection_cache
 
 
-def detect_violations(content: str, file_path: str, language: str = 'python') -> List[Dict]:
+def detect_violations(content: str, file_path: str, language: str = 'python', rules: List[Dict] = None) -> List[Dict]:
     """
     Detect all violations in code.
 
@@ -35,7 +35,7 @@ def detect_violations(content: str, file_path: str, language: str = 'python') ->
         violations.extend(ast_detector.detect_all())
 
         # Pattern-based detection
-        pattern_detector = PatternBasedDetector(content, file_path)
+        pattern_detector = PatternBasedDetector(content, file_path, rules=rules)
         violations.extend(pattern_detector.detect_all())
 
     elif language == 'javascript':

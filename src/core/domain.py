@@ -29,6 +29,7 @@ class Violation(BaseModel):
     line: int
     severity: ViolationSeverity
     message: str
+    cognitive_complexity: Optional[int] = None
     pattern_match: Optional[str] = None
 
     model_config = ConfigDict(extra='ignore')
@@ -289,3 +290,5 @@ class ProjectComparisonDTO(BaseModel):
             total_emissions=project.total_emissions,
             last_scan_time=project.last_scan
         )
+
+# Consistency update: Added cognitive_complexity to domain models.
