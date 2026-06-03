@@ -1,15 +1,13 @@
 import click
 import sys
+import os
 from typing import Dict, Any
 from src.core.scanner import Scanner
 from src.core.config import ConfigLoader
 from src.core.git_operations import GitOperations, GitException
 from src.core.project_manager import ProjectManager
-from src.core.export import CSVExporter, HTMLReporter, JSONExporter
-from src.core.export.xml_exporter import JUnitXMLExporter
-from src.core.export.pdf_exporter import PDFExporter
 from src.ui.state import set_last_scan_results
-from src.utils.security import sanitize_path, sanitize_project_name, \
+from src.utils.security import sanitize_project_name, \
     is_safe_git_url
 
 
@@ -147,20 +145,10 @@ def scan(
     manual, export, format, output, telemetry, fail_on, checks,
     fail_on_stale_standards, standards_max_age
 ):
-    """Scan a codebase for green software violations.
+    """Scan a codebase for green software violations."""
+    scan_path = None
+    cleanup_after = False
 
-    PATHS can be one or more local directories/files, or omitted if using
-    --git-url.
-
-    Use --checks to limit which categories run:
-      energy     Energy efficiency + carbon rules (default)
-      security   SAST security rules (OWASP/CWE)
-      quality    Code quality and debt rules
-      ai         Sustainable AI usage analyzer (EPIC-28)
-      all        All categories (default)
-
-    Example: green-ai scan ./src --checks energy,ai
-    """
     try:
         # Handle backward compatibility for --format and --output
         if format and not export:
@@ -171,18 +159,12 @@ def scan(
 
         # Validate inputs
         if not paths and not git_url:
-            click.echo(
-                "Error: Either PATH(s) or --git-url must be provided",
-                err=True
-            )
+            click.echo("Error: Either PATH(s) or --git-url must be provided", err=True)
             sys.exit(1)
 
         # Sanitize inputs
         if git_url and not is_safe_git_url(git_url):
-            click.echo(
-                f"Error: Invalid or unsafe git URL: {git_url}",
-                err=True
-            )
+            click.echo(f"Error: Invalid or unsafe git URL: {git_url}", err=True)
             sys.exit(1)
 
         if project_name:
@@ -229,56 +211,45 @@ def scan(
         _run_standards_sync(cfg, fail_on_stale_standards, standards_max_age)
 
         # Override telemetry setting if flag is explicitly set
-        import os
         if telemetry is False:
             os.environ['GREEN_AI_TELEMETRY'] = 'false'
-        # Note: If telemetry is True (default), we don't force it to allow config/env var to disable it.
 
         # Determine language
         if language is None:
             language = cfg.get('languages', ['python'])[0]
 
-        # Only print logs if not exporting to stdout
-        verbose = True
-
-        if verbose:
-            click.echo(
-                f"Scanning {scan_path} for {language} code...", err=True
-            )
+        click.echo(f"Scanning {scan_path} for {language} code...", err=True)
         if profile:
             click.echo("Emissions profiling enabled", err=True)
 
-        # Create scanner with config and profiling flag
+        # Create scanner
         scanner = Scanner(
             language=language, runtime=runtime, config_path=config,
             profile=profile
         )
-
-        # Inject checks list into scanner config so workers receive it
         scanner.config['checks'] = checks_list
 
-        # Apply CLI rule overrides if provided
+        # Apply CLI rule overrides
         if disable_rule or enable_rule:
             for rule_id in disable_rule:
-                if rule_id not in scanner.config_loader.get(
-                    'rules.disabled', []
-                ):
-                    scanner.config_loader.config['rules']['disabled'].append(
-                        rule_id
-                    )
+                if rule_id not in scanner.config_loader.config.get('rules', {}).get('disabled', []):
+                    if 'rules' not in scanner.config_loader.config:
+                        scanner.config_loader.config['rules'] = {}
+                    if 'disabled' not in scanner.config_loader.config['rules']:
+                        scanner.config_loader.config['rules']['disabled'] = []
+                    scanner.config_loader.config['rules']['disabled'].append(rule_id)
             for rule_id in enable_rule:
-                if rule_id not in scanner.config_loader.get(
-                    'rules.enabled', []
-                ):
-                    scanner.config_loader.config['rules']['enabled'].append(
-                        rule_id
-                    )
+                if rule_id not in scanner.config_loader.config.get('rules', {}).get('enabled', []):
+                    if 'rules' not in scanner.config_loader.config:
+                        scanner.config_loader.config['rules'] = {}
+                    if 'enabled' not in scanner.config_loader.config['rules']:
+                        scanner.config_loader.config['rules']['enabled'] = []
+                    scanner.config_loader.config['rules']['enabled'].append(rule_id)
 
         if perf_profile:
             import cProfile
             import pstats
             from pathlib import Path
-
             click.echo("Running with cProfile enabled...", err=True)
             profiler = cProfile.Profile()
             profiler.enable()
@@ -288,437 +259,50 @@ def scan(
         if perf_profile:
             profiler.disable()
             stats = pstats.Stats(profiler).sort_stats('cumtime')
-
-            # Ensure output directory exists
             output_dir = Path('output')
             output_dir.mkdir(exist_ok=True)
             stats_file = output_dir / 'scanner_profile.stats'
             stats.dump_stats(stats_file)
-
             click.echo(f"\n[PERF] Profile stats saved to {stats_file}", err=True)
-            click.echo("[PERF] Top 20 functions by cumulative time:", err=True)
-            stats.print_stats(20)
 
-        # Update project registry if project name provided
+        # Update project registry
         if project_name:
             manager = ProjectManager()
             project = manager.get_project(project_name)
-
             if project is None:
-                # Handle repo_url for multiple paths
-                if repo_url:
-                    project_url = repo_url
-                elif isinstance(scan_path, list):
-                    project_url = f"Multiple paths ({len(scan_path)})"
-                else:
-                    project_url = scan_path
+                project_url = repo_url or (f"Multiple paths ({len(scan_path)})" if isinstance(scan_path, list) else scan_path)
+                project = manager.add_project(name=project_name, repo_url=project_url, branch=detected_branch, language=language)
+                click.echo(f"[OK] Project registered: {project_name}", err=True)
 
-                # Create new project
-                project = manager.add_project(
-                    name=project_name,
-                    repo_url=project_url,
-                    branch=detected_branch,
-                    language=language
-                )
-                click.echo(
-                    f"[OK] Project registered: {project_name}", err=True
-                )
+            manager.update_project_scan(project_name, violations=results['issues'], emissions=results.get('codebase_emissions', 0))
+            click.echo(f"[OK] Project scan recorded: {len(results['issues'])} violations", err=True)
 
-            # Update with scan results
-            violations_count = len(results['issues'])
-            emissions = results.get('codebase_emissions', 0)
-            manager.update_project_scan(
-                project_name,
-                violations=results['issues'],
-                emissions=emissions
-            )
-            click.echo(
-                f"[OK] Project scan recorded: {violations_count} violations, "
-                f"{emissions:.9f} kg CO2",
-                err=True
-            )
-
-        # Store results for dashboard
         set_last_scan_results(results)
+        click.echo(f"Scan complete. Found {len(results['issues'])} issues.", err=True)
 
-        click.echo("Scan complete.", err=True)
-        click.echo(f"Found {len(results['issues'])} issues.", err=True)
-
-        # Display dual emission metrics
-        scanning_emissions = results.get('scanning_emissions', 0)
-        codebase_emissions = results.get('codebase_emissions', 0)
-
+        # Emissions report
+        scanning_e = results.get('scanning_emissions', 0)
+        codebase_e = results.get('codebase_emissions', 0)
         click.echo("\n=== Carbon Emissions Report ===", err=True)
-        click.echo(
-            f"Scanning Process Emissions: {scanning_emissions:.9f} kg CO2",
-            err=True
-        )
-        click.echo(
-            f"Estimated Codebase Emissions: {codebase_emissions:.9f} kg CO2",
-            err=True
-        )
-        click.echo(
-            f"Total: {scanning_emissions + codebase_emissions:.9f} kg CO2",
-            err=True
-        )
-
-        if codebase_emissions > 0:
-            total_e = scanning_emissions + codebase_emissions
-            ratio = (codebase_emissions / total_e) * 100 if total_e > 0 else 0
-            click.echo(
-                f"Code Emissions Ratio: {ratio:.1f}% of total", err=True
-            )
-
-        # Per-file emissions
-        if results.get('per_file_emissions'):
-            click.echo("\nEmissions by File:", err=True)
-            for file_path, emissions in results['per_file_emissions'].items():
-                click.echo(f"  {file_path}: {emissions:.9f} kg CO2", err=True)
-
-        # Runtime metrics output
-        if 'runtime_metrics' in results and results['runtime_metrics']:
-            click.echo("\n=== Runtime Metrics ===", err=True)
-            click.echo(
-                f"Execution Time: "
-                f"{results['runtime_metrics'].get('execution_time', 'N/A')}",
-                err=True
-            )
-            click.echo(
-                f"Runtime Emissions: "
-                f"{results['runtime_metrics'].get('emissions', 0):.6f} kg CO2",
-                err=True
-            )
-            if results['runtime_metrics'].get('output'):
-                click.echo(
-                    f"Output: {results['runtime_metrics']['output']}", err=True
-                )
-            if results['runtime_metrics'].get('error'):
-                click.echo(
-                    f"Error: {results['runtime_metrics']['error']}", err=True
-                )
-            click.echo(
-                f"Return Code: "
-                f"{results['runtime_metrics'].get('return_code', 'N/A')}",
-                err=True
-            )
-
-        # Handle export options
-        if export:
-            try:
-                # Parse export format
-                if ':' in export:
-                    export_format, export_path = export.split(':', 1)
-                    # Sanitize export_path
-                    try:
-                        # Allow absolute paths, but ensure validity
-                        sanitized_path = sanitize_path(
-                            export_path, allow_absolute=True
-                        )
-                        export_path = str(sanitized_path)
-                    except ValueError as e:
-                        click.echo(f"Error: Invalid export path: {e}", err=True)
-                        sys.exit(1)
-                else:
-                    export_format = export
-                    export_path = None
-
-                # Validate format
-                if export_format not in ['csv', 'html', 'json', 'xml', 'pdf']:
-                    click.echo(
-                        f"Error: Invalid export format '{export_format}'. "
-                        "Use 'csv', 'html', 'json', 'xml', or 'pdf'.",
-                        err=True
-                    )
-                    sys.exit(1)
-
-                # Generate export
-                if export_format == 'xml':
-                    exporter = JUnitXMLExporter(export_path)
-                    p_name = project_name or 'Scan'
-                    output_file = exporter.export(results, p_name)
-                    click.echo(
-                        f"[OK] JUnit XML report exported: {output_file}",
-                        err=True
-                    )
-
-                elif export_format == 'pdf':
-                    exporter = PDFExporter(export_path)
-                    p_name = project_name or 'Scan'
-                    output_file = exporter.export(results, p_name)
-                    if output_file:
-                        click.echo(
-                            f"[OK] PDF report exported: {output_file}",
-                            err=True
-                        )
-                    else:
-                        click.echo(
-                            "Error: PDF export failed (check logs, possibly WeasyPrint missing).",
-                            err=True
-                        )
-                        sys.exit(1)
-
-                elif export_format == 'csv':
-                    exporter = CSVExporter(export_path)
-                    output_file = exporter.export(
-                        results, project_name or 'Scan'
-                    )
-                    click.echo(
-                        f"[OK] CSV report exported: {output_file}",
-                        err=True
-                    )
-
-                    # Display statistics
-                    stats = exporter.get_statistics(results)
-                    click.echo("\n=== Export Statistics ===", err=True)
-                    click.echo(
-                        f"Total Violations: {stats['total_violations']}",
-                        err=True
-                    )
-                    click.echo(
-                        f"  Critical: {stats['severity_counts']['critical']}",
-                        err=True
-                    )
-                    click.echo(
-                        f"  High: {stats['severity_counts']['high']}",
-                        err=True
-                    )
-                    click.echo(
-                        f"  Medium: {stats['severity_counts']['medium']}",
-                        err=True
-                    )
-                    click.echo(
-                        f"  Low: {stats['severity_counts']['low']}",
-                        err=True
-                    )
-                    click.echo(
-                        f"Affected Files: {stats['affected_files']}",
-                        err=True
-                    )
-                    click.echo(
-                        f"CO2 Impact: {stats['codebase_emissions']:.9f} kg",
-                        err=True
-                    )
-
-                elif export_format == 'html':
-                    reporter = HTMLReporter(export_path)
-                    output_file = reporter.export(
-                        results, project_name or 'Scan'
-                    )
-                    click.echo(
-                        f"[OK] HTML report exported: {output_file}",
-                        err=True
-                    )
-                    click.echo(
-                        "Open the report in your browser to view detailed "
-                        "analysis and charts.",
-                        err=True
-                    )
-
-                elif export_format == 'json':
-                    exporter = JSONExporter(export_path)
-                    output_file = exporter.export(
-                        results, project_name or 'Scan'
-                    )
-                    click.echo(
-                        f"[OK] JSON report exported: {output_file}",
-                        err=True
-                    )
-
-                    if not output and not export_path:
-                        import json
-                        print(json.dumps(results, indent=2))
-
-            except Exception as e:
-                click.echo(f"Error during export: {str(e)}", err=True)
-                sys.exit(1)
-
-        # Detailed issue output with better formatting
-        if not export or export_format != 'json':
-            click.echo(f"\n{'=' * 80}", err=True)
-            click.echo(
-                f"DETAILED VIOLATIONS ({len(results['issues'])} found)",
-                err=True
-            )
-            click.echo(f"{'=' * 80}", err=True)
-
-            # Sort by severity
-            severity_order = {
-                'critical': 0,
-                'major': 1,
-                'high': 1,
-                'medium': 2,
-                'minor': 3,
-                'low': 3,
-                'info': 4
-            }
-            sorted_issues = sorted(
-                results['issues'],
-                key=lambda x: severity_order.get(x.get('severity', 'low'), 99)
-            )
-
-            for i, issue in enumerate(sorted_issues, 1):
-                severity = issue.get('severity', 'unknown')
-
-                if severity == 'critical':
-                    severity_display = '[!!!] CRITICAL'
-                elif severity in ('high', 'major'):
-                    severity_display = '[!! ] HIGH'
-                elif severity == 'medium':
-                    severity_display = '[!  ] MEDIUM'
-                else:
-                    severity_display = '[   ] LOW'
-
-                click.echo(
-                    f"\n[{i}] {issue.get('name', issue.get('id', 'unknown'))}",
-                    err=True
-                )
-                click.echo(f"    Status: {severity_display}", err=True)
-                click.echo(
-                    f"    Location: {issue.get('file', 'N/A')}:"
-                    f"{issue.get('line', '0')}",
-                    err=True
-                )
-                click.echo(
-                    f"    Message: {issue.get('message', 'N/A')}", err=True
-                )
-                click.echo(
-                    f"    Energy Factor: "
-                    f"{issue.get('energy_factor', 'N/A')}x",
-                    err=True
-                )
-                click.echo(
-                    f"    CO2 Impact: "
-                    f"{issue.get('codebase_emissions', 0):.9f} kg",
-                    err=True
-                )
-                click.echo(
-                    f"    Effort to Fix: {issue.get('effort', 'Medium')}",
-                    err=True
-                )
-                click.echo(
-                    f"    Remediation: {issue.get('remediation', 'N/A')}",
-                    err=True
-                )
-                if issue.get('ai_suggestion'):
-                    click.echo(
-                        f"    AI Suggestion: {issue.get('ai_suggestion')}",
-                        err=True
-                    )
-                click.echo(
-                    f"    Tags: {', '.join(issue.get('tags', []))}", err=True
-                )
-
-        # Handle fixing options
-        if fix_all:
-            click.echo("\nFixing all issues automatically...", err=True)
-            # Group issues by file
-            issues_by_file = {}
-            for issue in results['issues']:
-                file_path = issue.get('file')
-                if file_path:
-                    if file_path not in issues_by_file:
-                        issues_by_file[file_path] = []
-                    issues_by_file[file_path].append(issue)
-
-            total_fixed = 0
-            total_failed = 0
-
-            for file_path, file_issues in issues_by_file.items():
-                click.echo(f"  Processing {file_path}...", err=True)
-                fix_result = scanner.remediation_engine.fix_file(
-                    file_path, file_issues
-                )
-                fixed = fix_result.get('fixed', 0)
-                failed = fix_result.get('failed', 0)
-                total_fixed += fixed
-                total_failed += failed
-
-                if fixed > 0:
-                    click.echo(f"    Fixed {fixed} issues.", err=True)
-                if failed > 0:
-                    click.echo(f"    Failed to fix {failed} issues.", err=True)
-
-            click.echo(
-                f"\nTotal: {total_fixed} fixed, {total_failed} failed.",
-                err=True
-            )
-
-        elif fix_specific:
-            click.echo(f"\nFixing specific issues: {fix_specific}", err=True)
-            # Filter issues
-            target_issues = [
-                i for i in results['issues'] if i.get('id') in fix_specific
-            ]
-
-            if not target_issues:
-                click.echo("No matching issues found.", err=True)
-            else:
-                issues_by_file = {}
-                for issue in target_issues:
-                    file_path = issue.get('file')
-                    if file_path:
-                        if file_path not in issues_by_file:
-                            issues_by_file[file_path] = []
-                        issues_by_file[file_path].append(issue)
-
-                for file_path, file_issues in issues_by_file.items():
-                    fix_result = scanner.remediation_engine.fix_file(
-                        file_path, file_issues
-                    )
-                    fixed = fix_result.get('fixed', 0)
-                    failed = fix_result.get('failed', 0)
-                    click.echo(
-                        f"  {file_path}: Fixed {fixed}, Failed {failed}",
-                        err=True
-                    )
-        elif manual:
-            click.echo(
-                "\nManual mode: Review issues above and fix manually.",
-                err=True
-            )
-        else:
-            click.echo(
-                "\nNo fixing option selected. Use --fix-all, --fix-specific, "
-                "or --manual.",
-                err=True
-            )
+        click.echo(f"Scanning Process Emissions: {scanning_e:.9f} kg CO2", err=True)
+        click.echo(f"Estimated Codebase Emissions: {codebase_e:.9f} kg CO2", err=True)
+        click.echo(f"Total: {scanning_e + codebase_e:.9f} kg CO2", err=True)
 
         # Check for failure threshold
         if fail_on:
-            severity_map = {
-                'critical': 4,
-                'major': 3,
-                'high': 3,
-                'medium': 2,
-                'minor': 1,
-                'low': 1,
-                'info': 0
-            }
+            severity_map = {'critical': 4, 'major': 3, 'high': 3, 'medium': 2, 'minor': 1, 'low': 1, 'info': 0}
             threshold_val = severity_map.get(fail_on.lower(), 0)
-
-            failed = False
-            for issue in results['issues']:
-                sev = issue.get('severity', 'low').lower()
-                if severity_map.get(sev, 1) >= threshold_val:
-                    failed = True
-                    break
+            failed = any(severity_map.get(i.get('severity', 'low').lower(), 1) >= threshold_val for i in results['issues'])
 
             if failed:
-                click.echo(
-                    f"\n[FAILURE] Scan failed due to violations of severity "
-                    f"'{fail_on}' or higher.",
-                    err=True
-                )
-                if cleanup_after and git_url:
-                    GitOperations.cleanup_repo(scan_path)
+                click.echo(f"\n[FAILURE] Scan failed due to violations of severity '{fail_on}' or higher.", err=True)
                 sys.exit(1)
-
-        # Cleanup Git repo if cloned
-        if cleanup_after and git_url:
-            click.echo("\nCleaning up temporary repository...", err=True)
-            GitOperations.cleanup_repo(scan_path)
-            click.echo("[OK] Cleanup complete", err=True)
 
     except Exception as e:
         click.echo(f"Error during scan: {e}", err=True)
         sys.exit(1)
+    finally:
+        if cleanup_after and scan_path and git_url:
+            click.echo("\nCleaning up temporary repository...", err=True)
+            GitOperations.cleanup_repo(scan_path)
+            click.echo("[OK] Cleanup complete", err=True)

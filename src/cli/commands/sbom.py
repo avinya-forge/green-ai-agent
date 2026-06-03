@@ -1,51 +1,53 @@
 import click
 import json
-import os
 from pathlib import Path
+from src.core.scanner.main import Scanner
 from src.core.sbom.generator import SBOMGenerator
 from src.core.export.esg_exporter import ESGExporter
-from src.core.scanner.main import Scanner
+
 
 @click.command('sbom')
 @click.argument('path', type=click.Path(exists=True))
-@click.option('--format', type=click.Choice(['cyclonedx', 'spdx']), default='cyclonedx', help='SBOM format')
-@click.option('--output', help='Output file path')
-@click.option('--esg-report', is_flag=True, help='Generate ESG compliance report')
-def sbom(path, format, output, esg_report):
-    """Generate SBOM for a repository"""
-    click.echo(f"Generating {format} SBOM for {path}...")
-
-    path_obj = Path(path)
-    components = []
-
-    if (path_obj / 'requirements.txt').exists():
-        components.append({
-            "name": "sample-python-pkg",
-            "version": "1.0.0",
-            "purl": "pkg:pip/sample-python-pkg@1.0.0",
-            "licenses": [{"license": {"id": "MIT"}}]
-        })
-
-    generator = SBOMGenerator(project_name=path_obj.name)
-
-    if format == 'cyclonedx':
-        result = generator.generate_cyclonedx(components)
+@click.option('--format', 'sbom_format', type=click.Choice(['cyclonedx', 'spdx']), default='cyclonedx', help='SBOM format')
+@click.option('--output', type=click.Path(), help='Output file path')
+@click.option('--esg-report', is_flag=True, help='Generate ESG compliance report PDF')
+def sbom(path, sbom_format, output, esg_report):
+    """Generate Software Bill of Materials (SBOM) for compliance"""
+    if esg_report:
+        click.echo(f"Generating ESG report for {path}...")
     else:
-        result = generator.generate_spdx(components)
+        click.echo(f"Generating {sbom_format} SBOM for {path}...")
 
-    output_path = output or f"output/sbom-{path_obj.name}.json"
-    os_output_path = Path(output_path)
-    os_output_path.parent.mkdir(parents=True, exist_ok=True)
-
-    with open(os_output_path, 'w') as f:
-        json.dump(result, f, indent=2)
-
-    click.echo(f"[OK] SBOM generated at {os_output_path}")
+    scanner = Scanner()
+    results = scanner.scan(path)
 
     if esg_report:
-        click.echo("Generating ESG compliance report...")
-        scanner = Scanner()
-        results = scanner.scan(path)
-        exporter = ESGExporter()
-        pdf_path = exporter.export(results, project_name=path_obj.name)
-        click.echo(f"[OK] ESG Report generated at {pdf_path}")
+        exporter = ESGExporter(output_path=output)
+        report_path = exporter.export(results, project_name=str(Path(path).name))
+        click.echo(f"[OK] ESG Report generated at {report_path}")
+        return
+
+    # Simplified: in real life would parse dependencies
+    components = []
+    # Using codebase emissions keys as a proxy for scanned files
+    for file_path in results.get('per_file_emissions', {}).keys():
+        components.append({
+            "name": Path(file_path).name,
+            "version": "0.0.1",
+            "purl": f"pkg:generic/{Path(file_path).name}@0.0.1"
+        })
+
+    generator = SBOMGenerator(project_name=str(Path(path).name))
+    if sbom_format == 'cyclonedx':
+        sbom_data = generator.generate_cyclonedx(components)
+    else:
+        sbom_data = generator.generate_spdx(components)
+
+    if output:
+        output_path = Path(output)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_path, 'w') as f:
+            json.dump(sbom_data, f, indent=2)
+        click.echo(f"[OK] SBOM exported to {output}")
+    else:
+        click.echo(json.dumps(sbom_data, indent=2))

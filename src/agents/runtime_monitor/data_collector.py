@@ -45,3 +45,18 @@ class RuntimeDataCollector:
                 _, report = instrumented_run()
                 reports.append(report)
         return reports
+
+    def collect_from_command(self, command):
+        """Execute command and collect data."""
+        self.monitor.start_monitoring()
+        start_time = time.time()
+
+        import subprocess
+        subprocess.run(command, capture_output=True)
+
+        end_time = time.time()
+        self.monitor.stop_monitoring()
+        execution_time = end_time - start_time
+        report = self.monitor.get_report()
+        report["execution_time_sec"] = execution_time
+        return report

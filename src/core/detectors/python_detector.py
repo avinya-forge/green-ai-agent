@@ -11,7 +11,6 @@ class PythonViolationDetector(ast.NodeVisitor):
     """AST visitor to detect green software violations in Python code."""
 
     IO_PATTERNS = {'open', 'read', 'write', 'requests', 'urlopen'}
-    REDUNDANT_FUNCS = {'len', 'range', 're.compile', 'datetime.now', 'time.time'}
     BLOCKING_IO = {'requests.get', 'urlopen', 'time.sleep'}
 
     def __init__(self, content: str, file_path: str):

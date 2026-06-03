@@ -28,7 +28,18 @@ class PatternAnalyzer:
                     "severity": "medium",
                     "description": "High memory usage, consider optimizing data structures."
                 })
-            if report.get("emissions_kg", 0) > self.thresholds["high_emissions"]:
+
+            # Handle codecarbon Emissions object
+            emissions = report.get("emissions_kg", 0)
+            if hasattr(emissions, 'emissions'):
+                emissions_value = float(emissions.emissions)
+            else:
+                try:
+                    emissions_value = float(emissions)
+                except (TypeError, ValueError):
+                    emissions_value = 0.0
+
+            if emissions_value > self.thresholds["high_emissions"]:
                 patterns.append({
                     "type": "high_emissions",
                     "severity": "high",
