@@ -166,7 +166,7 @@ class TestComparisonEndpoint:
         """Test comparison endpoint with no projects specified"""
         response = client.get('/api/projects/comparison')
         
-        assert response.status_code == 400
+        assert response.status_code == 422
         data = response.json()
         assert 'detail' in data
 
