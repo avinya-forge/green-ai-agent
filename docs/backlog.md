@@ -10,6 +10,11 @@
 | BUG-017a | MEDIUM | Scanner | Ensure proper cleanup of temporary directories in multiprocessing mode. | FIXED |
 | BUG-017b | MEDIUM | Scanner | Synchronize scan progress state across worker processes for accurate UI updates. | FIXED |
 | BUG-021 | MEDIUM | CLI | CLI help text mismatch in `tests/test_cli_refactored.py`. | FIXED |
+| BUG-022 | CRITICAL | Security | Update starlette to 1.0.1 to fix PYSEC-2026-161 (URL spoofing). | TODO |
+| BUG-023 | CRITICAL | Security | Update pytest to 9.0.3 to fix CVE-2025-71176 (DoS). | TODO |
+| BUG-024 | HIGH | Security | Fix Bandit B501 (verify=False) in src/standards/sync_engine.py. | TODO |
+| BUG-025 | HIGH | Security | Fix Bandit B701 (Jinja2 autoescape=False) in PDF/ESG exporters. | TODO |
+| BUG-026 | HIGH | Security | Fix Bandit B324 (MD5 hash) in src/core/detectors/cache.py. | TODO |
 
 ## 2. Feature Completion (P1 - Stability & Parity)
 
@@ -50,7 +55,7 @@
 | ID | Task | Status |
 |---|---|---|
 | ENG-018 | Code Cleanup: Final audit of scrubbed code paths in `src/core/detectors/python_detector.py`. | TODO |
-| ENG-019 | Security: Audit and standardize `Query(...)` validation across all 20+ FastAPI endpoints. | TODO |
+| ENG-019 | Security: Audit and standardize `Query(...)` validation across all 20+ FastAPI endpoints. | FIXED |
 | ENG-020 | Documentation: Implement auto-sync check between `vision.md` and `architecture.md` (CI gate). | TODO |
 
 ## 5. Completed Tasks (v1.0.4 Batch)

@@ -6,7 +6,7 @@ for the migration from Flask/Eventlet.
 """
 
 import socketio
-from fastapi import FastAPI, Request, HTTPException, Query, Response
+from fastapi import FastAPI, Request, HTTPException, Query, Response, Path
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from typing import Any, List, Optional
@@ -203,7 +203,7 @@ async def api_standards_list() -> Any:
 
 
 @app.get("/api/standards/{standard_name}/rules")
-async def api_standard_rules(standard_name: str) -> Any:
+async def api_standard_rules(standard_name: str = Path(..., min_length=1)) -> Any:
     registry = state.get_standards_registry()
     if standard_name in registry.standards:
         rules = registry.standards[standard_name]
@@ -237,9 +237,7 @@ async def api_projects_list() -> Any:
 
 
 @app.get("/api/projects/comparison")
-async def api_projects_comparison(projects: List[str] = Query(None)) -> Any:
-    if not projects or len(projects) == 0:
-        raise HTTPException(status_code=400, detail="No projects specified. Use ?projects=name1&projects=name2")
+async def api_projects_comparison(projects: List[str] = Query(..., min_length=1)) -> Any:
 
     if len(projects) > 5:
         raise HTTPException(status_code=400, detail="Maximum 5 projects can be compared at once")
@@ -262,7 +260,7 @@ async def api_projects_comparison(projects: List[str] = Query(None)) -> Any:
 
 
 @app.get("/api/projects/{project_name}")
-async def api_project_detail(project_name: str) -> Any:
+async def api_project_detail(project_name: str = Path(..., min_length=1)) -> Any:
     pm = state.get_project_manager()
     project = pm.get_project(project_name)
 
@@ -276,9 +274,7 @@ async def api_project_detail(project_name: str) -> Any:
 
 
 @app.get("/api/history")
-async def api_get_history(project: str, days: Optional[int] = None) -> Any:
-    if not project:
-        raise HTTPException(status_code=400, detail="project parameter required")
+async def api_get_history(project: str = Query(..., min_length=1), days: Optional[int] = Query(None)) -> Any:
 
     try:
         scans = state.get_history_manager().get_project_history(project, days=days)
@@ -293,9 +289,7 @@ async def api_get_history(project: str, days: Optional[int] = None) -> Any:
 
 
 @app.get("/api/trending")
-async def api_get_trending(project: str, days: Optional[int] = None) -> Any:
-    if not project:
-        raise HTTPException(status_code=400, detail="project parameter required")
+async def api_get_trending(project: str = Query(..., min_length=1), days: Optional[int] = Query(None)) -> Any:
 
     try:
         trending = state.get_history_manager().get_trending_data(project, days=days)
@@ -312,12 +306,10 @@ async def api_get_trending(project: str, days: Optional[int] = None) -> Any:
 
 @app.get("/api/compare")
 async def api_compare_scans(
-    project: str,
-    scan1: int = -2,
-    scan2: int = -1
+    project: str = Query(..., min_length=1),
+    scan1: int = Query(-2),
+    scan2: int = Query(-1)
 ) -> Any:
-    if not project:
-        raise HTTPException(status_code=400, detail="project parameter required")
 
     try:
         hm = state.get_history_manager()
@@ -407,7 +399,7 @@ async def api_scan(request: ScanRequest):
 
 
 @app.delete("/api/projects/{project_name}")
-async def api_delete_project(project_name: str):
+async def api_delete_project(project_name: str = Path(..., min_length=1)):
     pm = state.get_project_manager()
     project = pm.get_project(project_name)
     if not project:
@@ -427,7 +419,7 @@ async def api_delete_project(project_name: str):
 
 
 @app.post("/api/projects/{project_name}/rescan")
-async def api_rescan_project(project_name: str):
+async def api_rescan_project(project_name: str = Path(..., min_length=1)):
     project = state.get_project_manager().get_project(project_name)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -442,7 +434,7 @@ async def api_rescan_project(project_name: str):
 
 
 @app.post("/api/projects/{project_name}/clear")
-async def api_clear_project(project_name: str):
+async def api_clear_project(project_name: str = Path(..., min_length=1)):
     pm = state.get_project_manager()
     project = pm.get_project(project_name)
     if not project:
@@ -464,25 +456,25 @@ async def api_clear_project(project_name: str):
 
 
 @app.post("/api/standards/{standard_name}/enable")
-async def api_enable_standard(standard_name: str):
+async def api_enable_standard(standard_name: str = Path(..., min_length=1)):
     state.get_standards_registry().enable_standard(standard_name)
     return {'status': 'ok', 'message': f'Standard {standard_name} enabled'}
 
 
 @app.post("/api/standards/{standard_name}/disable")
-async def api_disable_standard(standard_name: str):
+async def api_disable_standard(standard_name: str = Path(..., min_length=1)):
     state.get_standards_registry().disable_standard(standard_name)
     return {'status': 'ok', 'message': f'Standard {standard_name} disabled'}
 
 
 @app.post("/api/rules/{rule_id}/enable")
-async def api_enable_rule(rule_id: str):
+async def api_enable_rule(rule_id: str = Path(..., min_length=1)):
     state.get_standards_registry().enable_rule(rule_id)
     return {'status': 'ok', 'message': f'Rule {rule_id} enabled'}
 
 
 @app.post("/api/rules/{rule_id}/disable")
-async def api_disable_rule(rule_id: str):
+async def api_disable_rule(rule_id: str = Path(..., min_length=1)):
     state.get_standards_registry().disable_rule(rule_id)
     return {'status': 'ok', 'message': f'Rule {rule_id} disabled'}
 
@@ -491,10 +483,10 @@ async def api_disable_rule(rule_id: str):
 
 @app.get("/api/remediation/preview")
 async def api_remediation_preview(
-    project: str = Query(...),
-    file: str = Query(...),
+    project: str = Query(..., min_length=1),
+    file: str = Query(..., min_length=1),
     line: int = Query(...),
-    issue_id: str = Query(...)
+    issue_id: str = Query(..., min_length=1)
 ):
     try:
         from pathlib import Path
@@ -578,12 +570,12 @@ def _handle_export(exporter_cls, mime_type, file_extension, project_name='Scan')
 
 
 @app.get("/api/export/csv")
-async def api_export_csv(project: str = 'Scan'):
+async def api_export_csv(project: str = Query('Scan', min_length=1)):
     return _handle_export(CSVExporter, 'text/csv', 'csv', project)
 
 
 @app.get("/api/export/html")
-async def api_export_html(project: str = 'Scan'):
+async def api_export_html(project: str = Query('Scan', min_length=1)):
     return _handle_export(HTMLReporter, 'text/html', 'html', project)
 
 
@@ -612,7 +604,7 @@ async def api_standards_versions() -> Any:
 
 
 @app.post("/api/standards/sync")
-async def api_standards_sync(force: bool = False) -> Any:
+async def api_standards_sync(force: bool = Query(False)) -> Any:
     """Trigger a standards sync from all remote sources.
 
     Set force=true to bypass the freshness interval check.
