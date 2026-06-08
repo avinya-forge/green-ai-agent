@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any, Optional
 
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 from src.utils.logger import logger
 from src.utils.security import sanitize_path
 from src.core.export.charts import ChartGenerator
@@ -102,7 +102,10 @@ class PDFExporter:
         }
 
         # Render HTML
-        env = Environment(loader=FileSystemLoader(str(TEMPLATE_DIR)))
+        env = Environment(
+            loader=FileSystemLoader(str(TEMPLATE_DIR)),
+            autoescape=select_autoescape(['html', 'xml'])
+        )
         template = env.get_template('pdf_report.html')
         html_content = template.render(**context)
 

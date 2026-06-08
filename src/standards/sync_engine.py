@@ -215,7 +215,7 @@ class StandardsSyncEngine:
     def _fetch(self, spec: SourceSpec) -> Optional[bytes]:
         headers = {"Accept": "application/vnd.github.v3+json"}
         try:
-            resp = requests.get(spec.url, headers=headers, timeout=self.timeout)
+            resp = requests.get(spec.url, headers=headers, timeout=self.timeout, verify=True)
             resp.raise_for_status()
             return resp.content
         except requests.RequestException as exc:

@@ -47,7 +47,7 @@ class GitHubStandardSource(StandardSource):
     def fetch_content(self) -> str:
         url = self._get_raw_url()
         try:
-            response = requests.get(url, timeout=10)
+            response = requests.get(url, timeout=10, verify=True)
             response.raise_for_status()
             return response.text
         except requests.RequestException as e:
@@ -177,7 +177,7 @@ class OWASPTop10Source(StandardSource):
 
     def fetch(self) -> List[StandardRule]:
         try:
-            resp = requests.get(self._URL, timeout=10)
+            resp = requests.get(self._URL, timeout=10, verify=True)
             resp.raise_for_status()
             entries = self._parse_markdown(resp.text)
         except requests.RequestException:
@@ -279,7 +279,7 @@ class CWESource(StandardSource):
         Returns empty list on any failure so the caller uses the fallback.
         """
         try:
-            resp = requests.get(self._URL, timeout=30, stream=True)
+            resp = requests.get(self._URL, timeout=30, stream=True, verify=True)
             resp.raise_for_status()
             raw = resp.content
         except requests.RequestException:
@@ -337,7 +337,7 @@ class EPSSSource(StandardSource):
 
     def fetch(self) -> List[StandardRule]:
         try:
-            resp = requests.get(self._URL, timeout=15)
+            resp = requests.get(self._URL, timeout=15, verify=True)
             resp.raise_for_status()
             data = resp.json()
         except (requests.RequestException, json.JSONDecodeError):

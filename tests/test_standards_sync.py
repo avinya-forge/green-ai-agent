@@ -79,7 +79,7 @@ def test_registry_sync(mock_requests_get):
     mock_response_eco = MagicMock()
     mock_response_eco.status_code = 404
 
-    def side_effect(url, timeout=10):
+    def side_effect(url, timeout=10, **kwargs):
         if "Green-Software-Foundation" in url:
             return mock_response_gsf
         return mock_response_eco

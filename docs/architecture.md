@@ -258,6 +258,12 @@ helm install green-ai ./deploy/helm/green-ai -f custom-values.yaml
 
 ### ADR-005: Pin Web Framework Versions (2026-04-22)
 
-**Decision:** Pin `fastapi==0.136.0`, `starlette==1.0.0`, `uvicorn==0.45.0`, `python-socketio==5.16.1`.  
-**Reason:** Starlette 1.0.0 changed `TemplateResponse` signature, silently breaking 8 tests on fresh install. Unpinned framework deps are a reliability risk.  
-**Status:** Added to `requirements.txt`. See BUG-004 in backlog.
+**Decision:** Pin `fastapi==0.136.0`, `starlette==1.0.1`, `uvicorn==0.45.0`, `python-socketio==5.16.1`.
+**Reason:** Starlette 1.0.0 changed `TemplateResponse` signature, silently breaking 8 tests on fresh install. Unpinned framework deps are a reliability risk. Updated to `1.0.1` to fix URL spoofing vulnerability.
+**Status:** Added to `requirements.txt`. See BUG-004 and BUG-022 in backlog.
+
+### ADR-006: Security Enforcements (2026-06-08)
+
+**Decision:** Enforce security configurations universally.
+**Reason:** Several configurations defaulted to insecure options (Bandit B501, B701, B324). `requests.get` now enforces `verify=True`, `Jinja2` environments use `autoescape=select_autoescape`, and MD5 hashes used for non-security caches explicitly specify `usedforsecurity=False` for FIPS-compliance.
+**Status:** Implemented across `src/standards`, `src/core/export`, and cache implementations. See BUG-024, BUG-025, BUG-026 in backlog.
