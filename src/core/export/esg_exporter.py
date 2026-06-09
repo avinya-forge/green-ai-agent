@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any, Optional
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 from src.core.sbom.sci import SCICalculator
 from src.utils.logger import logger
 
@@ -50,7 +50,10 @@ class ESGExporter:
             'compliance_status': 'IN REVIEW' if critical_count > 0 else 'PASSED'
         }
 
-        env = Environment(loader=FileSystemLoader(str(TEMPLATE_DIR)))
+        env = Environment(
+            loader=FileSystemLoader(str(TEMPLATE_DIR)),
+            autoescape=select_autoescape(['html', 'xml'])
+        )
         template = env.get_template('esg_report.html')
         html_content = template.render(**context)
 
