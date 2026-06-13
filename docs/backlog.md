@@ -75,3 +75,16 @@
 
 ---
 > Tasks follow the SSOT vision defined in `/docs/vision.md`.
+
+## 6. Vision Alignment & Deep Auditing (P2 - New Dashboard & Quality)
+
+| ID | Epic | Task | Status |
+|---|---|---|---|
+| DASH-005 | UI | Feature: Build the new News Dashboard UI component per vision.md. | TODO |
+| CRAWL-001 | Data | Integration: Evaluate and integrate a top-tier open-source crawler for tech/security news. | TODO |
+| CRAWL-002 | Data | Parser: Implement data normalization pipeline for crawled news into standardized internal format. | TODO |
+| QUAL-004 | Quality | Deep Cleaning: Perform a comprehensive codebase audit to remove deprecated/unused legacy code. | TODO |
+| QUAL-005 | Quality | UI Auditing: Conduct thorough accessibility and visual consistency audits across all dashboard views. | TODO |
+| QUAL-006 | Quality | Code Review: Establish strict PR templates and automated code review workflows (Bug Hunter). | TODO |
+| TEST-001 | Test | E2E Testing: Implement comprehensive end-to-end browser tests using Playwright. | TODO |
+| TEST-002 | Test | Coverage: Increase overall unit test coverage strictly to >= 90%. | TODO |
