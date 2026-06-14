@@ -10,13 +10,9 @@ from src.utils.entropy import calculate_shannon_entropy
 class PythonViolationDetector(ast.NodeVisitor):
     """AST visitor to detect green software violations in Python code."""
 
-    IO_PATTERNS = {'open', 'read', 'write', 'requests', 'urlopen'}
-    BLOCKING_IO = {'requests.get', 'urlopen', 'time.sleep'}
-
     def __init__(self, content: str, file_path: str):
         self.content = content
         self.file_path = file_path
-        self.lines = content.split('\n')
         self.violations = []
         self.current_depth = 0
         self.in_loop = False
@@ -276,7 +272,8 @@ class PythonViolationDetector(ast.NodeVisitor):
                     })
 
             # Rule: Resource might leak (proper_resource_cleanup)
-            if func_name == 'open' and not self._is_in_context_manager(node):
+            if func_name == 'open':
+                # Simplified check since we removed _is_in_context_manager
                 self.violations.append({
                     'id': 'proper_resource_cleanup',
                     'line': node.lineno,
@@ -778,11 +775,6 @@ class PythonViolationDetector(ast.NodeVisitor):
         """Detect context managers (proper cleanup)."""
         # Track items in with statements to identify manual open() calls elsewhere
         self.generic_visit(node)
-
-    def _is_in_context_manager(self, call_node) -> bool:
-        """Check if call is within a with statement."""
-        # Simplified check - would need to track parent nodes properly
-        return False
 
     def _calculate_cyclomatic_complexity(self, node) -> int:
         """Calculate cyclomatic complexity of a function."""
