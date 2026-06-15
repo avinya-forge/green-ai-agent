@@ -1,4 +1,5 @@
 import logging
+import ast
 from pygls.lsp.server import LanguageServer
 from lsprotocol.types import (
     TEXT_DOCUMENT_DID_OPEN,
@@ -19,6 +20,8 @@ from lsprotocol.types import (
     WorkspaceEdit,
     TextEdit,
 )
+from src.core.detectors.python_detector import PythonViolationDetector
+from src.core.detectors.javascript_detector import JavaScriptASTDetector
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -33,33 +36,75 @@ class GreenAILanguageServer(LanguageServer):
 server = GreenAILanguageServer()
 
 
+def _get_severity(sev_str: str) -> DiagnosticSeverity:
+    sev_str = sev_str.lower()
+    if sev_str == "critical" or sev_str == "high":
+        return DiagnosticSeverity.Error
+    elif sev_str == "medium" or sev_str == "major":
+        return DiagnosticSeverity.Warning
+    elif sev_str == "low" or sev_str == "minor":
+        return DiagnosticSeverity.Information
+    return DiagnosticSeverity.Hint
+
+
 def _validate(ls: GreenAILanguageServer, params):
     """
     Validate the document and publish diagnostics.
-    Mock implementation until Scanner is fully integrated.
+    Uses AST detectors for Python and JS.
     """
     text_doc = ls.workspace.get_text_document(params.text_document.uri)
-
     source = text_doc.source
+    uri = params.text_document.uri
+
     diagnostics = []
 
-    # Mock check: Detect "print(" usage as a green violation
-    for i, line in enumerate(source.splitlines()):
-        if "print(" in line:
-            start_char = line.find("print(")
-            end_char = start_char + 6
-            range_ = Range(
-                start=Position(line=i, character=start_char),
-                end=Position(line=i, character=end_char),
-            )
-            msg = "Avoid using print() in production. Use a logger instead."
-            d = Diagnostic(
-                range=range_,
-                message=msg,
-                severity=DiagnosticSeverity.Warning,
-                source="Green-AI",
-            )
-            diagnostics.append(d)
+    # Choose detector based on extension
+    if uri.endswith('.py'):
+        try:
+            tree = ast.parse(source)
+            detector = PythonViolationDetector(file_path=uri)
+            detector.visit(tree)
+
+            for v in detector.violations:
+                line = max(0, v.line - 1)
+                # Just highlight the first word if we don't have exact ranges
+                range_ = Range(
+                    start=Position(line=line, character=0),
+                    end=Position(line=line, character=10),
+                )
+
+                msg = f"{v.message}\nRemediation: {v.remediation}"
+                d = Diagnostic(
+                    range=range_,
+                    message=msg,
+                    severity=_get_severity(v.severity),
+                    source="Green-AI",
+                )
+                diagnostics.append(d)
+        except SyntaxError:
+            pass # Ignore syntax errors for now
+    elif uri.endswith('.js') or uri.endswith('.jsx'):
+        try:
+            detector = JavaScriptASTDetector()
+            violations = detector.analyze(source, uri)
+
+            for v in violations:
+                line = max(0, v.line - 1)
+                range_ = Range(
+                    start=Position(line=line, character=0),
+                    end=Position(line=line, character=10),
+                )
+
+                msg = f"{v.message}\nRemediation: {v.remediation}"
+                d = Diagnostic(
+                    range=range_,
+                    message=msg,
+                    severity=_get_severity(v.severity),
+                    source="Green-AI",
+                )
+                diagnostics.append(d)
+        except Exception:
+            pass
 
     ls.publish_diagnostics(text_doc.uri, diagnostics)
 
@@ -78,7 +123,6 @@ async def did_open(ls: GreenAILanguageServer, params: DidOpenTextDocumentParams)
     """Handle document open."""
     msg = f"Document opened: {params.text_document.uri}"
     logger.info(msg)
-    ls.window_show_message(msg)
     _validate(ls, params)
 
 
@@ -93,28 +137,14 @@ async def did_save(ls: GreenAILanguageServer, params: DidSaveTextDocumentParams)
     """Handle document save."""
     msg = f"Document saved: {params.text_document.uri}"
     logger.info(msg)
-    ls.window_show_message(msg)
     _validate(ls, params)
 
 
 @server.feature(TEXT_DOCUMENT_CODE_ACTION)
 def code_action(ls: GreenAILanguageServer, params: CodeActionParams):
-    """Handle code action requests (quick fixes)."""
+    """Handle code action requests."""
     items = []
-
-    for diagnostic in params.context.diagnostics:
-        if "Avoid using print() in production" in diagnostic.message:
-            # Provide quick fix to replace print( with logger.info(
-            edit = TextEdit(range=diagnostic.range, new_text="logger.info(")
-            workspace_edit = WorkspaceEdit(changes={params.text_document.uri: [edit]})
-            action = CodeAction(
-                title="Replace with logger.info(",
-                kind=CodeActionKind.QuickFix,
-                diagnostics=[diagnostic],
-                edit=workspace_edit,
-            )
-            items.append(action)
-
+    # Can implement real quick fixes here later based on diagnostics
     return items
 
 
