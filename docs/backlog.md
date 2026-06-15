@@ -20,10 +20,10 @@
 
 | ID | Epic | Task | Status |
 |---|---|---|---|
-| IDE-001a | IDE | VS Code extension: Initialize scaffold with `yo code` and configure extension manifests. | TODO |
-| IDE-001b | IDE | VS Code extension: Implement settings provider for `.green-ai.yaml` editing. | TODO |
-| IDE-002a | IDE | LSP: Implement base server handshake and workspace synchronization. | TODO |
-| IDE-002b | IDE | LSP: Port Python/JS AST detectors to run in-process for LSP diagnostics. | TODO |
+| IDE-001a | IDE | VS Code extension: Initialize scaffold with `yo code` and configure extension manifests. | FIXED |
+| IDE-001b | IDE | VS Code extension: Implement settings provider for `.green-ai.yaml` editing. | FIXED |
+| IDE-002a | IDE | LSP: Implement base server handshake and workspace synchronization. | FIXED |
+| IDE-002b | IDE | LSP: Port Python/JS AST detectors to run in-process for LSP diagnostics. | FIXED |
 | AUDIT-003 | Audit | Security: Create automated XSS payload tests for all dashboard fields. | FIXED |
 | AUDIT-005 | Audit | Security: Implement unit tests for path traversal in `/api/remediation/preview`. | FIXED |
 | TEAM-001a | Team | Database: Setup SQLAlchemy Core and migration environment (Alembic). | TODO |

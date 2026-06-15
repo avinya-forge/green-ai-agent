@@ -23,8 +23,13 @@
     "languages": [
       {
         "id": "green-ai-rule",
-        "aliases": ["Green AI Rule", "gairule"],
-        "extensions": [".gairule"]
+        "aliases": [
+          "Green AI Rule",
+          "gairule"
+        ],
+        "extensions": [
+          ".gairule"
+        ]
       }
     ],
     "grammars": [
@@ -56,7 +61,11 @@
         },
         "green-ai.scanner.strictness": {
           "type": "string",
-          "enum": ["low", "medium", "high"],
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
           "default": "medium",
           "description": "Strictness level of the Green AI scanner."
         }
@@ -71,9 +80,12 @@
     "test": "npm run compile && node ./out/test/runTest.js"
   },
   "devDependencies": {
-    "@types/vscode": "^1.90.0",
     "@types/node": "20.x",
+    "@types/vscode": "^1.120.0",
     "typescript": "^5.4.5",
     "vsce": "^2.15.0"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^10.0.0"
   }
 }
