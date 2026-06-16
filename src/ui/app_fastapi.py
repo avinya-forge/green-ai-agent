@@ -679,3 +679,19 @@ async def api_ai_violations() -> Any:
     except Exception as e:
         print(f"Error in api_ai_violations: {e}", file=sys.stderr)
         raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
+@app.get("/api/news")
+def api_news_dashboard() -> Any:
+    """
+    Returns the latest aggregated news, security updates, and compliance requirements
+    for the News Dashboard component.
+    """
+    try:
+        from src.core.news.parser import NewsParser
+        parser = NewsParser()
+        articles = parser.get_latest_news()
+        return {"status": "ok", "articles": articles}
+    except Exception as e:
+        print(f"Error in api_news_dashboard: {e}", file=sys.stderr)
+        raise HTTPException(status_code=500, detail="Internal Server Error")

@@ -102,6 +102,10 @@ src/
 │   ├── registry.py         # Standards registry
 │   └── sources.py          # GSF and ecoCode standard sources
 │
+├── news/                   # Tech and security news pipeline
+│   ├── crawler.py          # Fetch data from news sources
+│   └── parser.py           # Normalize raw article data
+│
 └── agents/                 # Autonomous runtime monitoring
     └── runtime_monitor/
 ```
@@ -137,7 +141,7 @@ scan_files()
 ```
 Browser (WebSocket + REST)
   └── FastAPI 0.136.0 + Starlette 1.0.0 (app_fastapi.py)
-        ├── HTTP Routes: /api/scan, /api/projects, /api/results, /api/charts, /api/calibrate
+        ├── HTTP Routes: /api/scan, /api/projects, /api/results, /api/charts, /api/calibrate, /api/news
         ├── WebSocket (python-socketio 5.16.1 ASGI): real-time scan progress
         ├── Jinja2 Templates: dashboard HTML
         └── Middleware: SecurityHeadersMiddleware, RateLimitMiddleware

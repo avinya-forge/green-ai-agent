@@ -1301,6 +1301,7 @@
         <button class="tab-button" onclick="switchTab('projects')" title="View all projects">🗂️ Projects</button>
         <button class="tab-button" onclick="switchTab('comparison')" title="Compare projects">📈 Comparison</button>
         <button class="tab-button" onclick="switchTab('telemetry')" title="View telemetry">📡 Telemetry</button>
+        <button class="tab-button" onclick="switchTab('news-dashboard')" title="View news dashboard">📰 News</button>
     </div>
 
     <!-- Tab 1: Scan Results (Default) -->
@@ -1594,6 +1595,27 @@
         </div>
     </div> <!-- End telemetry tab -->
 
+    <!-- Tab 5: News Dashboard -->
+    <div id="tab-news-dashboard" class="tab-content" style="display: none;">
+        <div class="header-section">
+            <div class="title-area">
+                <h2>📰 Tech & Security News</h2>
+                <div class="subtitle">Latest aggregated news, security updates, and compliance requirements</div>
+            </div>
+            <div class="actions">
+                <button class="btn btn-primary" onclick="loadNewsDashboard()">
+                    <span class="icon">🔄</span> Refresh News
+                </button>
+            </div>
+        </div>
+        <div class="card" style="margin-top: 1rem;">
+            <h3>Latest Updates</h3>
+            <div id="news-container" class="issues-list">
+                <p>Loading news...</p>
+            </div>
+        </div>
+    </div> <!-- End news dashboard tab -->
+
     <script>
         // Security: Escape HTML to prevent XSS
         function escapeHTML(str) {
@@ -1627,7 +1649,41 @@
                 loadProjects();
             } else if (tabName === 'telemetry') {
                 loadTelemetry();
+            } else if (tabName === 'tab-news-dashboard' || tabName === 'news-dashboard') {
+                loadNewsDashboard();
             }
+        }
+
+        function loadNewsDashboard() {
+            const container = document.getElementById('news-container');
+            container.innerHTML = '<p>Loading news...</p>';
+
+            fetch('/api/news')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'ok' && data.articles && data.articles.length > 0) {
+                        let html = '';
+                        data.articles.forEach(article => {
+                            html += `
+                                <div class="issue-item severity-info">
+                                    <div style="flex: 1;">
+                                        <strong><a href="${escapeHTML(article.url)}" target="_blank" style="color: inherit; text-decoration: none;">${escapeHTML(article.title)}</a></strong>
+                                        <div class="issue-meta">
+                                            Source: ${escapeHTML(article.source)} | Score: ${escapeHTML(String(article.score))} | Time: ${new Date(article.timestamp * 1000).toLocaleString()}
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        container.innerHTML = html;
+                    } else {
+                        container.innerHTML = '<p>No news available.</p>';
+                    }
+                })
+                .catch(err => {
+                    console.error('Error fetching news:', err);
+                    container.innerHTML = '<p>Error loading news.</p>';
+                });
         }
 
         // Load projects from API

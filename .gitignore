@@ -41,6 +41,7 @@ coverage.xml
 # Ignore generated CSV/HTML exports but keep folder structure
 output/**/*.csv           # Generated CSV exports in all subdirectories
 output/**/*.html          # Generated HTML reports in all subdirectories
+output/**/*.pdf
 output/logs/*.log
 output/logs/pytest.log
 output/emissions/
