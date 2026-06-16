@@ -1667,7 +1667,7 @@
                             html += `
                                 <div class="issue-item severity-info">
                                     <div style="flex: 1;">
-                                        <strong><a href="${escapeHTML(article.url)}" target="_blank" style="color: inherit; text-decoration: none;">${escapeHTML(article.title)}</a></strong>
+                                        <strong><a href="${(article.url && (article.url.startsWith('http://') || article.url.startsWith('https://'))) ? escapeHTML(article.url) : '#'}" target="_blank" style="color: inherit; text-decoration: none;">${escapeHTML(article.title)}</a></strong>
                                         <div class="issue-meta">
                                             Source: ${escapeHTML(article.source)} | Score: ${escapeHTML(String(article.score))} | Time: ${new Date(article.timestamp * 1000).toLocaleString()}
                                         </div>

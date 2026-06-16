@@ -126,3 +126,4 @@ Dockerfile.bak
 output/**/*.xml
 output/telemetry.jsonl
 .memory/
+green_ai.db

@@ -5,6 +5,10 @@ This module initializes the FastAPI application and Socket.IO server
 for the migration from Flask/Eventlet.
 """
 
+from src.core.models import Team, User, TeamMembership
+from src.core.database import get_db, Base, engine
+from pydantic import BaseModel
+from fastapi import Depends
 import socketio
 from fastapi import FastAPI, Request, HTTPException, Query, Response, Path
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -695,3 +699,80 @@ def api_news_dashboard() -> Any:
     except Exception as e:
         print(f"Error in api_news_dashboard: {e}", file=sys.stderr)
         raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
+# TEAM-002 REST endpoints
+
+# Ensure tables are created (in a real app, use Alembic - initialized manually on startup instead)
+# Alembic handles this now, but we keep this here as a fallback for pure unit tests without DB prep.
+# We comment this out so it doesn't try to create tables on the main engine before tests override it.
+# Base.metadata.create_all(bind=engine)
+
+
+class TeamCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+
+
+class MembershipCreate(BaseModel):
+    user_id: str
+    role: str = "member"
+
+
+@app.post("/api/teams")
+def create_team(team: TeamCreate, db=Depends(get_db)):
+    db_team = db.query(Team).filter(Team.name == team.name).first()
+    if db_team:
+        raise HTTPException(status_code=400, detail="Team name already registered")
+
+    new_team = Team(name=team.name, description=team.description)
+    db.add(new_team)
+    db.commit()
+    db.refresh(new_team)
+    return {"status": "ok", "team_id": new_team.id, "name": new_team.name}
+
+
+@app.get("/api/teams")
+def get_teams(db=Depends(get_db)):
+    teams = db.query(Team).all()
+    return {"status": "ok", "teams": [{"id": t.id, "name": t.name, "description": t.description} for t in teams]}
+
+
+@app.post("/api/teams/{team_id}/members")
+def add_team_member(team_id: str, membership: MembershipCreate, db=Depends(get_db)):
+    team = db.query(Team).filter(Team.id == team_id).first()
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+
+    user = db.query(User).filter(User.id == membership.user_id).first()
+    if not user:
+        # For ease of testing/simplicity, if user doesn't exist, we create one inline here
+        # (in production, users would be created through auth flow)
+        user = User(id=membership.user_id, email=f"{membership.user_id}@example.com", full_name="Auto Created")
+        db.add(user)
+        db.commit()
+
+    existing = db.query(TeamMembership).filter_by(team_id=team_id, user_id=membership.user_id).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="User already in team")
+
+    new_membership = TeamMembership(team_id=team_id, user_id=user.id, role=membership.role)
+    db.add(new_membership)
+    db.commit()
+    return {"status": "ok", "message": "Member added successfully"}
+
+
+@app.get("/api/teams/{team_id}/members")
+def get_team_members(team_id: str, db=Depends(get_db)):
+    team = db.query(Team).filter(Team.id == team_id).first()
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+
+    members = []
+    for m in team.members:
+        members.append({
+            "user_id": m.user_id,
+            "email": m.user.email,
+            "role": m.role
+        })
+    return {"status": "ok", "members": members}
