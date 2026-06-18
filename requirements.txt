@@ -6,6 +6,10 @@ pydantic==2.12.5
 pydantic-core==2.41.5
 pyyaml>=6.0,<7.0
 
+# Database
+SQLAlchemy>=2.0,<3.0
+alembic>=1.13,<2.0
+
 # Web framework (pinned — Starlette 1.0 broke TemplateResponse on silent upgrade)
 fastapi==0.136.0
 starlette==1.0.1

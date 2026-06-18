@@ -132,6 +132,18 @@ scan_files()
 
 ---
 
+## Database Architecture
+
+Green-AI has been expanded to support a relational database schema using SQLAlchemy and Alembic. This is currently used for managing logic related to Teams, Users, and Projects.
+
+**Core Entities**:
+- `User`: Represents a dashboard user.
+- `Team`: Represents an organization or group of users.
+- `ProjectDB`: Links a project run configuration directly to a `Team`.
+- `TeamMembership`: Manages the many-to-many relationship and roles between `User` and `Team`.
+
+---
+
 ## Web Dashboard Architecture
 
 ```

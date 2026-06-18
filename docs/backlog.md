@@ -26,9 +26,9 @@
 | IDE-002b | IDE | LSP: Port Python/JS AST detectors to run in-process for LSP diagnostics. | FIXED |
 | AUDIT-003 | Audit | Security: Create automated XSS payload tests for all dashboard fields. | FIXED |
 | AUDIT-005 | Audit | Security: Implement unit tests for path traversal in `/api/remediation/preview`. | FIXED |
-| TEAM-001a | Team | Database: Setup SQLAlchemy Core and migration environment (Alembic). | TODO |
-| TEAM-001b | Team | Database: Implement User, Project, and Team relational models. | TODO |
-| TEAM-002 | Team | API: Create REST endpoints for team creation and membership management. | TODO |
+| TEAM-001a | Team | Database: Setup SQLAlchemy Core and migration environment (Alembic). | FIXED |
+| TEAM-001b | Team | Database: Implement User, Project, and Team relational models. | FIXED |
+| TEAM-002 | Team | API: Create REST endpoints for team creation and membership management. | FIXED |
 | SEC-001 | Security | SAST: Port 40+ remaining OWASP Top 10 rules to YAML engine. | TODO |
 | SBOM-005 | SBOM | Report: Generate ESG compliance summary PDF (E: SCI, S: Secrets, G: Debt). | TODO |
 
@@ -80,9 +80,6 @@
 
 | ID | Epic | Task | Status |
 |---|---|---|---|
-| DASH-005 | UI | Feature: Build the new News Dashboard UI component per vision.md. | TODO |
-| CRAWL-001 | Data | Integration: Evaluate and integrate a top-tier open-source crawler for tech/security news. | TODO |
-| CRAWL-002 | Data | Parser: Implement data normalization pipeline for crawled news into standardized internal format. | TODO |
 | QUAL-004 | Quality | Deep Cleaning: Perform a comprehensive codebase audit to remove deprecated/unused legacy code. | TODO |
 | QUAL-005 | Quality | UI Auditing: Conduct thorough accessibility and visual consistency audits across all dashboard views. | TODO |
 | QUAL-006 | Quality | Code Review: Establish strict PR templates and automated code review workflows (Bug Hunter). | TODO |
