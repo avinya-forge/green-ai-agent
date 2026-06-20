@@ -38,3 +38,91 @@ rules:
     tags: [code_quality]
     carbon_impact: 0
     energy_factor: 0
+
+  - id: sql_injection
+    name: SQL Injection
+    description: Constructing SQL queries using string formatting or concatenation leaves the application vulnerable to SQL injection.
+    severity: critical
+    languages: [java]
+    pattern: |
+      (SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER)\s+.*\s+(WHERE|VALUES|SET)\s+.*(\+.*)
+    remediation: Use PreparedStatement instead of Statement for parameterized queries.
+    source: OWASP
+    tags: [security, owasp-a03, injection]
+
+  - id: command_injection
+    name: Command Injection
+    description: Passing unsanitized input to Runtime.exec() or ProcessBuilder can lead to command injection.
+    severity: critical
+    languages: [java]
+    pattern: |
+      (Runtime\.getRuntime\(\)\.exec|new\s+ProcessBuilder)\s*\(\s*.*(\+)
+    remediation: Avoid executing shell commands directly, or pass arguments securely without concatenation.
+    source: OWASP
+    tags: [security, owasp-a03, injection]
+
+  - id: path_traversal
+    name: Path Traversal
+    description: Constructing file paths with unsanitized input can allow attackers to read arbitrary files.
+    severity: critical
+    languages: [java]
+    pattern: |
+      new\s+(File|FileInputStream|FileOutputStream|FileReader|FileWriter)\s*\(\s*.*(\+)
+    remediation: Validate file paths and ensure they belong to an allowed base directory.
+    source: OWASP
+    tags: [security, owasp-a01, access-control]
+
+  - id: insecure_deserialization
+    name: Insecure Deserialization
+    description: Deserializing untrusted data with ObjectInputStream can lead to remote code execution.
+    severity: critical
+    languages: [java]
+    pattern: |
+      \.readObject\(\)
+    remediation: Use safe serialization formats like JSON, or implement strict look-ahead object input streams.
+    source: OWASP
+    tags: [security, owasp-a08, deserialization]
+
+  - id: ssrf
+    name: Server-Side Request Forgery (SSRF)
+    description: Fetching remote URLs constructed with user input can lead to SSRF vulnerabilities.
+    severity: critical
+    languages: [java]
+    pattern: |
+      new\s+URL\s*\(\s*.*(\+).*\)\.openConnection\(\)
+    remediation: Validate and sanitize URLs before fetching them. Ensure they belong to an allowed domain list.
+    source: OWASP
+    tags: [security, owasp-a10, ssrf]
+
+  - id: xxe
+    name: XML External Entity (XXE) Injection
+    description: Parsing XML with external entities enabled can lead to file disclosure or SSRF.
+    severity: critical
+    languages: [java]
+    pattern: |
+      (DocumentBuilderFactory|SAXParserFactory|XMLInputFactory)\.newInstance\(\)
+    remediation: Disable external entity resolution on the XML factory.
+    source: OWASP
+    tags: [security, owasp-a05, xxe]
+
+  - id: hardcoded_secret
+    name: Hardcoded Secret
+    description: Hardcoded passwords, tokens, or keys in source code are highly vulnerable.
+    severity: critical
+    languages: [java]
+    pattern: |
+      (?i)(password|secret|token|key|api_key|access_key)\s*=\s*['"][a-zA-Z0-9_\-\.]{10,}['"]
+    remediation: Store secrets in environment variables or a secure vault.
+    source: OWASP
+    tags: [security, owasp-a07, secrets]
+
+  - id: weak_cryptography
+    name: Weak Cryptography
+    description: Using weak or broken cryptographic algorithms like MD5 or SHA1.
+    severity: high
+    languages: [java]
+    pattern: |
+      MessageDigest\.getInstance\(\s*['"](MD5|SHA1)['"]\s*\)
+    remediation: Use strong algorithms like SHA-256 for hashing.
+    source: OWASP
+    tags: [security, owasp-a02, crypto]
