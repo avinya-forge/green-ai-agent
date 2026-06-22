@@ -52,3 +52,69 @@ rules:
       - algorithmic
     energy_factor: 10
     carbon_impact: 0.000005
+
+  - id: sql_injection
+    name: SQL Injection
+    description: Constructing SQL queries using string formatting or concatenation leaves the application vulnerable to SQL injection.
+    severity: critical
+    languages: [go]
+    pattern: |
+      (SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER)\s+.*\s+(WHERE|VALUES|SET)\s+.*(%s|\+)
+    remediation: Use parameterized queries (prepared statements) to prevent SQL injection.
+    source: OWASP
+    tags: [security, owasp-a03, injection]
+
+  - id: command_injection
+    name: Command Injection
+    description: Passing unsanitized input to exec.Command or os/exec functions can lead to command injection.
+    severity: critical
+    languages: [go]
+    pattern: |
+      exec\.Command\(\s*.*(\+|%s)
+    remediation: Pass arguments as separate strings rather than part of a single shell command string.
+    source: OWASP
+    tags: [security, owasp-a03, injection]
+
+  - id: path_traversal
+    name: Path Traversal
+    description: Constructing file paths with unsanitized input can allow attackers to read arbitrary files.
+    severity: critical
+    languages: [go]
+    pattern: |
+      os\.(Open|ReadFile|Create|WriteFile)\s*\(\s*.*(\+|%s)
+    remediation: Use filepath.Clean and validate file paths against an allowed base directory.
+    source: OWASP
+    tags: [security, owasp-a01, access-control]
+
+  - id: ssrf
+    name: Server-Side Request Forgery (SSRF)
+    description: Fetching remote URLs constructed with user input can lead to SSRF vulnerabilities.
+    severity: critical
+    languages: [go]
+    pattern: |
+      http\.(Get|Post|Head)\s*\(\s*.*(\+|%s)
+    remediation: Validate and sanitize URLs before fetching them. Ensure they belong to an allowed domain list.
+    source: OWASP
+    tags: [security, owasp-a10, ssrf]
+
+  - id: hardcoded_secret
+    name: Hardcoded Secret
+    description: Hardcoded passwords, tokens, or keys in source code are highly vulnerable.
+    severity: critical
+    languages: [go]
+    pattern: |
+      (?i)(password|secret|token|key|api_key|access_key)\s*:=\s*['"][a-zA-Z0-9_\-\.]{10,}['"]
+    remediation: Store secrets in environment variables or a secure vault.
+    source: OWASP
+    tags: [security, owasp-a07, secrets]
+
+  - id: weak_cryptography
+    name: Weak Cryptography
+    description: Using weak or broken cryptographic algorithms like MD5 or SHA1.
+    severity: high
+    languages: [go]
+    pattern: |
+      (md5|sha1)\.(New|Sum)
+    remediation: Use strong algorithms like SHA-256 for hashing.
+    source: OWASP
+    tags: [security, owasp-a02, crypto]

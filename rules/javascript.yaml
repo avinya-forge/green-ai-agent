@@ -180,3 +180,91 @@ rules:
     remediation: Use textContent or DOM node manipulation methods.
     source: ecoCode
     tags: [performance, security]
+
+  - id: sql_injection
+    name: SQL Injection
+    description: Constructing SQL queries using string formatting or concatenation leaves the application vulnerable to SQL injection.
+    severity: critical
+    languages: [javascript]
+    pattern: |
+      (SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER)\s+.*\s+(WHERE|VALUES|SET)\s+.*(\+.*|`.*`.*)
+    remediation: Use parameterized queries (prepared statements) to prevent SQL injection.
+    source: OWASP
+    tags: [security, owasp-a03, injection]
+
+  - id: command_injection
+    name: Command Injection
+    description: Passing unsanitized input to child_process functions can lead to command injection.
+    severity: critical
+    languages: [javascript]
+    pattern: |
+      (child_process\.)?(exec|execSync|spawn|spawnSync)\s*\(\s*.*(\+|`.*`.*)
+    remediation: Use child_process.execFile or spawn with a separate arguments array.
+    source: OWASP
+    tags: [security, owasp-a03, injection]
+
+  - id: path_traversal
+    name: Path Traversal
+    description: Constructing file paths with unsanitized input can allow attackers to read arbitrary files.
+    severity: critical
+    languages: [javascript]
+    pattern: |
+      fs\.(readFile|readFileSync|createReadStream|writeFile|writeFileSync|createWriteStream)\s*\(\s*.*(\+|`.*`.*)
+    remediation: Validate file paths using path.normalize and ensure they belong to an allowed base directory.
+    source: OWASP
+    tags: [security, owasp-a01, access-control]
+
+  - id: insecure_deserialization
+    name: Insecure Deserialization
+    description: Deserializing untrusted data with eval() or insecure packages like node-serialize can lead to remote code execution.
+    severity: critical
+    languages: [javascript]
+    pattern: |
+      (unserialize|deserialize)\s*\(
+    remediation: Use secure serialization formats like JSON (JSON.parse).
+    source: OWASP
+    tags: [security, owasp-a08, deserialization]
+
+  - id: ssrf
+    name: Server-Side Request Forgery (SSRF)
+    description: Fetching remote URLs constructed with user input can lead to SSRF vulnerabilities.
+    severity: critical
+    languages: [javascript]
+    pattern: |
+      (axios\.|fetch\(|request\()*\s*.*\s*(\+|`.*`.*)
+    remediation: Validate and sanitize URLs before fetching them. Ensure they belong to an allowed domain list.
+    source: OWASP
+    tags: [security, owasp-a10, ssrf]
+
+  - id: xss_injection
+    name: Cross-Site Scripting (XSS)
+    description: Assigning unsanitized input directly to innerHTML or related properties can lead to XSS.
+    severity: critical
+    languages: [javascript]
+    pattern: |
+      \.(innerHTML|outerHTML|insertAdjacentHTML|write)\s*=
+    remediation: Use textContent, sanitize input, or use safe DOM manipulation libraries.
+    source: OWASP
+    tags: [security, owasp-a03, xss]
+
+  - id: hardcoded_secret
+    name: Hardcoded Secret
+    description: Hardcoded passwords, tokens, or keys in source code are highly vulnerable.
+    severity: critical
+    languages: [javascript]
+    pattern: |
+      (?i)(password|secret|token|key|api_key|access_key)\s*(:|=)\s*['"][a-zA-Z0-9_\-\.]{10,}['"]
+    remediation: Store secrets in environment variables or a secure vault.
+    source: OWASP
+    tags: [security, owasp-a07, secrets]
+
+  - id: weak_cryptography
+    name: Weak Cryptography
+    description: Using weak or broken cryptographic algorithms like MD5 or SHA1.
+    severity: high
+    languages: [javascript]
+    pattern: |
+      crypto\.createHash\(\s*['"](md5|sha1)['"]\s*\)
+    remediation: Use strong algorithms like SHA-256 for hashing.
+    source: OWASP
+    tags: [security, owasp-a02, crypto]
