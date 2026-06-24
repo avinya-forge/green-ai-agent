@@ -93,6 +93,7 @@ src/
 │   ├── charts.py           # Chart data generation
 │   ├── templates/          # Jinja2 HTML templates
 │   └── middleware/         # security.py, rate_limit.py
+│   └── news/               # News Dashboard Integration
 │
 ├── ide/                    # IDE integrations
 │   ├── vscode/             # VS Code extension (TypeScript, v0.1.0)
