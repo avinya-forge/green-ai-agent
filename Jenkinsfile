@@ -61,6 +61,17 @@ pipeline {
             }
         }
         
+        stage('Check Docs Sync') {
+            steps {
+                script {
+                    echo "📚 Checking docs sync..."
+                    sh '''
+                        python scripts/check_docs_sync.py
+                    '''
+                }
+            }
+        }
+
         stage('Scan Codebase') {
             steps {
                 script {

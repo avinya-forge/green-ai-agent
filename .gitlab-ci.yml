@@ -17,6 +17,9 @@ green-ai-scan:
     - pip install green-ai-agent
     
   script:
+    # Check docs sync
+    - python scripts/check_docs_sync.py
+
     # Run scan and generate JSON report
     - green-ai scan . --language python --format json > $REPORT_FILE || true
     

@@ -56,7 +56,7 @@
 |---|---|---|
 | ENG-018 | Code Cleanup: Final audit of scrubbed code paths in `src/core/detectors/python_detector.py`. | FIXED |
 | ENG-019 | Security: Audit and standardize `Query(...)` validation across all 20+ FastAPI endpoints. | FIXED |
-| ENG-020 | Documentation: Implement auto-sync check between `vision.md` and `architecture.md` (CI gate). | TODO |
+| ENG-020 | Documentation: Implement auto-sync check between `vision.md` and `architecture.md` (CI gate). | DONE |
 
 ## 5. Completed Tasks (v1.0.4 Batch)
 
