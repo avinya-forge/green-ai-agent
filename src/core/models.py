@@ -55,3 +55,45 @@ class ProjectDB(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     team = relationship("Team", back_populates="projects")
+
+
+class StandardSource(Base):
+    __tablename__ = "standard_sources"
+
+    id = Column(String, primary_key=True, default=generate_uuid)
+    name = Column(String, index=True)
+    url = Column(String)
+    last_synced_at = Column(DateTime, nullable=True)
+    sync_interval_hours = Column(String, default="24")
+
+    rules = relationship("RuleDefinition", back_populates="source")
+
+
+class RuleDefinition(Base):
+    __tablename__ = "rules"
+
+    id = Column(String, primary_key=True)
+    source_id = Column(String, ForeignKey("standard_sources.id"))
+    language = Column(String)
+    severity = Column(String)
+    description = Column(String)
+    ast_query = Column(String)
+    remediation_effort_minutes = Column(String, default="15")
+    is_active = Column(Boolean, default=True)
+    version = Column(String, default="1.0.0")
+
+    source = relationship("StandardSource", back_populates="rules")
+    overrides = relationship("RuleOverride", back_populates="rule")
+
+
+class RuleOverride(Base):
+    __tablename__ = "rule_overrides"
+
+    id = Column(String, primary_key=True, default=generate_uuid)
+    rule_id = Column(String, ForeignKey("rules.id"))
+    org_id = Column(String) # Placeholder for future Organization linking
+    override_severity = Column(String, nullable=True)
+    is_disabled = Column(Boolean, default=False)
+    custom_message = Column(String, nullable=True)
+
+    rule = relationship("RuleDefinition", back_populates="overrides")

@@ -30,6 +30,9 @@ class Violation(BaseModel):
     severity: ViolationSeverity
     message: str
     pattern_match: Optional[str] = None
+    author: Optional[str] = None
+    author_email: Optional[str] = None
+    commit_date: Optional[str] = None
 
     model_config = ConfigDict(extra='ignore')
 

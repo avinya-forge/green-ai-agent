@@ -1,10 +1,9 @@
 name: Green AI Scan
 
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+  schedule:
+    - cron: '0 0 * * 0' # Run weekly on Sunday at midnight
+  workflow_dispatch: # Allow manual triggering
 
 jobs:
   scan:

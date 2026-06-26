@@ -22,6 +22,10 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '30'))
     }
     
+    triggers {
+        cron('0 0 * * 0') // Run weekly on Sunday at midnight
+    }
+
     parameters {
         string(name: 'LANGUAGE', defaultValue: 'python', description: 'Code language: python, javascript, etc.')
         choice(name: 'FAIL_ON_CRITICAL', choices: ['true', 'false'], description: 'Fail build on CRITICAL violations?')

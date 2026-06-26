@@ -2,10 +2,26 @@
 
 > **Vision:** One tool — Environmental (energy/carbon) + Security (SAST/secrets/SCA) + Governance (quality/debt/license) + AI Fix. Single CLI, VS Code, CI/CD, and Dashboard.
 
-## 1. Bugs (P0 - Immediate)
+## 1. Bugs & High Priority Analysis (P0 - Immediate)
 
 | ID | Priority | Component | Issue | Status |
 |---|---|---|---|---|
+| ANALYSIS-001a | HIGH | Analysis | Define architecture for passing AST context to LLMs without exceeding token limits. | DONE |
+| ANALYSIS-001b | HIGH | Analysis | Evaluate LibCST vs raw string replacement for LLM-suggested code fixes. | DONE |
+| ANALYSIS-002a | HIGH | Analysis | Research OSV.dev and GSF API rate limits for dynamic standard syncing. | DONE |
+| ANALYSIS-002b | HIGH | Analysis | Design DB schema for caching external standard definitions locally. | DONE |
+| ANALYSIS-003a | HIGH | Analysis | Design YAML configuration hierarchy (Global > Org > User). | DONE |
+| ANALYSIS-004a | HIGH | Analysis | Determine performance impact of running 'git blame' on every violation during scan. | DONE |
+| IMPL-001 | HIGH | Backend | Database Schema: Create SQLAlchemy models for standard_sources and rules caching. | DONE |
+| IMPL-002 | HIGH | Backend | Alembic Migration: Generate migration script for new rule schema. | DONE |
+| IMPL-003 | HIGH | Backend | Git Blame: Add author, author_email, and commit_date to Violation domain model. | DONE |
+| IMPL-004 | HIGH | Backend | Git Blame: Update worker.py to attach pygit2 blame metadata to violations natively. | DONE |
+| IMPL-005 | HIGH | Backend | Configuration: Update config.py to merge Global, Org, Project, and Local rules hierarchies. | DONE |
+| IMPL-006 | HIGH | LLM | Context Limiting: Add token counting utility for AST snippets in remediation engine. | DONE |
+| IMPL-007 | HIGH | LLM | Fallback Remediation: Implement surgical byte-slice replacement fallback for non-Python nodes. | DONE |
+| IMPL-008 | HIGH | UI | Dashboard Filters: Implement Git author breakdown aggregation endpoint in app_fastapi.py. | DONE |
+| IMPL-009 | HIGH | External API | OSV Client: Create initial stub for downloading OSV.dev vulnerability databases. | DONE |
+| IMPL-010 | HIGH | External API | GSF Rules Client: Create initial stub for authenticating and fetching GSF GitHub rules. | DONE |
 | BUG-007 | HIGH | UI/Server | websockets.legacy deprecation in test output (Upstream uvicorn issue). | FIXED |
 | BUG-017a | MEDIUM | Scanner | Ensure proper cleanup of temporary directories in multiprocessing mode. | FIXED |
 | BUG-017b | MEDIUM | Scanner | Synchronize scan progress state across worker processes for accurate UI updates. | FIXED |
