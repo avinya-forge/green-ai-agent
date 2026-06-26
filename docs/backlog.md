@@ -2,10 +2,16 @@
 
 > **Vision:** One tool — Environmental (energy/carbon) + Security (SAST/secrets/SCA) + Governance (quality/debt/license) + AI Fix. Single CLI, VS Code, CI/CD, and Dashboard.
 
-## 1. Bugs (P0 - Immediate)
+## 1. Bugs & High Priority Analysis (P0 - Immediate)
 
 | ID | Priority | Component | Issue | Status |
 |---|---|---|---|---|
+| ANALYSIS-001a | HIGH | Analysis | Define architecture for passing AST context to LLMs without exceeding token limits. | DONE |
+| ANALYSIS-001b | HIGH | Analysis | Evaluate LibCST vs raw string replacement for LLM-suggested code fixes. | DONE |
+| ANALYSIS-002a | HIGH | Analysis | Research OSV.dev and GSF API rate limits for dynamic standard syncing. | DONE |
+| ANALYSIS-002b | HIGH | Analysis | Design DB schema for caching external standard definitions locally. | DONE |
+| ANALYSIS-003a | HIGH | Analysis | Design YAML configuration hierarchy (Global > Org > User). | DONE |
+| ANALYSIS-004a | HIGH | Analysis | Determine performance impact of running 'git blame' on every violation during scan. | DONE |
 | BUG-007 | HIGH | UI/Server | websockets.legacy deprecation in test output (Upstream uvicorn issue). | FIXED |
 | BUG-017a | MEDIUM | Scanner | Ensure proper cleanup of temporary directories in multiprocessing mode. | FIXED |
 | BUG-017b | MEDIUM | Scanner | Synchronize scan progress state across worker processes for accurate UI updates. | FIXED |
@@ -49,10 +55,6 @@
 | DEBT-002 | Governance | Debt: Compute aggregate "cleanliness" and "remediation time" scores. | TODO |
 | ESG-001 | Governance | ESG: Define weighted aggregate score algorithm (40% E, 30% S, 30% G). | TODO |
 | RUST-001 | Rust | Lang: Integrate `tree-sitter-rust` and implement `RustASTDetector`. | TODO |
-| ANALYSIS-001 | Analysis | Feasibility report for LLM-powered AI auto-fixing (risk, architecture). | TODO |
-| ANALYSIS-002 | Analysis | Feasibility and design for dynamic rule synchronization from external standard forums. | TODO |
-| ANALYSIS-003 | Analysis | Feasibility of organization-level and individual-level rule customization/version upgrading. | TODO |
-| ANALYSIS-004 | Analysis | Feasibility of a comprehensive SonarQube-style dashboard with advanced filters (e.g., git username). | TODO |
 
 ## 4. Technical Debt & Cleanup (P3)
 
