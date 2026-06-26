@@ -1,5 +1,7 @@
 from typing import Dict, Any, List, Optional
 import ast
+import subprocess
+from datetime import datetime, timezone
 from src.core.remediation.engine import RemediationEngine
 from src.core.analyzer import EmissionAnalyzer
 from src.core.detectors import detect_violations
@@ -18,6 +20,50 @@ def _checks_include(config: Dict, check: str) -> bool:
     if isinstance(checks, str):
         checks = [checks]
     return 'all' in checks or check in checks
+
+
+def _get_git_blame_info(file_path: str, lines: List[int]) -> Dict[int, Dict[str, str]]:
+    """Fetch git blame info for specific lines using pygit2 for high performance."""
+    blame_info = {}
+    if not lines:
+        return blame_info
+
+    try:
+        import pygit2
+    except ImportError:
+        return blame_info
+
+    try:
+        repo_path = pygit2.discover_repository(file_path)
+        if not repo_path:
+            return blame_info
+
+        repo = pygit2.Repository(repo_path)
+        workdir = repo.workdir
+        rel_path = os.path.relpath(file_path, workdir)
+
+        # Pygit2 blame is highly optimized and runs once per file
+        blame = repo.blame(rel_path)
+
+        for line in set(lines):
+            # pygit2 uses 1-based indexing for lines
+            if line > 0 and line <= len(blame):
+                hunk = blame.for_line(line)
+                signature = hunk.final_committer
+                author = signature.name
+                author_email = signature.email
+                commit_time = datetime.fromtimestamp(signature.time, tz=timezone.utc).isoformat()
+
+                blame_info[line] = {
+                    'author': author,
+                    'author_email': author_email,
+                    'commit_date': commit_time
+                }
+    except Exception:
+        # Silently fail if file is untracked or pygit2 errors out
+        pass
+
+    return blame_info
 
 
 def scan_file_worker(
@@ -69,6 +115,9 @@ def scan_file_worker(
                 if disk_cache:
                     disk_cache.set(content, language, violations)
 
+            violation_lines = [v.get('line', 0) for v in violations if v.get('line')]
+            blame_cache = _get_git_blame_info(file_path, violation_lines)
+
             for violation in violations:
                 rule = next((r for r in rules if r['id'] == violation['id']), None)
                 if rule:
@@ -88,20 +137,26 @@ def scan_file_worker(
                         # Apply severity override if present
                         issue_severity = severity_overrides.get(rule_id, rule.get('severity', 'medium'))
 
+                        v_line = violation.get('line', 0)
+                        blame = blame_cache.get(v_line, {})
+
                         issue = {
                             'id': rule_id,
                             'type': 'green_violation',
                             'severity': issue_severity,
                             'message': violation.get('message', 'N/A'),
                             'file': file_path,
-                            'line': violation.get('line', 0),
+                            'line': v_line,
                             'remediation': rule.get('remediation', 'N/A'),
                             'ai_suggestion': remediation_engine.get_suggestion(rule_id),
                             'effort': rule.get('effort', 'Medium'),
                             'tags': rule.get('tags', []),
                             'carbon_impact': rule.get('carbon_impact', 1e-9),
                             'energy_factor': rule.get('energy_factor', 1),
-                            'name': rule.get('name', rule_id)
+                            'name': rule.get('name', rule_id),
+                            'author': blame.get('author'),
+                            'author_email': blame.get('author_email'),
+                            'commit_date': blame.get('commit_date')
                         }
 
                         if not is_suppressed(issue, inline_suppressions, external_suppressions):

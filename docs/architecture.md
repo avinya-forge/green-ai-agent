@@ -280,3 +280,27 @@ helm install green-ai ./deploy/helm/green-ai -f custom-values.yaml
 **Decision:** Enforce security configurations universally.
 **Reason:** Several configurations defaulted to insecure options (Bandit B501, B701, B324). `requests.get` now enforces `verify=True`, `Jinja2` environments use `autoescape=select_autoescape`, and MD5 hashes used for non-security caches explicitly specify `usedforsecurity=False` for FIPS-compliance.
 **Status:** Implemented across `src/standards`, `src/core/export`, and cache implementations. See BUG-024, BUG-025, BUG-026 in backlog.
+
+### ADR-007: LLM Auto-Fix Context Architecture (ANALYSIS-001a)
+
+**Decision:** Use `tree-sitter` to extract pruned AST scope snippets before sending to LLM. Provide byte-slice surgical replacement for non-Python languages and use `LibCST` for Python.
+**Reason:** Passing raw source files exceeds token limits and context windows. `LibCST` ensures 100% safe replacements without breaking styles but only supports Python, thus a hybrid approach is necessary.
+**Status:** Feasibility verified. Pending implementation.
+
+### ADR-008: Dynamic External Rule Syncing (ANALYSIS-002a, 002b)
+
+**Decision:** Download bulk OSV data dumps via cron job and sync GSF/ecoCode rules using authenticated GitHub APIs, caching them in a relational DB (`standard_sources`, `rules`, `rule_overrides`).
+**Reason:** Avoids rate limits during scans and allows local caching. Database schema supports multi-tenant organization customizations.
+**Status:** Feasibility verified. Pending implementation.
+
+### ADR-009: Organization-Level Rule Hierarchy (ANALYSIS-003a)
+
+**Decision:** Implement a deep-merge configuration resolver with precedence: Local (`.green-ai/suppress.yaml`) > Project (DB/yaml) > Organization (DB) > Global (Engine DB).
+**Reason:** Fulfills the "truly customizable product" requirement, allowing admins and users to tailor standard rules without modifying the global cached source.
+**Status:** Feasibility verified. Pending implementation.
+
+### ADR-010: Git Blame Dashboard Integration (ANALYSIS-004a)
+
+**Decision:** Use in-process `pygit2` to perform file-level batch blame lookups at the end of AST scans, attaching `author`, `author_email`, and `commit_date` to `Violation` models.
+**Reason:** Shelling out to `git blame` per violation is too slow. `pygit2` enables fast in-memory execution, allowing the SonarQube-style dashboard to filter by Git metadata efficiently.
+**Status:** Feasibility verified. Pending implementation.

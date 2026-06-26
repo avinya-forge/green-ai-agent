@@ -213,7 +213,24 @@ class ConfigLoader:
                 "Or remove .green-ai.yaml to use defaults."
             )
 
-        # 1. Load Global Config (merged into defaults)
+        # 1. Load Database Config (Global Engine Defaults)
+        db_config = self._fetch_db_config("GLOBAL")
+        config = self._merge_config(config, db_config)
+
+        # 2. Load Organization Config (from DB, if org_id is present)
+        # Note: Org ID would typically be injected via environment or API context
+        org_id = os.environ.get("GREEN_AI_ORG_ID")
+        if org_id:
+            org_config = self._fetch_db_config(f"ORG_{org_id}")
+            config = self._merge_config(config, org_config)
+
+        # 3. Load Project Config (from DB, if project_id is present)
+        project_id = os.environ.get("GREEN_AI_PROJECT_ID")
+        if project_id:
+            project_config = self._fetch_db_config(f"PROJECT_{project_id}")
+            config = self._merge_config(config, project_config)
+
+        # 4. Load Global Config (User home dir, merged into DB hierarchy)
         global_path = self._find_global_config_file()
         if global_path:
             try:
@@ -224,7 +241,7 @@ class ConfigLoader:
                 # Silently ignore global config errors to avoid breaking execution
                 pass
 
-        # 2. Load Local Config (merged into defaults+global)
+        # 5. Load Local Config (merged into defaults+DB+global)
         local_config_path = self.config_path
 
         if local_config_path and self._is_url(local_config_path):
@@ -248,6 +265,15 @@ class ConfigLoader:
         self.config = self._validate_config(config)
 
         return self.config
+
+    def _fetch_db_config(self, scope: str) -> Dict:
+        """
+        Stub to fetch rules and overrides from the DB schema created in IMPL-001.
+        In a full implementation, this connects to the SQLAlchemy session
+        and queries RuleOverride joined with RuleDefinition.
+        """
+        # Return an empty dict stub for now until full DB session injection is built
+        return {}
 
     def _merge_config(self, default: Dict, user: Dict) -> Dict:
         """Recursively merge user config into defaults."""

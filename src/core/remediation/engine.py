@@ -86,6 +86,24 @@ class RemediationEngine:
         diff = self.get_diff(file_path, original_code, line, issue_id)
         return diff if diff else ""
 
+    def estimate_tokens(self, text: str) -> int:
+        """
+        Stub for counting tokens of an AST snippet before sending to LLM.
+        This fulfills IMPL-006. In production, this would use tiktoken.
+        """
+        # Roughly 1 token per 4 chars as a fallback estimation
+        return len(text) // 4
+
+    def apply_byte_slice_fallback(self, source: bytes, start_byte: int, end_byte: int, replacement: bytes) -> bytes:
+        """
+        Surgical byte-slice replacement fallback for non-Python AST nodes (IMPL-007).
+        Uses exact byte bounds provided by tree-sitter to guarantee safe replacements
+        without breaking syntax like regex might.
+        """
+        if start_byte < 0 or end_byte > len(source) or start_byte > end_byte:
+            raise ValueError("Invalid byte boundaries for replacement.")
+        return source[:start_byte] + replacement + source[end_byte:]
+
     def fix_file(self, file_path: str, violations: List[Dict]) -> Dict[str, int]:
         """
         Apply fixes to a file for the given violations.

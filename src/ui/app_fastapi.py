@@ -178,6 +178,28 @@ async def api_charts() -> Any:
     return state.last_charts or {}
 
 
+@app.get("/api/charts/authors")
+async def api_charts_authors() -> Any:
+    """
+    Returns an aggregation of violations by Git author.
+    Used by the dashboard to power SonarQube-style filters.
+    """
+    results = state.last_scan_results
+    if not results or "issues" not in results:
+        return {}
+
+    author_counts = {}
+    for issue in results["issues"]:
+        author = issue.get("author")
+        if not author:
+            author = "Unknown"
+        if author not in author_counts:
+            author_counts[author] = 0
+        author_counts[author] += 1
+
+    return author_counts
+
+
 @app.get("/api/results")
 async def api_results() -> Any:
     return state.last_scan_results or {}

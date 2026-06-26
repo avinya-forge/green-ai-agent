@@ -49,3 +49,4 @@ matplotlib>=3.7,<4.0
 # Telemetry / runtime emissions
 codecarbon>=2.4,<3.0
 psutil>=5.9,<7.0
+pygit2>=1.14
