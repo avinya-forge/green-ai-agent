@@ -49,6 +49,10 @@
 | DEBT-002 | Governance | Debt: Compute aggregate "cleanliness" and "remediation time" scores. | TODO |
 | ESG-001 | Governance | ESG: Define weighted aggregate score algorithm (40% E, 30% S, 30% G). | TODO |
 | RUST-001 | Rust | Lang: Integrate `tree-sitter-rust` and implement `RustASTDetector`. | TODO |
+| ANALYSIS-001 | Analysis | Feasibility report for LLM-powered AI auto-fixing (risk, architecture). | TODO |
+| ANALYSIS-002 | Analysis | Feasibility and design for dynamic rule synchronization from external standard forums. | TODO |
+| ANALYSIS-003 | Analysis | Feasibility of organization-level and individual-level rule customization/version upgrading. | TODO |
+| ANALYSIS-004 | Analysis | Feasibility of a comprehensive SonarQube-style dashboard with advanced filters (e.g., git username). | TODO |
 
 ## 4. Technical Debt & Cleanup (P3)
 
