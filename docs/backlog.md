@@ -30,7 +30,6 @@
 | TEAM-001b | Team | Database: Implement User, Project, and Team relational models. | FIXED |
 | TEAM-002 | Team | API: Create REST endpoints for team creation and membership management. | FIXED |
 | SEC-001 | Security | SAST: Port 40+ remaining OWASP Top 10 rules to YAML engine. | FIXED |
-| SBOM-005 | SBOM | Report: Generate ESG compliance summary PDF (E: SCI, S: Secrets, G: Debt). | TODO |
 
 ## 3. New Features (P2 - Expansion & Vision Alignment)
 
