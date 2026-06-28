@@ -15,10 +15,6 @@ from lsprotocol.types import (
     Range,
     TEXT_DOCUMENT_CODE_ACTION,
     CodeActionParams,
-    CodeAction,
-    CodeActionKind,
-    WorkspaceEdit,
-    TextEdit,
 )
 from src.core.detectors.python_detector import PythonViolationDetector
 from src.core.detectors.javascript_detector import JavaScriptASTDetector
@@ -82,7 +78,7 @@ def _validate(ls: GreenAILanguageServer, params):
                 )
                 diagnostics.append(d)
         except SyntaxError:
-            pass # Ignore syntax errors for now
+            pass  # Ignore syntax errors for now
     elif uri.endswith('.js') or uri.endswith('.jsx'):
         try:
             detector = JavaScriptASTDetector()

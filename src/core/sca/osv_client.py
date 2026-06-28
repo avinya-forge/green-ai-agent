@@ -4,6 +4,7 @@ from typing import Dict, Any
 
 logger = logging.getLogger(__name__)
 
+
 class OSVClient:
     """Client for downloading Open Source Vulnerabilities (OSV.dev) database."""
 

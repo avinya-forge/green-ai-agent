@@ -1,379 +1,523 @@
-# Python Green Coding Rules
-# Source: GSF, ecoCode
-
 rules:
-  # Critical Violations
-  - id: no_infinite_loops
-    name: No Infinite Loops
-    description: Infinite loops consume unlimited energy and CPU
-    severity: critical
-    languages: [python]
-    pattern: |
-      while\s*\(?\s*[Tt]rue\s*\)?
-    remediation: Add loop termination conditions or use break/return statements
-    source: GSF
-    tags: [performance, energy, cpu]
+- id: no_infinite_loops
+  name: No Infinite Loops
+  description: Infinite loops consume unlimited energy and CPU
+  severity: critical
+  languages:
+  - python
+  pattern: 'while\s*\(?\s*[Tt]rue\s*\)?
 
-  - id: no_n2_algorithms
-    name: No O(n²) Algorithms Without Justification
-    description: Nested loops without optimization waste exponential energy
-    severity: critical
-    languages: [python]
-    pattern: |
-      for.*for\s*\(
-    remediation: Use efficient algorithms or vectorization (numpy, list comprehension)
-    source: GSF
-    tags: [performance, energy, algorithm]
+    '
+  remediation: Add loop termination conditions or use break/return statements
+  source: GSF
+  tags:
+  - performance
+  - energy
+  - cpu
+  effort: 60
+- id: no_n2_algorithms
+  name: "No O(n\xB2) Algorithms Without Justification"
+  description: Nested loops without optimization waste exponential energy
+  severity: critical
+  languages:
+  - python
+  pattern: 'for.*for\s*\(
 
-  # Major Violations
-  - id: inefficient_loop
-    name: Inefficient Loop Detection
-    description: Non-optimized loops that could be vectorized or optimized
-    severity: major
-    languages: [python]
-    pattern: |
-      for\s+\w+\s+in\s+range\(
-    remediation: Consider list comprehension or use numpy for vectorization
-    source: ecoCode
-    tags: [performance, energy]
+    '
+  remediation: Use efficient algorithms or vectorization (numpy, list comprehension)
+  source: GSF
+  tags:
+  - performance
+  - energy
+  - algorithm
+  effort: 60
+- id: inefficient_loop
+  name: Inefficient Loop Detection
+  description: Non-optimized loops that could be vectorized or optimized
+  severity: major
+  languages:
+  - python
+  pattern: 'for\s+\w+\s+in\s+range\(
 
-  - id: unnecessary_computation
-    name: Unnecessary Computation in Loops
-    description: Redundant calculations inside loops waste energy
-    severity: major
-    languages: [python]
-    pattern: |
-      
-    remediation: Cache or optimize computation placement outside loops
-    source: ecoCode
-    tags: [performance, optimization]
+    '
+  remediation: Consider list comprehension or use numpy for vectorization
+  source: ecoCode
+  tags:
+  - performance
+  - energy
+  effort: 60
+- id: unnecessary_computation
+  name: Unnecessary Computation in Loops
+  description: Redundant calculations inside loops waste energy
+  severity: major
+  languages:
+  - python
+  pattern: ''
+  remediation: Cache or optimize computation placement outside loops
+  source: ecoCode
+  tags:
+  - performance
+  - optimization
+  effort: 60
+- id: proper_resource_cleanup
+  name: Ensure Proper Resource Cleanup
+  description: Always close files, connections, and resources to prevent leaks
+  severity: major
+  languages:
+  - python
+  pattern: 'open\s*\(
 
-  - id: proper_resource_cleanup
-    name: Ensure Proper Resource Cleanup
-    description: Always close files, connections, and resources to prevent leaks
-    severity: major
-    languages: [python]
-    pattern: |
-      open\s*\(
-    remediation: Use context managers (with statement) for automatic cleanup
-    source: GSF
-    tags: [resource-management, memory]
+    '
+  remediation: Use context managers (with statement) for automatic cleanup
+  source: GSF
+  tags:
+  - resource-management
+  - memory
+  effort: 60
+- id: string_concatenation_in_loop
+  name: Avoid String Concatenation in Loops
+  description: String concatenation creates new objects repeatedly, wasting memory
+  severity: major
+  languages:
+  - python
+  pattern: '\+=\s*["'']
 
-  - id: string_concatenation_in_loop
-    name: Avoid String Concatenation in Loops
-    description: String concatenation creates new objects repeatedly, wasting memory
-    severity: major
-    languages: [python]
-    pattern: |
-      \+=\s*["']
-    remediation: Use list append and join() instead of string concatenation
-    source: ecoCode
-    tags: [memory, performance]
+    '
+  remediation: Use list append and join() instead of string concatenation
+  source: ecoCode
+  tags:
+  - memory
+  - performance
+  effort: 60
+- id: unused_imports
+  name: Remove Unused Imports
+  description: Unused imports consume memory and slow down module loading
+  severity: minor
+  languages:
+  - python
+  pattern: '^import\s+\w+
 
-  # Minor Violations
-  - id: unused_imports
-    name: Remove Unused Imports
-    description: Unused imports consume memory and slow down module loading
-    severity: minor
-    languages: [python]
-    pattern: |
-      ^import\s+\w+
-    remediation: Remove unused imports to reduce memory footprint
-    source: GSF
-    tags: [code-quality, memory]
+    '
+  remediation: Remove unused imports to reduce memory footprint
+  source: GSF
+  tags:
+  - code-quality
+  - memory
+  effort: 60
+- id: excessive_logging
+  name: Excessive Logging
+  description: Excessive logging can waste disk I/O and energy
+  severity: minor
+  languages:
+  - python
+  pattern: 'print\(|logger\.(debug|info)
 
-  - id: excessive_logging
-    name: Excessive Logging
-    description: Excessive logging can waste disk I/O and energy
-    severity: minor
-    languages: [python]
-    pattern: |
-      print\(|logger\.(debug|info)
-    remediation: Use appropriate log levels and reduce verbosity in production
-    source: ecoCode
-    tags: [io, energy]
+    '
+  remediation: Use appropriate log levels and reduce verbosity in production
+  source: ecoCode
+  tags:
+  - io
+  - energy
+  effort: 60
+- id: magic_numbers
+  name: Avoid Magic Numbers
+  description: Magic numbers reduce code clarity and maintainability
+  severity: minor
+  languages:
+  - python
+  pattern: '\s[0-9]{3,}\s
 
-  - id: magic_numbers
-    name: Avoid Magic Numbers
-    description: Magic numbers reduce code clarity and maintainability
-    severity: minor
-    languages: [python]
-    pattern: |
-      \s[0-9]{3,}\s
-    remediation: Use named constants instead of magic numbers
-    source: SUSCOM
-    tags: [code-quality, maintainability]
+    '
+  remediation: Use named constants instead of magic numbers
+  source: SUSCOM
+  tags:
+  - code-quality
+  - maintainability
+  effort: 60
+- id: exceptions_in_loop
+  name: Exceptions Inside Loops
+  description: Using try/except inside loops adds significant overhead
+  severity: major
+  languages:
+  - python
+  pattern: 'try:
 
-  - id: exceptions_in_loop
-    name: Exceptions Inside Loops
-    description: Using try/except inside loops adds significant overhead
-    severity: major
-    languages: [python]
-    pattern: |
-      try:
-    remediation: Move try/except blocks outside the loop
-    source: ecoCode
-    tags: [performance, energy]
+    '
+  remediation: Move try/except blocks outside the loop
+  source: ecoCode
+  tags:
+  - performance
+  - energy
+  effort: 60
+- id: heavy_object_copy
+  name: Heavy Object Copying
+  description: Using deepcopy allows expensive object duplication
+  severity: major
+  languages:
+  - python
+  pattern: 'copy\.deepcopy
 
-  - id: heavy_object_copy
-    name: Heavy Object Copying
-    description: Using deepcopy allows expensive object duplication
-    severity: major
-    languages: [python]
-    pattern: |
-      copy\.deepcopy
-    remediation: Use shallow copy or redesign data flow
-    source: GSF
-    tags: [memory, energy]
+    '
+  remediation: Use shallow copy or redesign data flow
+  source: GSF
+  tags:
+  - memory
+  - energy
+  effort: 60
+- id: process_spawning
+  name: Excessive Process Spawning
+  description: Spawning new processes is an expensive OS operation
+  severity: critical
+  languages:
+  - python
+  pattern: 'subprocess\.(run|Popen)|os\.system
 
-  - id: process_spawning
-    name: Excessive Process Spawning
-    description: Spawning new processes is an expensive OS operation
-    severity: critical
-    languages: [python]
-    pattern: |
-      subprocess\.(run|Popen)|os\.system
-    remediation: Use internal API calls or batch processing
-    source: GSF
-    tags: [performance, os]
+    '
+  remediation: Use internal API calls or batch processing
+  source: GSF
+  tags:
+  - performance
+  - os
+  effort: 60
+- id: inefficient_file_read
+  name: Inefficient File Reading
+  description: Reading entire file into memory with readlines()
+  severity: major
+  languages:
+  - python
+  pattern: '\.readlines\(\)
 
-  - id: inefficient_file_read
-    name: Inefficient File Reading
-    description: Reading entire file into memory with readlines()
-    severity: major
-    languages: [python]
-    pattern: |
-      \.readlines\(\)
-    remediation: Iterate over the file object directly
-    source: ecoCode
-    tags: [memory, io]
+    '
+  remediation: Iterate over the file object directly
+  source: ecoCode
+  tags:
+  - memory
+  - io
+  effort: 60
+- id: global_variable_mutation
+  name: Global Variable Mutation
+  description: Excessive reliance on global variables hampers optimization
+  severity: minor
+  languages:
+  - python
+  pattern: 'global\s+\w+
 
-  - id: global_variable_mutation
-    name: Global Variable Mutation
-    description: Excessive reliance on global variables hampers optimization
-    severity: minor
-    languages: [python]
-    pattern: |
-      global\s+\w+
-    remediation: Pass variables as arguments to functions
-    source: GSF
-    tags: [code-quality, performance]
+    '
+  remediation: Pass variables as arguments to functions
+  source: GSF
+  tags:
+  - code-quality
+  - performance
+  effort: 60
+- id: pandas_iterrows
+  name: Inefficient Pandas Iteration
+  description: Using iterrows() is significantly slower than vectorization
+  severity: major
+  languages:
+  - python
+  pattern: '\.iterrows\(\)
 
-  - id: pandas_iterrows
-    name: Inefficient Pandas Iteration
-    description: Using iterrows() is significantly slower than vectorization
-    severity: major
-    languages: [python]
-    pattern: |
-      \.iterrows\(\)
-    remediation: Use vectorization or apply()
-    source: ecoCode
-    tags: [performance, data-science]
+    '
+  remediation: Use vectorization or apply()
+  source: ecoCode
+  tags:
+  - performance
+  - data-science
+  effort: 60
+- id: deep_recursion
+  name: Deep Recursion
+  description: Deep recursion consumes significant stack memory and CPU
+  severity: major
+  languages:
+  - python
+  pattern: ''
+  remediation: Refactor to iteration or use tail-call optimization if possible
+  source: GSF
+  tags:
+  - performance
+  - memory
+  effort: 60
+- id: inefficient_lookup
+  name: Inefficient Membership Lookup
+  description: Membership tests on lists inside loops are O(n)
+  severity: medium
+  languages:
+  - python
+  pattern: ''
+  remediation: Convert list to set for O(1) membership lookups
+  source: ecoCode
+  tags:
+  - performance
+  - optimization
+  effort: 60
+- id: eager_logging_formatting
+  name: Eager Logging Formatting
+  description: Using f-strings in logging calls evaluates the string even if not logged.
+  severity: minor
+  languages:
+  - python
+  pattern: 'logger.info(f"...")
 
-  - id: deep_recursion
-    name: Deep Recursion
-    description: Deep recursion consumes significant stack memory and CPU
-    severity: major
-    languages: [python]
-    pattern: |
-      
-    remediation: Refactor to iteration or use tail-call optimization if possible
-    source: GSF
-    tags: [performance, memory]
+    '
+  remediation: 'Use lazy formatting (e.g., logger.info("val: %s", val))'
+  source: ecoCode
+  tags:
+  - performance
+  - energy
+  effort: 60
+- id: mutable_default_argument
+  name: Mutable Default Argument
+  description: Mutable default arguments are shared across function calls.
+  severity: major
+  languages:
+  - python
+  pattern: 'def foo(x=[]):
 
-  - id: inefficient_lookup
-    name: Inefficient Membership Lookup
-    description: Membership tests on lists inside loops are O(n)
-    severity: medium
-    languages: [python]
-    pattern: |
-      
-    remediation: Convert list to set for O(1) membership lookups
-    source: ecoCode
-    tags: [performance, optimization]
+    '
+  remediation: Use None as default and initialize inside function.
+  source: python-guide
+  tags:
+  - code-quality
+  - bug-risk
+  effort: 60
+- id: any_all_list_comprehension
+  name: Any/All List Comprehension
+  description: Using list comprehension with any() or all() builds the full list.
+  severity: major
+  languages:
+  - python
+  pattern: 'any([...])
 
-  - id: eager_logging_formatting
-    name: Eager Logging Formatting
-    description: Using f-strings in logging calls evaluates the string even if not logged.
-    severity: minor
-    languages: [python]
-    pattern: |
-      logger.info(f"...")
-    remediation: 'Use lazy formatting (e.g., logger.info("val: %s", val))'
-    source: ecoCode
-    tags: [performance, energy]
+    '
+  remediation: Use generator expression (remove brackets) for lazy evaluation.
+  source: ecoCode
+  tags:
+  - performance
+  - memory
+  - energy
+  effort: 60
+- id: bare_except
+  name: Bare Except
+  description: Bare except clauses catch all exceptions including system exits.
+  severity: major
+  languages:
+  - python
+  pattern: 'except:
 
-  - id: mutable_default_argument
-    name: Mutable Default Argument
-    description: Mutable default arguments are shared across function calls.
-    severity: major
-    languages: [python]
-    pattern: |
-      def foo(x=[]):
-    remediation: Use None as default and initialize inside function.
-    source: python-guide
-    tags: [code-quality, bug-risk]
+    '
+  remediation: 'Catch specific exceptions (e.g., except Exception: or except ValueError:)'
+  source: python-guide
+  tags:
+  - code-quality
+  - bug-risk
+  effort: 60
+- id: unnecessary_generator_list
+  name: Unnecessary List in Generator
+  description: Using list comprehension inside sum/max/min consumes more memory.
+  severity: minor
+  languages:
+  - python
+  pattern: 'sum([...])
 
-  - id: any_all_list_comprehension
-    name: Any/All List Comprehension
-    description: Using list comprehension with any() or all() builds the full list.
-    severity: major
-    languages: [python]
-    pattern: |
-      any([...])
-    remediation: Use generator expression (remove brackets) for lazy evaluation.
-    source: ecoCode
-    tags: [performance, memory, energy]
+    '
+  remediation: Use generator expression by removing brackets.
+  source: ecoCode
+  tags:
+  - memory
+  - performance
+  effort: 60
+- id: inefficient_dictionary_iteration
+  name: Inefficient Dictionary Iteration
+  description: Iterating over .keys() is redundant.
+  severity: minor
+  languages:
+  - python
+  pattern: '\.keys\(\)
 
-  - id: bare_except
-    name: Bare Except
-    description: Bare except clauses catch all exceptions including system exits.
-    severity: major
-    languages: [python]
-    pattern: |
-      except:
-    remediation: 'Catch specific exceptions (e.g., except Exception: or except ValueError:)'
-    source: python-guide
-    tags: [code-quality, bug-risk]
+    '
+  remediation: Iterate over the dictionary directly or use .items() if values are
+    needed.
+  source: ecoCode
+  tags:
+  - performance
+  - code-quality
+  effort: 60
+- id: unnecessary_comprehension
+  name: Unnecessary Comprehension
+  description: Wraping a comprehension in a list/set/dict call is inefficient.
+  severity: major
+  languages:
+  - python
+  pattern: 'list([...])
 
-  - id: unnecessary_generator_list
-    name: Unnecessary List in Generator
-    description: Using list comprehension inside sum/max/min consumes more memory.
-    severity: minor
-    languages: [python]
-    pattern: |
-      sum([...])
-    remediation: Use generator expression by removing brackets.
-    source: ecoCode
-    tags: [memory, performance]
+    '
+  remediation: Remove the outer call or use generator expression.
+  source: ecoCode
+  tags:
+  - memory
+  - performance
+  effort: 60
+- id: numpy_sum_vs_python_sum
+  name: Numpy Sum vs Python Sum
+  description: Using built-in sum() on numpy arrays is slower than numpy.sum().
+  severity: minor
+  languages:
+  - python
+  pattern: 'sum(np_array)
 
-  - id: inefficient_dictionary_iteration
-    name: Inefficient Dictionary Iteration
-    description: Iterating over .keys() is redundant.
-    severity: minor
-    languages: [python]
-    pattern: |
-      \.keys\(\)
-    remediation: Iterate over the dictionary directly or use .items() if values are needed.
-    source: ecoCode
-    tags: [performance, code-quality]
+    '
+  remediation: Use numpy.sum() or array.sum().
+  source: ecoCode
+  tags:
+  - performance
+  - data-science
+  effort: 60
+- id: subprocess_run_without_timeout
+  name: Subprocess Run Without Timeout
+  description: subprocess.run() without timeout can hang indefinitely.
+  severity: major
+  languages:
+  - python
+  pattern: 'subprocess.run(...)
 
-  - id: unnecessary_comprehension
-    name: Unnecessary Comprehension
-    description: Wraping a comprehension in a list/set/dict call is inefficient.
-    severity: major
-    languages: [python]
-    pattern: |
-      list([...])
-    remediation: Remove the outer call or use generator expression.
-    source: ecoCode
-    tags: [memory, performance]
+    '
+  remediation: Add timeout argument.
+  source: python-guide
+  tags:
+  - reliability
+  - resource-management
+  effort: 60
+- id: sql_injection
+  name: SQL Injection
+  description: Constructing SQL queries using string formatting or concatenation leaves
+    the application vulnerable to SQL injection.
+  severity: critical
+  languages:
+  - python
+  pattern: '(SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER)\s+.*\s+(WHERE|VALUES|SET)\s+.*(%s|\.format|\+|%|f")
 
-  - id: numpy_sum_vs_python_sum
-    name: Numpy Sum vs Python Sum
-    description: Using built-in sum() on numpy arrays is slower than numpy.sum().
-    severity: minor
-    languages: [python]
-    pattern: |
-      sum(np_array)
-    remediation: Use numpy.sum() or array.sum().
-    source: ecoCode
-    tags: [performance, data-science]
+    '
+  remediation: Use parameterized queries (prepared statements) to prevent SQL injection.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a03
+  - injection
+  effort: 60
+- id: command_injection
+  name: Command Injection
+  description: Passing unsanitized input to os.system or subprocess methods can lead
+    to command injection.
+  severity: critical
+  languages:
+  - python
+  pattern: '(os\.system|subprocess\.(Popen|call|run|check_call|check_output))\s*\(\s*.*(\+|%|\.format|f")
 
-  - id: subprocess_run_without_timeout
-    name: Subprocess Run Without Timeout
-    description: subprocess.run() without timeout can hang indefinitely.
-    severity: major
-    languages: [python]
-    pattern: |
-      subprocess.run(...)
-    remediation: Add timeout argument.
-    source: python-guide
-    tags: [reliability, resource-management]
-  - id: sql_injection
-    name: SQL Injection
-    description: Constructing SQL queries using string formatting or concatenation leaves the application vulnerable to SQL injection.
-    severity: critical
-    languages: [python]
-    pattern: |
-      (SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER)\s+.*\s+(WHERE|VALUES|SET)\s+.*(%s|\.format|\+|%|f")
-    remediation: Use parameterized queries (prepared statements) to prevent SQL injection.
-    source: OWASP
-    tags: [security, owasp-a03, injection]
+    '
+  remediation: Use subprocess with shell=False and pass arguments as a list.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a03
+  - injection
+  effort: 60
+- id: ssrf
+  name: Server-Side Request Forgery (SSRF)
+  description: Fetching remote URLs constructed with user input can lead to SSRF vulnerabilities.
+  severity: critical
+  languages:
+  - python
+  pattern: 'requests\.(get|post|put|delete|patch|head|options)\s*\(\s*.*(\+|%|\.format|f")
 
-  - id: command_injection
-    name: Command Injection
-    description: Passing unsanitized input to os.system or subprocess methods can lead to command injection.
-    severity: critical
-    languages: [python]
-    pattern: |
-      (os\.system|subprocess\.(Popen|call|run|check_call|check_output))\s*\(\s*.*(\+|%|\.format|f")
-    remediation: Use subprocess with shell=False and pass arguments as a list.
-    source: OWASP
-    tags: [security, owasp-a03, injection]
+    '
+  remediation: Validate and sanitize URLs before fetching them. Ensure they belong
+    to an allowed domain list.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a10
+  - ssrf
+  effort: 60
+- id: path_traversal
+  name: Path Traversal
+  description: Constructing file paths with unsanitized input can allow attackers
+    to read arbitrary files.
+  severity: critical
+  languages:
+  - python
+  pattern: 'open\s*\(\s*.*(\+|%|\.format|f")
 
-  - id: ssrf
-    name: Server-Side Request Forgery (SSRF)
-    description: Fetching remote URLs constructed with user input can lead to SSRF vulnerabilities.
-    severity: critical
-    languages: [python]
-    pattern: |
-      requests\.(get|post|put|delete|patch|head|options)\s*\(\s*.*(\+|%|\.format|f")
-    remediation: Validate and sanitize URLs before fetching them. Ensure they belong to an allowed domain list.
-    source: OWASP
-    tags: [security, owasp-a10, ssrf]
+    '
+  remediation: Use os.path.basename or validate file paths against an allowed base
+    directory.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a01
+  - access-control
+  effort: 60
+- id: xxe
+  name: XML External Entity (XXE) Injection
+  description: Parsing XML with external entities enabled can lead to file disclosure
+    or SSRF.
+  severity: critical
+  languages:
+  - python
+  pattern: 'xml\.etree\.ElementTree\.parse|xml\.dom\.minidom\.parse|lxml\.etree\.parse
 
-  - id: path_traversal
-    name: Path Traversal
-    description: Constructing file paths with unsanitized input can allow attackers to read arbitrary files.
-    severity: critical
-    languages: [python]
-    pattern: |
-      open\s*\(\s*.*(\+|%|\.format|f")
-    remediation: Use os.path.basename or validate file paths against an allowed base directory.
-    source: OWASP
-    tags: [security, owasp-a01, access-control]
+    '
+  remediation: Disable external entity resolution in XML parsers or use defusedxml.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a05
+  - xxe
+  effort: 60
+- id: insecure_deserialization
+  name: Insecure Deserialization
+  description: Deserializing untrusted data can lead to remote code execution.
+  severity: critical
+  languages:
+  - python
+  pattern: 'pickle\.loads|yaml\.load\(\s*.*,\s*Loader=yaml\.Loader\s*\)
 
-  - id: xxe
-    name: XML External Entity (XXE) Injection
-    description: Parsing XML with external entities enabled can lead to file disclosure or SSRF.
-    severity: critical
-    languages: [python]
-    pattern: |
-      xml\.etree\.ElementTree\.parse|xml\.dom\.minidom\.parse|lxml\.etree\.parse
-    remediation: Disable external entity resolution in XML parsers or use defusedxml.
-    source: OWASP
-    tags: [security, owasp-a05, xxe]
+    '
+  remediation: Use safe serialization formats like JSON, or use yaml.SafeLoader.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a08
+  - deserialization
+  effort: 60
+- id: hardcoded_secret
+  name: Hardcoded Secret
+  description: Hardcoded passwords, tokens, or keys in source code are highly vulnerable.
+  severity: critical
+  languages:
+  - python
+  pattern: '(?i)(password|secret|token|key|api_key|access_key)\s*=\s*[''"][a-zA-Z0-9_\-\.]{10,}[''"]
 
-  - id: insecure_deserialization
-    name: Insecure Deserialization
-    description: Deserializing untrusted data can lead to remote code execution.
-    severity: critical
-    languages: [python]
-    pattern: |
-      pickle\.loads|yaml\.load\(\s*.*,\s*Loader=yaml\.Loader\s*\)
-    remediation: Use safe serialization formats like JSON, or use yaml.SafeLoader.
-    source: OWASP
-    tags: [security, owasp-a08, deserialization]
+    '
+  remediation: Store secrets in environment variables or a secure vault.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a07
+  - secrets
+  effort: 60
+- id: weak_cryptography
+  name: Weak Cryptography
+  description: Using weak or broken cryptographic algorithms like MD5 or SHA1.
+  severity: high
+  languages:
+  - python
+  pattern: 'hashlib\.(md5|sha1)\(
 
-  - id: hardcoded_secret
-    name: Hardcoded Secret
-    description: Hardcoded passwords, tokens, or keys in source code are highly vulnerable.
-    severity: critical
-    languages: [python]
-    pattern: |
-      (?i)(password|secret|token|key|api_key|access_key)\s*=\s*['"][a-zA-Z0-9_\-\.]{10,}['"]
-    remediation: Store secrets in environment variables or a secure vault.
-    source: OWASP
-    tags: [security, owasp-a07, secrets]
-
-  - id: weak_cryptography
-    name: Weak Cryptography
-    description: Using weak or broken cryptographic algorithms like MD5 or SHA1.
-    severity: high
-    languages: [python]
-    pattern: |
-      hashlib\.(md5|sha1)\(
-    remediation: Use strong algorithms like SHA-256 or bcrypt for hashing.
-    source: OWASP
-    tags: [security, owasp-a02, crypto]
+    '
+  remediation: Use strong algorithms like SHA-256 or bcrypt for hashing.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a02
+  - crypto
+  effort: 60

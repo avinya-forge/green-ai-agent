@@ -1,120 +1,154 @@
-# Go Rules for Green-AI Scanner
-# ============================
-
 rules:
-  - id: formatted_print
-    name: Excessive Logging (fmt.Print*)
-    severity: minor
-    message: "fmt.Print* detected. Use a logger or remove in production."
-    remediation: "Replace fmt.Print* with a proper logging library (e.g., log/slog, zap, zerolog) or remove in production builds to reduce I/O overhead."
-    effort: Low
-    tags:
-      - performance
-      - io
-      - logging
-    energy_factor: 2
-    carbon_impact: 0.00000005  # 50 nano-kg per call
+- id: formatted_print
+  name: Excessive Logging (fmt.Print*)
+  severity: minor
+  message: fmt.Print* detected. Use a logger or remove in production.
+  remediation: Replace fmt.Print* with a proper logging library (e.g., log/slog, zap,
+    zerolog) or remove in production builds to reduce I/O overhead.
+  effort: 15
+  tags:
+  - performance
+  - io
+  - logging
+  energy_factor: 2
+  carbon_impact: 5.0e-08
+- id: empty_block
+  name: Empty Block
+  severity: minor
+  message: Empty block detected.
+  remediation: Remove empty blocks or add comments explaining why they are empty.
+    Empty blocks can indicate missing logic or dead code.
+  effort: 15
+  tags:
+  - maintenance
+  - code-quality
+  energy_factor: 1
+  carbon_impact: 1.0e-08
+- id: infinite_loop
+  name: Infinite Loop (for {})
+  severity: critical
+  message: Infinite loop detected (for {}). Ensure break condition exists.
+  remediation: Ensure the loop has a termination condition or a break statement to
+    prevent CPU spinning.
+  effort: 60
+  tags:
+  - performance
+  - cpu
+  - critical
+  energy_factor: 100
+  carbon_impact: 0.0001
+- id: string_concatenation_in_loop
+  name: String Concatenation in Loop
+  severity: high
+  message: String concatenation in loop detected. Use strings.Builder for efficiency.
+  remediation: Use strings.Builder or bytes.Buffer to construct strings inside loops.
+    Repeated concatenation creates new string objects every iteration (O(n^2)).
+  effort: 60
+  tags:
+  - performance
+  - memory
+  - algorithmic
+  energy_factor: 10
+  carbon_impact: 5.0e-06
+- id: sql_injection
+  name: SQL Injection
+  description: Constructing SQL queries using string formatting or concatenation leaves
+    the application vulnerable to SQL injection.
+  severity: critical
+  languages:
+  - go
+  pattern: '(SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER)\s+.*\s+(WHERE|VALUES|SET)\s+.*(%s|\+)
 
-  - id: empty_block
-    name: Empty Block
-    severity: minor
-    message: "Empty block detected."
-    remediation: "Remove empty blocks or add comments explaining why they are empty. Empty blocks can indicate missing logic or dead code."
-    effort: Low
-    tags:
-      - maintenance
-      - code-quality
-    energy_factor: 1
-    carbon_impact: 0.00000001
+    '
+  remediation: Use parameterized queries (prepared statements) to prevent SQL injection.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a03
+  - injection
+  effort: 60
+- id: command_injection
+  name: Command Injection
+  description: Passing unsanitized input to exec.Command or os/exec functions can
+    lead to command injection.
+  severity: critical
+  languages:
+  - go
+  pattern: 'exec\.Command\(\s*.*(\+|%s)
 
-  - id: infinite_loop
-    name: Infinite Loop (for {})
-    severity: critical
-    message: "Infinite loop detected (for {}). Ensure break condition exists."
-    remediation: "Ensure the loop has a termination condition or a break statement to prevent CPU spinning."
-    effort: Medium
-    tags:
-      - performance
-      - cpu
-      - critical
-    energy_factor: 100
-    carbon_impact: 0.0001  # high impact
+    '
+  remediation: Pass arguments as separate strings rather than part of a single shell
+    command string.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a03
+  - injection
+  effort: 60
+- id: path_traversal
+  name: Path Traversal
+  description: Constructing file paths with unsanitized input can allow attackers
+    to read arbitrary files.
+  severity: critical
+  languages:
+  - go
+  pattern: 'os\.(Open|ReadFile|Create|WriteFile)\s*\(\s*.*(\+|%s)
 
-  - id: string_concatenation_in_loop
-    name: String Concatenation in Loop
-    severity: high
-    message: "String concatenation in loop detected. Use strings.Builder for efficiency."
-    remediation: "Use strings.Builder or bytes.Buffer to construct strings inside loops. Repeated concatenation creates new string objects every iteration (O(n^2))."
-    effort: Medium
-    tags:
-      - performance
-      - memory
-      - algorithmic
-    energy_factor: 10
-    carbon_impact: 0.000005
+    '
+  remediation: Use filepath.Clean and validate file paths against an allowed base
+    directory.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a01
+  - access-control
+  effort: 60
+- id: ssrf
+  name: Server-Side Request Forgery (SSRF)
+  description: Fetching remote URLs constructed with user input can lead to SSRF vulnerabilities.
+  severity: critical
+  languages:
+  - go
+  pattern: 'http\.(Get|Post|Head)\s*\(\s*.*(\+|%s)
 
-  - id: sql_injection
-    name: SQL Injection
-    description: Constructing SQL queries using string formatting or concatenation leaves the application vulnerable to SQL injection.
-    severity: critical
-    languages: [go]
-    pattern: |
-      (SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER)\s+.*\s+(WHERE|VALUES|SET)\s+.*(%s|\+)
-    remediation: Use parameterized queries (prepared statements) to prevent SQL injection.
-    source: OWASP
-    tags: [security, owasp-a03, injection]
+    '
+  remediation: Validate and sanitize URLs before fetching them. Ensure they belong
+    to an allowed domain list.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a10
+  - ssrf
+  effort: 60
+- id: hardcoded_secret
+  name: Hardcoded Secret
+  description: Hardcoded passwords, tokens, or keys in source code are highly vulnerable.
+  severity: critical
+  languages:
+  - go
+  pattern: '(?i)(password|secret|token|key|api_key|access_key)\s*:=\s*[''"][a-zA-Z0-9_\-\.]{10,}[''"]
 
-  - id: command_injection
-    name: Command Injection
-    description: Passing unsanitized input to exec.Command or os/exec functions can lead to command injection.
-    severity: critical
-    languages: [go]
-    pattern: |
-      exec\.Command\(\s*.*(\+|%s)
-    remediation: Pass arguments as separate strings rather than part of a single shell command string.
-    source: OWASP
-    tags: [security, owasp-a03, injection]
+    '
+  remediation: Store secrets in environment variables or a secure vault.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a07
+  - secrets
+  effort: 60
+- id: weak_cryptography
+  name: Weak Cryptography
+  description: Using weak or broken cryptographic algorithms like MD5 or SHA1.
+  severity: high
+  languages:
+  - go
+  pattern: '(md5|sha1)\.(New|Sum)
 
-  - id: path_traversal
-    name: Path Traversal
-    description: Constructing file paths with unsanitized input can allow attackers to read arbitrary files.
-    severity: critical
-    languages: [go]
-    pattern: |
-      os\.(Open|ReadFile|Create|WriteFile)\s*\(\s*.*(\+|%s)
-    remediation: Use filepath.Clean and validate file paths against an allowed base directory.
-    source: OWASP
-    tags: [security, owasp-a01, access-control]
-
-  - id: ssrf
-    name: Server-Side Request Forgery (SSRF)
-    description: Fetching remote URLs constructed with user input can lead to SSRF vulnerabilities.
-    severity: critical
-    languages: [go]
-    pattern: |
-      http\.(Get|Post|Head)\s*\(\s*.*(\+|%s)
-    remediation: Validate and sanitize URLs before fetching them. Ensure they belong to an allowed domain list.
-    source: OWASP
-    tags: [security, owasp-a10, ssrf]
-
-  - id: hardcoded_secret
-    name: Hardcoded Secret
-    description: Hardcoded passwords, tokens, or keys in source code are highly vulnerable.
-    severity: critical
-    languages: [go]
-    pattern: |
-      (?i)(password|secret|token|key|api_key|access_key)\s*:=\s*['"][a-zA-Z0-9_\-\.]{10,}['"]
-    remediation: Store secrets in environment variables or a secure vault.
-    source: OWASP
-    tags: [security, owasp-a07, secrets]
-
-  - id: weak_cryptography
-    name: Weak Cryptography
-    description: Using weak or broken cryptographic algorithms like MD5 or SHA1.
-    severity: high
-    languages: [go]
-    pattern: |
-      (md5|sha1)\.(New|Sum)
-    remediation: Use strong algorithms like SHA-256 for hashing.
-    source: OWASP
-    tags: [security, owasp-a02, crypto]
+    '
+  remediation: Use strong algorithms like SHA-256 for hashing.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a02
+  - crypto
+  effort: 60

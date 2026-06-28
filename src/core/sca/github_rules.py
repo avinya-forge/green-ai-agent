@@ -4,6 +4,7 @@ from typing import Dict, Any
 
 logger = logging.getLogger(__name__)
 
+
 class GSFClient:
     """Client for fetching rules from Green Software Foundation (GSF) and ecoCode."""
 
@@ -15,10 +16,9 @@ class GSFClient:
 
     def fetch_rules(self) -> Dict[str, Any]:
         """Fetch latest rules repository contents."""
-        url = "https://api.github.com/repos/Green-Software-Foundation/rules/contents"
         try:
             # Stub implementation
-            logger.info(f"Authenticating with GitHub API and fetching GSF rules.")
+            logger.info("Authenticating with GitHub API and fetching GSF rules.")
             return {"status": "success", "rules": []}
         except httpx.HTTPError as e:
             logger.error(f"Failed to fetch GSF rules: {e}")
