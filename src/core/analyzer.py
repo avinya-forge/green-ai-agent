@@ -16,6 +16,7 @@ class ComplexityMetrics:
     """Metrics to measure code complexity and energy consumption."""
     lines_of_code: int
     cyclomatic_complexity: int  # Decision points (if/for/while)
+    cognitive_complexity: int  # Penalty for deep nesting
     max_nesting_depth: int  # Maximum nesting level
     function_count: int
     class_count: int
@@ -33,12 +34,16 @@ class ComplexityMetrics:
         loc_score = min(20, (self.lines_of_code / 1000) * 20)
         score += loc_score
 
-        # Cyclomatic complexity contribution (max 25 points)
-        cc_score = min(25, (self.cyclomatic_complexity / 50) * 25)
+        # Cyclomatic complexity contribution (max 20 points)
+        cc_score = min(20, (self.cyclomatic_complexity / 50) * 20)
         score += cc_score
 
-        # Nesting depth contribution (max 15 points)
-        depth_score = min(15, (self.max_nesting_depth / 10) * 15)
+        # Cognitive complexity contribution (max 10 points)
+        cog_score = min(10, (self.cognitive_complexity / 30) * 10)
+        score += cog_score
+
+        # Nesting depth contribution (max 10 points)
+        depth_score = min(10, (self.max_nesting_depth / 10) * 10)
         score += depth_score
 
         # Loop iterations contribution (max 20 points)
@@ -69,6 +74,7 @@ class CodeComplexityAnalyzer(ast.NodeVisitor):
 
     def __init__(self):
         self.cyclomatic_complexity = 1
+        self.cognitive_complexity = 0
         self.max_nesting_depth = 0
         self.current_depth = 0
         self.function_count = 0
@@ -113,6 +119,7 @@ class CodeComplexityAnalyzer(ast.NodeVisitor):
     def visit_If(self, node: ast.If) -> None:
         """Track if statements (cyclomatic complexity)."""
         self.cyclomatic_complexity += 1
+        self.cognitive_complexity += self.current_depth
         self.current_depth += 1
         self.max_nesting_depth = max(self.max_nesting_depth, self.current_depth)
         self.generic_visit(node)
@@ -121,6 +128,7 @@ class CodeComplexityAnalyzer(ast.NodeVisitor):
     def visit_For(self, node: ast.For) -> None:
         """Track for loops."""
         self.cyclomatic_complexity += 1
+        self.cognitive_complexity += self.current_depth
         self.current_depth += 1
         self.max_nesting_depth = max(self.max_nesting_depth, self.current_depth)
 
@@ -140,6 +148,7 @@ class CodeComplexityAnalyzer(ast.NodeVisitor):
     def visit_While(self, node: ast.While) -> None:
         """Track while loops."""
         self.cyclomatic_complexity += 1
+        self.cognitive_complexity += self.current_depth
         self.current_depth += 1
         self.max_nesting_depth = max(self.max_nesting_depth, self.current_depth)
         self.loop_iterations_estimate += 1000  # Estimate
@@ -149,6 +158,7 @@ class CodeComplexityAnalyzer(ast.NodeVisitor):
     def visit_ExceptHandler(self, node: ast.ExceptHandler) -> None:
         """Track exception handlers."""
         self.cyclomatic_complexity += 1
+        self.cognitive_complexity += self.current_depth
         self.generic_visit(node)
 
     def visit_Call(self, node: ast.Call) -> None:
@@ -211,6 +221,7 @@ class EmissionAnalyzer:
             return ComplexityMetrics(
                 lines_of_code=content.count('\n') + 1,
                 cyclomatic_complexity=1,
+                cognitive_complexity=0,
                 max_nesting_depth=0,
                 function_count=0,
                 class_count=0,
@@ -230,6 +241,7 @@ class EmissionAnalyzer:
         metrics = ComplexityMetrics(
             lines_of_code=content.count('\n') + 1,
             cyclomatic_complexity=analyzer.cyclomatic_complexity,
+            cognitive_complexity=analyzer.cognitive_complexity,
             max_nesting_depth=analyzer.max_nesting_depth,
             function_count=analyzer.function_count,
             class_count=analyzer.class_count,

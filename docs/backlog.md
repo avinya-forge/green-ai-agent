@@ -58,12 +58,12 @@
 | DASH-004 | UI | Interactive: Allow disabling rules directly from the dashboard UI (writing back to config). | TODO |
 | SCA-001 | Security | SCA: Implement dependency graph parser for Python, Node, and Go. | TODO |
 | SCA-002 | Security | SCA: Integrate OSV.dev API for automated CVE lookups of dependencies. | TODO |
-| QUAL-001 | Quality | Metrics: Implement AST-based cyclomatic and cognitive complexity scoring. | TODO |
+| QUAL-001 | Quality | Metrics: Implement AST-based cyclomatic and cognitive complexity scoring. | FIXED |
 | QUAL-002 | Quality | Metrics: Implement Type-1 and Type-2 code duplication detector. | TODO |
 | QUAL-003 | Quality | Metrics: Integrate `Vulture` as a library for dead-code identification. | TODO |
-| DEBT-001 | Governance | Debt: Define remediation effort (minutes) for every existing rule. | TODO |
-| DEBT-002 | Governance | Debt: Compute aggregate "cleanliness" and "remediation time" scores. | TODO |
-| ESG-001 | Governance | ESG: Define weighted aggregate score algorithm (40% E, 30% S, 30% G). | TODO |
+| DEBT-001 | Governance | Debt: Define remediation effort (minutes) for every existing rule. | FIXED |
+| DEBT-002 | Governance | Debt: Compute aggregate "cleanliness" and "remediation time" scores. | FIXED |
+| ESG-001 | Governance | ESG: Define weighted aggregate score algorithm (40% E, 30% S, 30% G). | FIXED |
 | RUST-001 | Rust | Lang: Integrate `tree-sitter-rust` and implement `RustASTDetector`. | TODO |
 
 ## 4. Technical Debt & Cleanup (P3)

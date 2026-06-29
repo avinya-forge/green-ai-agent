@@ -37,6 +37,16 @@ class Violation(BaseModel):
     model_config = ConfigDict(extra='ignore')
 
 
+class ESGScore(BaseModel):
+    """Represents the ESG scores of a project."""
+    environmental: float = 0.0
+    security: float = 0.0
+    governance: float = 0.0
+    aggregate: float = 0.0
+
+    model_config = ConfigDict(extra='ignore')
+
+
 class ViolationDetails(BaseModel):
     """Counts of violations by severity."""
     critical: int = 0
@@ -64,12 +74,21 @@ class Project(BaseModel):
     scan_count: int = 0
     latest_violations: int = 0
     total_emissions: float = 0.0
+    total_remediation_time_minutes: int = 0
     is_system: bool = False
     # violation_details stores counts per severity level
     violation_details: ViolationDetails = Field(default_factory=ViolationDetails)
     violations: List[Violation] = Field(default_factory=list)
+    esg_score: ESGScore = Field(default_factory=ESGScore)
 
     model_config = ConfigDict(extra='ignore')
+
+    @field_validator('esg_score', mode='before')
+    @classmethod
+    def set_esg_score_default(cls, v: Any) -> ESGScore:
+        if isinstance(v, dict):
+            return ESGScore(**v)
+        return v or ESGScore()
 
     @field_validator('violation_details', mode='before')
     @classmethod
@@ -97,6 +116,24 @@ class Project(BaseModel):
         elif self.latest_violations <= 10:
             return "C"
         elif self.latest_violations <= 20:
+            return "D"
+        else:
+            return "F"
+
+    def get_cleanliness_grade(self) -> str:
+        """
+        Get project cleanliness grade (A-F) based on remediation time.
+
+        Returns:
+            Grade letter (A, B, C, D, F)
+        """
+        if self.total_remediation_time_minutes == 0:
+            return "A"
+        elif self.total_remediation_time_minutes <= 60:
+            return "B"
+        elif self.total_remediation_time_minutes <= 240:
+            return "C"
+        elif self.total_remediation_time_minutes <= 480:
             return "D"
         else:
             return "F"
@@ -133,6 +170,8 @@ class Project(BaseModel):
         self.last_scan = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
         self.scan_count += 1
 
+        total_effort = 0
+
         if isinstance(violations, int):
             self.latest_violations = violations
             self.violations = []
@@ -142,6 +181,16 @@ class Project(BaseModel):
             details = {sev.value: 0 for sev in ViolationSeverity}
 
             for v_data in violations:
+                if isinstance(v_data, dict):
+                    effort = v_data.get('effort', 0)
+                    if isinstance(effort, str):
+                        try:
+                            total_effort += int(effort)
+                        except ValueError:
+                            pass
+                    elif isinstance(effort, (int, float)):
+                        total_effort += int(effort)
+
                 try:
                     # Create Violation object (validates severity)
                     violation = Violation(**v_data)
@@ -170,6 +219,10 @@ class Project(BaseModel):
             self.violation_details = ViolationDetails(**details)
 
         self.total_emissions = round(emissions, 9)
+        self.total_remediation_time_minutes = total_effort
+
+        # Optionally update esg_score here if environmental_score, security_score, and governance_score were available.
+        # But this function doesn't receive them. They are handled by ESGScoreEngine.
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
@@ -239,6 +292,7 @@ class ProjectDTO(BaseModel):
     violation_details: ViolationDetails
     violations: List[Violation]
     health_grade: str
+    esg_score: ESGScore
 
     model_config = ConfigDict(extra='ignore')
 
@@ -257,7 +311,8 @@ class ProjectDTO(BaseModel):
             is_system=project.is_system,
             violation_details=project.violation_details,
             violations=project.violations,
-            health_grade=project.get_grade()
+            health_grade=project.get_grade(),
+            esg_score=project.esg_score
         )
 
 

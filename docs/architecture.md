@@ -71,18 +71,18 @@ src/
 │   ├── ci/                 # CI/CD integration (PR comments, exit codes)
 │   ├── cache.py            # LRU + disk cache for scan results
 │   ├── history.py          # Scan history persistence
-│   ├── sca/                # [Phase 3] Dependency + license scanning
+│   ├── sca/                # Dependency + license scanning
 │   │   ├── manifest_parser.py
 │   │   ├── osv_client.py   # OSV.dev CVE lookup
 │   │   ├── version_checker.py
 │   │   └── license_detector.py
-│   ├── quality/            # [Phase 3] Code quality + debt
+│   ├── quality/            # Code quality + debt
 │   │   ├── duplication.py  # Rabin-Karp clone detection
 │   │   ├── dead_code.py    # Vulture integration
 │   │   └── debt.py         # Remediation effort estimation
-│   ├── esg/                # [Phase 3] ESG scoring
-│   │   └── scorer.py
-│   └── sbom/               # [Phase 3] SBOM + SCI
+│   ├── esg/                # ESG scoring
+│   │   └── score_engine.py
+│   └── sbom/               # SBOM + SCI
 │       └── generator.py
 │
 ├── ui/                     # Web dashboard

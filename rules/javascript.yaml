@@ -1,270 +1,379 @@
-# JavaScript Green Coding Rules
-# Source: GSF, ecoCode
-
 rules:
-  # Critical Violations
-  - id: no_infinite_loops
-    name: No Infinite Loops
-    description: Infinite loops consume unlimited energy and CPU
-    severity: critical
-    languages: [javascript]
-    pattern: |
-      while\s*\(\s*true\s*\)
-    remediation: Add loop termination conditions or use break/return statements
-    source: GSF
-    tags: [performance, energy, cpu]
+- id: no_infinite_loops
+  name: No Infinite Loops
+  description: Infinite loops consume unlimited energy and CPU
+  severity: critical
+  languages:
+  - javascript
+  pattern: 'while\s*\(\s*true\s*\)
 
-  - id: no_n2_algorithms
-    name: No O(n²) Algorithms Without Justification
-    description: Nested loops without optimization waste exponential energy
-    severity: critical
-    languages: [javascript]
-    pattern: |
-      for.*for\s*\(
-    remediation: Use efficient algorithms or vectorization
-    source: GSF
-    tags: [performance, energy, algorithm]
+    '
+  remediation: Add loop termination conditions or use break/return statements
+  source: GSF
+  tags:
+  - performance
+  - energy
+  - cpu
+  effort: 60
+- id: no_n2_algorithms
+  name: "No O(n\xB2) Algorithms Without Justification"
+  description: Nested loops without optimization waste exponential energy
+  severity: critical
+  languages:
+  - javascript
+  pattern: 'for.*for\s*\(
 
-  # Major Violations
-  - id: inefficient_loop
-    name: Inefficient Loop Detection
-    description: Non-optimized loops that could be optimized
-    severity: major
-    languages: [javascript]
-    pattern: |
-      for\s*\(\s*let\s+\w+\s*=
-    remediation: Consider modern array methods (map, filter, reduce) or optimization
-    source: ecoCode
-    tags: [performance, energy]
+    '
+  remediation: Use efficient algorithms or vectorization
+  source: GSF
+  tags:
+  - performance
+  - energy
+  - algorithm
+  effort: 60
+- id: inefficient_loop
+  name: Inefficient Loop Detection
+  description: Non-optimized loops that could be optimized
+  severity: major
+  languages:
+  - javascript
+  pattern: 'for\s*\(\s*let\s+\w+\s*=
 
-  - id: unnecessary_dom_manipulation
-    name: Unnecessary DOM Manipulation
-    description: Frequent DOM queries and updates waste browser resources
-    severity: major
-    languages: [javascript]
-    pattern: |
-      document\.(querySelector|getElementById)
-    remediation: Cache DOM references or use event delegation
-    source: ecoCode
-    tags: [performance, browser]
+    '
+  remediation: Consider modern array methods (map, filter, reduce) or optimization
+  source: ecoCode
+  tags:
+  - performance
+  - energy
+  effort: 60
+- id: unnecessary_dom_manipulation
+  name: Unnecessary DOM Manipulation
+  description: Frequent DOM queries and updates waste browser resources
+  severity: major
+  languages:
+  - javascript
+  pattern: 'document\.(querySelector|getElementById)
 
-  - id: string_concatenation
-    name: Avoid String Concatenation in Loops
-    description: String concatenation creates new objects repeatedly
-    severity: major
-    languages: [javascript]
-    pattern: |
-      \+=\s+["']
-    remediation: Use array join() or template literals
-    source: ecoCode
-    tags: [memory, performance]
+    '
+  remediation: Cache DOM references or use event delegation
+  source: ecoCode
+  tags:
+  - performance
+  - browser
+  effort: 60
+- id: string_concatenation
+  name: Avoid String Concatenation in Loops
+  description: String concatenation creates new objects repeatedly
+  severity: major
+  languages:
+  - javascript
+  pattern: '\+=\s+["'']
 
-  - id: synchronous_io
-    name: Avoid Synchronous I/O
-    description: Synchronous I/O blocks execution and wastes CPU
-    severity: major
-    languages: [javascript]
-    pattern: |
-      readFileSync|XMLHttpRequest
-    remediation: Use async/await or Promises for non-blocking I/O
-    source: GSF
-    tags: [performance, async]
+    '
+  remediation: Use array join() or template literals
+  source: ecoCode
+  tags:
+  - memory
+  - performance
+  effort: 60
+- id: synchronous_io
+  name: Avoid Synchronous I/O
+  description: Synchronous I/O blocks execution and wastes CPU
+  severity: major
+  languages:
+  - javascript
+  pattern: 'readFileSync|XMLHttpRequest
 
-  # Minor Violations
-  - id: unused_variables
-    name: Remove Unused Variables
-    description: Unused variables consume memory
-    severity: minor
-    languages: [javascript]
-    pattern: |
-      ^(let|const|var)\s+\w+\s*=
-    remediation: Remove unused variable declarations
-    source: GSF
-    tags: [code-quality, memory]
+    '
+  remediation: Use async/await or Promises for non-blocking I/O
+  source: GSF
+  tags:
+  - performance
+  - async
+  effort: 60
+- id: unused_variables
+  name: Remove Unused Variables
+  description: Unused variables consume memory
+  severity: minor
+  languages:
+  - javascript
+  pattern: '^(let|const|var)\s+\w+\s*=
 
-  - id: excessive_console_logging
-    name: Excessive Console Logging
-    description: Excessive logging can slow down application
-    severity: minor
-    languages: [javascript]
-    pattern: |
-      console\.(log|debug)
-    remediation: Use appropriate logging levels and disable in production
-    source: ecoCode
-    tags: [performance, debugging]
+    '
+  remediation: Remove unused variable declarations
+  source: GSF
+  tags:
+  - code-quality
+  - memory
+  effort: 60
+- id: excessive_console_logging
+  name: Excessive Console Logging
+  description: Excessive logging can slow down application
+  severity: minor
+  languages:
+  - javascript
+  pattern: 'console\.(log|debug)
 
-  - id: magic_numbers
-    name: Avoid Magic Numbers
-    description: Magic numbers reduce code clarity
-    severity: minor
-    languages: [javascript]
-    pattern: |
-      \s[0-9]{3,}\s
-    remediation: Use named constants instead of magic numbers
-    source: SUSCOM
-    tags: [code-quality, maintainability]
+    '
+  remediation: Use appropriate logging levels and disable in production
+  source: ecoCode
+  tags:
+  - performance
+  - debugging
+  effort: 60
+- id: magic_numbers
+  name: Avoid Magic Numbers
+  description: Magic numbers reduce code clarity
+  severity: minor
+  languages:
+  - javascript
+  pattern: '\s[0-9]{3,}\s
 
-  - id: eval_usage
-    name: Avoid Eval
-    description: Using eval() is a security risk and prevents engine optimization
-    severity: critical
-    languages: [javascript]
-    pattern: |
-      eval\(
-    remediation: Rewrite code to avoid dynamic execution
-    source: GSF
-    tags: [security, performance]
+    '
+  remediation: Use named constants instead of magic numbers
+  source: SUSCOM
+  tags:
+  - code-quality
+  - maintainability
+  effort: 60
+- id: eval_usage
+  name: Avoid Eval
+  description: Using eval() is a security risk and prevents engine optimization
+  severity: critical
+  languages:
+  - javascript
+  pattern: 'eval\(
 
-  - id: setInterval_animation
-    name: Avoid setInterval for Animations
-    description: setInterval runs even when tab is inactive, wasting battery
-    severity: major
-    languages: [javascript]
-    pattern: |
-      setInterval
-    remediation: Use requestAnimationFrame for visual updates
-    source: GSF
-    tags: [energy, browser]
+    '
+  remediation: Rewrite code to avoid dynamic execution
+  source: GSF
+  tags:
+  - security
+  - performance
+  effort: 60
+- id: setInterval_animation
+  name: Avoid setInterval for Animations
+  description: setInterval runs even when tab is inactive, wasting battery
+  severity: major
+  languages:
+  - javascript
+  pattern: 'setInterval
 
-  - id: momentjs_deprecated
-    name: Avoid Moment.js
-    description: Moment.js is a heavy library; use lightweight alternatives
-    severity: major
-    languages: [javascript]
-    pattern: |
-      from\s+['"]moment['"]|require\(['"]moment['"]\)
-    remediation: Use date-fns, Day.js, or native Date API
-    source: ecoCode
-    tags: [bundle-size, performance]
+    '
+  remediation: Use requestAnimationFrame for visual updates
+  source: GSF
+  tags:
+  - energy
+  - browser
+  effort: 60
+- id: momentjs_deprecated
+  name: Avoid Moment.js
+  description: Moment.js is a heavy library; use lightweight alternatives
+  severity: major
+  languages:
+  - javascript
+  pattern: 'from\s+[''"]moment[''"]|require\([''"]moment[''"]\)
 
-  - id: document_write
-    name: Avoid document.write
-    description: document.write() blocks page loading and is deprecated
-    severity: critical
-    languages: [javascript]
-    pattern: |
-      document\.write
-    remediation: Use DOM manipulation methods
-    source: GSF
-    tags: [performance, browser]
+    '
+  remediation: Use date-fns, Day.js, or native Date API
+  source: ecoCode
+  tags:
+  - bundle-size
+  - performance
+  effort: 60
+- id: document_write
+  name: Avoid document.write
+  description: document.write() blocks page loading and is deprecated
+  severity: critical
+  languages:
+  - javascript
+  pattern: 'document\.write
 
-  - id: alert_usage
-    name: Avoid Alert/Prompt/Confirm
-    description: Synchronous native dialogs block the main thread and UI
-    severity: minor
-    languages: [javascript]
-    pattern: |
-      window\.(alert|prompt|confirm)
-    remediation: Use non-blocking modal UI components
-    source: ecoCode
-    tags: [ux, performance]
+    '
+  remediation: Use DOM manipulation methods
+  source: GSF
+  tags:
+  - performance
+  - browser
+  effort: 60
+- id: alert_usage
+  name: Avoid Alert/Prompt/Confirm
+  description: Synchronous native dialogs block the main thread and UI
+  severity: minor
+  languages:
+  - javascript
+  pattern: 'window\.(alert|prompt|confirm)
 
-  - id: console_time
-    name: Remove Console Time
-    description: console.time() and console.timeEnd() are for debugging and should not be in production.
-    severity: minor
-    languages: [javascript]
-    pattern: |
-      console\.time
-    remediation: Remove console.time() calls.
-    source: ecoCode
-    tags: [debugging, cleanup]
+    '
+  remediation: Use non-blocking modal UI components
+  source: ecoCode
+  tags:
+  - ux
+  - performance
+  effort: 60
+- id: console_time
+  name: Remove Console Time
+  description: console.time() and console.timeEnd() are for debugging and should not
+    be in production.
+  severity: minor
+  languages:
+  - javascript
+  pattern: 'console\.time
 
-  - id: inner_html
-    name: Avoid innerHTML
-    description: Using innerHTML is slow and can expose XSS vulnerabilities.
-    severity: major
-    languages: [javascript]
-    pattern: |
-      \.innerHTML\s*=
-    remediation: Use textContent or DOM node manipulation methods.
-    source: ecoCode
-    tags: [performance, security]
+    '
+  remediation: Remove console.time() calls.
+  source: ecoCode
+  tags:
+  - debugging
+  - cleanup
+  effort: 60
+- id: inner_html
+  name: Avoid innerHTML
+  description: Using innerHTML is slow and can expose XSS vulnerabilities.
+  severity: major
+  languages:
+  - javascript
+  pattern: '\.innerHTML\s*=
 
-  - id: sql_injection
-    name: SQL Injection
-    description: Constructing SQL queries using string formatting or concatenation leaves the application vulnerable to SQL injection.
-    severity: critical
-    languages: [javascript]
-    pattern: |
-      (SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER)\s+.*\s+(WHERE|VALUES|SET)\s+.*(\+.*|`.*`.*)
-    remediation: Use parameterized queries (prepared statements) to prevent SQL injection.
-    source: OWASP
-    tags: [security, owasp-a03, injection]
+    '
+  remediation: Use textContent or DOM node manipulation methods.
+  source: ecoCode
+  tags:
+  - performance
+  - security
+  effort: 60
+- id: sql_injection
+  name: SQL Injection
+  description: Constructing SQL queries using string formatting or concatenation leaves
+    the application vulnerable to SQL injection.
+  severity: critical
+  languages:
+  - javascript
+  pattern: '(SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER)\s+.*\s+(WHERE|VALUES|SET)\s+.*(\+.*|`.*`.*)
 
-  - id: command_injection
-    name: Command Injection
-    description: Passing unsanitized input to child_process functions can lead to command injection.
-    severity: critical
-    languages: [javascript]
-    pattern: |
-      (child_process\.)?(exec|execSync|spawn|spawnSync)\s*\(\s*.*(\+|`.*`.*)
-    remediation: Use child_process.execFile or spawn with a separate arguments array.
-    source: OWASP
-    tags: [security, owasp-a03, injection]
+    '
+  remediation: Use parameterized queries (prepared statements) to prevent SQL injection.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a03
+  - injection
+  effort: 60
+- id: command_injection
+  name: Command Injection
+  description: Passing unsanitized input to child_process functions can lead to command
+    injection.
+  severity: critical
+  languages:
+  - javascript
+  pattern: '(child_process\.)?(exec|execSync|spawn|spawnSync)\s*\(\s*.*(\+|`.*`.*)
 
-  - id: path_traversal
-    name: Path Traversal
-    description: Constructing file paths with unsanitized input can allow attackers to read arbitrary files.
-    severity: critical
-    languages: [javascript]
-    pattern: |
-      fs\.(readFile|readFileSync|createReadStream|writeFile|writeFileSync|createWriteStream)\s*\(\s*.*(\+|`.*`.*)
-    remediation: Validate file paths using path.normalize and ensure they belong to an allowed base directory.
-    source: OWASP
-    tags: [security, owasp-a01, access-control]
+    '
+  remediation: Use child_process.execFile or spawn with a separate arguments array.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a03
+  - injection
+  effort: 60
+- id: path_traversal
+  name: Path Traversal
+  description: Constructing file paths with unsanitized input can allow attackers
+    to read arbitrary files.
+  severity: critical
+  languages:
+  - javascript
+  pattern: 'fs\.(readFile|readFileSync|createReadStream|writeFile|writeFileSync|createWriteStream)\s*\(\s*.*(\+|`.*`.*)
 
-  - id: insecure_deserialization
-    name: Insecure Deserialization
-    description: Deserializing untrusted data with eval() or insecure packages like node-serialize can lead to remote code execution.
-    severity: critical
-    languages: [javascript]
-    pattern: |
-      (unserialize|deserialize)\s*\(
-    remediation: Use secure serialization formats like JSON (JSON.parse).
-    source: OWASP
-    tags: [security, owasp-a08, deserialization]
+    '
+  remediation: Validate file paths using path.normalize and ensure they belong to
+    an allowed base directory.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a01
+  - access-control
+  effort: 60
+- id: insecure_deserialization
+  name: Insecure Deserialization
+  description: Deserializing untrusted data with eval() or insecure packages like
+    node-serialize can lead to remote code execution.
+  severity: critical
+  languages:
+  - javascript
+  pattern: '(unserialize|deserialize)\s*\(
 
-  - id: ssrf
-    name: Server-Side Request Forgery (SSRF)
-    description: Fetching remote URLs constructed with user input can lead to SSRF vulnerabilities.
-    severity: critical
-    languages: [javascript]
-    pattern: |
-      (axios\.|fetch\(|request\()*\s*.*\s*(\+|`.*`.*)
-    remediation: Validate and sanitize URLs before fetching them. Ensure they belong to an allowed domain list.
-    source: OWASP
-    tags: [security, owasp-a10, ssrf]
+    '
+  remediation: Use secure serialization formats like JSON (JSON.parse).
+  source: OWASP
+  tags:
+  - security
+  - owasp-a08
+  - deserialization
+  effort: 60
+- id: ssrf
+  name: Server-Side Request Forgery (SSRF)
+  description: Fetching remote URLs constructed with user input can lead to SSRF vulnerabilities.
+  severity: critical
+  languages:
+  - javascript
+  pattern: '(axios\.|fetch\(|request\()*\s*.*\s*(\+|`.*`.*)
 
-  - id: xss_injection
-    name: Cross-Site Scripting (XSS)
-    description: Assigning unsanitized input directly to innerHTML or related properties can lead to XSS.
-    severity: critical
-    languages: [javascript]
-    pattern: |
-      \.(innerHTML|outerHTML|insertAdjacentHTML|write)\s*=
-    remediation: Use textContent, sanitize input, or use safe DOM manipulation libraries.
-    source: OWASP
-    tags: [security, owasp-a03, xss]
+    '
+  remediation: Validate and sanitize URLs before fetching them. Ensure they belong
+    to an allowed domain list.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a10
+  - ssrf
+  effort: 60
+- id: xss_injection
+  name: Cross-Site Scripting (XSS)
+  description: Assigning unsanitized input directly to innerHTML or related properties
+    can lead to XSS.
+  severity: critical
+  languages:
+  - javascript
+  pattern: '\.(innerHTML|outerHTML|insertAdjacentHTML|write)\s*=
 
-  - id: hardcoded_secret
-    name: Hardcoded Secret
-    description: Hardcoded passwords, tokens, or keys in source code are highly vulnerable.
-    severity: critical
-    languages: [javascript]
-    pattern: |
-      (?i)(password|secret|token|key|api_key|access_key)\s*(:|=)\s*['"][a-zA-Z0-9_\-\.]{10,}['"]
-    remediation: Store secrets in environment variables or a secure vault.
-    source: OWASP
-    tags: [security, owasp-a07, secrets]
+    '
+  remediation: Use textContent, sanitize input, or use safe DOM manipulation libraries.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a03
+  - xss
+  effort: 60
+- id: hardcoded_secret
+  name: Hardcoded Secret
+  description: Hardcoded passwords, tokens, or keys in source code are highly vulnerable.
+  severity: critical
+  languages:
+  - javascript
+  pattern: '(?i)(password|secret|token|key|api_key|access_key)\s*(:|=)\s*[''"][a-zA-Z0-9_\-\.]{10,}[''"]
 
-  - id: weak_cryptography
-    name: Weak Cryptography
-    description: Using weak or broken cryptographic algorithms like MD5 or SHA1.
-    severity: high
-    languages: [javascript]
-    pattern: |
-      crypto\.createHash\(\s*['"](md5|sha1)['"]\s*\)
-    remediation: Use strong algorithms like SHA-256 for hashing.
-    source: OWASP
-    tags: [security, owasp-a02, crypto]
+    '
+  remediation: Store secrets in environment variables or a secure vault.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a07
+  - secrets
+  effort: 60
+- id: weak_cryptography
+  name: Weak Cryptography
+  description: Using weak or broken cryptographic algorithms like MD5 or SHA1.
+  severity: high
+  languages:
+  - javascript
+  pattern: 'crypto\.createHash\(\s*[''"](md5|sha1)[''"]\s*\)
+
+    '
+  remediation: Use strong algorithms like SHA-256 for hashing.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a02
+  - crypto
+  effort: 60

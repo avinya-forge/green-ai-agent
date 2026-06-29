@@ -1,6 +1,5 @@
 from typing import Dict, Any, List, Optional
 import ast
-import subprocess
 from datetime import datetime, timezone
 from src.core.remediation.engine import RemediationEngine
 from src.core.analyzer import EmissionAnalyzer

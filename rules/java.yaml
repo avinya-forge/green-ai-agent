@@ -1,128 +1,180 @@
 rules:
-  - id: excessive_logging
-    name: Excessive Console Logging
-    severity: minor
-    message: System.out.println detected. Use a logger (SLF4J/Log4j) in production.
-    remediation: Replace System.out.println with logger.info() or logger.debug().
-    effort: Low
-    tags: [logging, best_practice]
-    carbon_impact: 1e-8
-    energy_factor: 1
+- id: excessive_logging
+  name: Excessive Console Logging
+  severity: minor
+  message: System.out.println detected. Use a logger (SLF4J/Log4j) in production.
+  remediation: Replace System.out.println with logger.info() or logger.debug().
+  effort: 15
+  tags:
+  - logging
+  - best_practice
+  carbon_impact: 1e-8
+  energy_factor: 1
+- id: blocking_io
+  name: Blocking I/O
+  severity: major
+  message: Thread.sleep() blocks the thread. Use scheduled executors or async mechanisms.
+  remediation: Use ScheduledExecutorService or reactive streams.
+  effort: 60
+  tags:
+  - performance
+  - concurrency
+  carbon_impact: 5e-7
+  energy_factor: 5
+- id: string_concatenation_in_loop
+  name: String Concatenation in Loop
+  severity: major
+  message: String concatenation in loops creates unnecessary objects. Use StringBuilder.
+  remediation: Use StringBuilder.append() inside the loop.
+  effort: 60
+  tags:
+  - memory
+  - performance
+  carbon_impact: 2e-7
+  energy_factor: 2
+- id: empty_block
+  name: Empty Block
+  severity: minor
+  message: Empty block detected. Remove or implement logic.
+  remediation: Remove the empty block or add a comment/implementation.
+  effort: 15
+  tags:
+  - code_quality
+  carbon_impact: 0
+  energy_factor: 0
+- id: sql_injection
+  name: SQL Injection
+  description: Constructing SQL queries using string formatting or concatenation leaves
+    the application vulnerable to SQL injection.
+  severity: critical
+  languages:
+  - java
+  pattern: '(SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER)\s+.*\s+(WHERE|VALUES|SET)\s+.*(\+.*)
 
-  - id: blocking_io
-    name: Blocking I/O
-    severity: major
-    message: Thread.sleep() blocks the thread. Use scheduled executors or async mechanisms.
-    remediation: Use ScheduledExecutorService or reactive streams.
-    effort: Medium
-    tags: [performance, concurrency]
-    carbon_impact: 5e-7
-    energy_factor: 5
+    '
+  remediation: Use PreparedStatement instead of Statement for parameterized queries.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a03
+  - injection
+  effort: 60
+- id: command_injection
+  name: Command Injection
+  description: Passing unsanitized input to Runtime.exec() or ProcessBuilder can lead
+    to command injection.
+  severity: critical
+  languages:
+  - java
+  pattern: '(Runtime\.getRuntime\(\)\.exec|new\s+ProcessBuilder)\s*\(\s*.*(\+)
 
-  - id: string_concatenation_in_loop
-    name: String Concatenation in Loop
-    severity: major
-    message: String concatenation in loops creates unnecessary objects. Use StringBuilder.
-    remediation: Use StringBuilder.append() inside the loop.
-    effort: Medium
-    tags: [memory, performance]
-    carbon_impact: 2e-7
-    energy_factor: 2
+    '
+  remediation: Avoid executing shell commands directly, or pass arguments securely
+    without concatenation.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a03
+  - injection
+  effort: 60
+- id: path_traversal
+  name: Path Traversal
+  description: Constructing file paths with unsanitized input can allow attackers
+    to read arbitrary files.
+  severity: critical
+  languages:
+  - java
+  pattern: 'new\s+(File|FileInputStream|FileOutputStream|FileReader|FileWriter)\s*\(\s*.*(\+)
 
-  - id: empty_block
-    name: Empty Block
-    severity: minor
-    message: Empty block detected. Remove or implement logic.
-    remediation: Remove the empty block or add a comment/implementation.
-    effort: Low
-    tags: [code_quality]
-    carbon_impact: 0
-    energy_factor: 0
+    '
+  remediation: Validate file paths and ensure they belong to an allowed base directory.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a01
+  - access-control
+  effort: 60
+- id: insecure_deserialization
+  name: Insecure Deserialization
+  description: Deserializing untrusted data with ObjectInputStream can lead to remote
+    code execution.
+  severity: critical
+  languages:
+  - java
+  pattern: '\.readObject\(\)
 
-  - id: sql_injection
-    name: SQL Injection
-    description: Constructing SQL queries using string formatting or concatenation leaves the application vulnerable to SQL injection.
-    severity: critical
-    languages: [java]
-    pattern: |
-      (SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER)\s+.*\s+(WHERE|VALUES|SET)\s+.*(\+.*)
-    remediation: Use PreparedStatement instead of Statement for parameterized queries.
-    source: OWASP
-    tags: [security, owasp-a03, injection]
+    '
+  remediation: Use safe serialization formats like JSON, or implement strict look-ahead
+    object input streams.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a08
+  - deserialization
+  effort: 60
+- id: ssrf
+  name: Server-Side Request Forgery (SSRF)
+  description: Fetching remote URLs constructed with user input can lead to SSRF vulnerabilities.
+  severity: critical
+  languages:
+  - java
+  pattern: 'new\s+URL\s*\(\s*.*(\+).*\)\.openConnection\(\)
 
-  - id: command_injection
-    name: Command Injection
-    description: Passing unsanitized input to Runtime.exec() or ProcessBuilder can lead to command injection.
-    severity: critical
-    languages: [java]
-    pattern: |
-      (Runtime\.getRuntime\(\)\.exec|new\s+ProcessBuilder)\s*\(\s*.*(\+)
-    remediation: Avoid executing shell commands directly, or pass arguments securely without concatenation.
-    source: OWASP
-    tags: [security, owasp-a03, injection]
+    '
+  remediation: Validate and sanitize URLs before fetching them. Ensure they belong
+    to an allowed domain list.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a10
+  - ssrf
+  effort: 60
+- id: xxe
+  name: XML External Entity (XXE) Injection
+  description: Parsing XML with external entities enabled can lead to file disclosure
+    or SSRF.
+  severity: critical
+  languages:
+  - java
+  pattern: '(DocumentBuilderFactory|SAXParserFactory|XMLInputFactory)\.newInstance\(\)
 
-  - id: path_traversal
-    name: Path Traversal
-    description: Constructing file paths with unsanitized input can allow attackers to read arbitrary files.
-    severity: critical
-    languages: [java]
-    pattern: |
-      new\s+(File|FileInputStream|FileOutputStream|FileReader|FileWriter)\s*\(\s*.*(\+)
-    remediation: Validate file paths and ensure they belong to an allowed base directory.
-    source: OWASP
-    tags: [security, owasp-a01, access-control]
+    '
+  remediation: Disable external entity resolution on the XML factory.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a05
+  - xxe
+  effort: 60
+- id: hardcoded_secret
+  name: Hardcoded Secret
+  description: Hardcoded passwords, tokens, or keys in source code are highly vulnerable.
+  severity: critical
+  languages:
+  - java
+  pattern: '(?i)(password|secret|token|key|api_key|access_key)\s*=\s*[''"][a-zA-Z0-9_\-\.]{10,}[''"]
 
-  - id: insecure_deserialization
-    name: Insecure Deserialization
-    description: Deserializing untrusted data with ObjectInputStream can lead to remote code execution.
-    severity: critical
-    languages: [java]
-    pattern: |
-      \.readObject\(\)
-    remediation: Use safe serialization formats like JSON, or implement strict look-ahead object input streams.
-    source: OWASP
-    tags: [security, owasp-a08, deserialization]
+    '
+  remediation: Store secrets in environment variables or a secure vault.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a07
+  - secrets
+  effort: 60
+- id: weak_cryptography
+  name: Weak Cryptography
+  description: Using weak or broken cryptographic algorithms like MD5 or SHA1.
+  severity: high
+  languages:
+  - java
+  pattern: 'MessageDigest\.getInstance\(\s*[''"](MD5|SHA1)[''"]\s*\)
 
-  - id: ssrf
-    name: Server-Side Request Forgery (SSRF)
-    description: Fetching remote URLs constructed with user input can lead to SSRF vulnerabilities.
-    severity: critical
-    languages: [java]
-    pattern: |
-      new\s+URL\s*\(\s*.*(\+).*\)\.openConnection\(\)
-    remediation: Validate and sanitize URLs before fetching them. Ensure they belong to an allowed domain list.
-    source: OWASP
-    tags: [security, owasp-a10, ssrf]
-
-  - id: xxe
-    name: XML External Entity (XXE) Injection
-    description: Parsing XML with external entities enabled can lead to file disclosure or SSRF.
-    severity: critical
-    languages: [java]
-    pattern: |
-      (DocumentBuilderFactory|SAXParserFactory|XMLInputFactory)\.newInstance\(\)
-    remediation: Disable external entity resolution on the XML factory.
-    source: OWASP
-    tags: [security, owasp-a05, xxe]
-
-  - id: hardcoded_secret
-    name: Hardcoded Secret
-    description: Hardcoded passwords, tokens, or keys in source code are highly vulnerable.
-    severity: critical
-    languages: [java]
-    pattern: |
-      (?i)(password|secret|token|key|api_key|access_key)\s*=\s*['"][a-zA-Z0-9_\-\.]{10,}['"]
-    remediation: Store secrets in environment variables or a secure vault.
-    source: OWASP
-    tags: [security, owasp-a07, secrets]
-
-  - id: weak_cryptography
-    name: Weak Cryptography
-    description: Using weak or broken cryptographic algorithms like MD5 or SHA1.
-    severity: high
-    languages: [java]
-    pattern: |
-      MessageDigest\.getInstance\(\s*['"](MD5|SHA1)['"]\s*\)
-    remediation: Use strong algorithms like SHA-256 for hashing.
-    source: OWASP
-    tags: [security, owasp-a02, crypto]
+    '
+  remediation: Use strong algorithms like SHA-256 for hashing.
+  source: OWASP
+  tags:
+  - security
+  - owasp-a02
+  - crypto
+  effort: 60

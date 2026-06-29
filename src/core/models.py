@@ -91,7 +91,7 @@ class RuleOverride(Base):
 
     id = Column(String, primary_key=True, default=generate_uuid)
     rule_id = Column(String, ForeignKey("rules.id"))
-    org_id = Column(String) # Placeholder for future Organization linking
+    org_id = Column(String)  # Placeholder for future Organization linking
     override_severity = Column(String, nullable=True)
     is_disabled = Column(Boolean, default=False)
     custom_message = Column(String, nullable=True)
