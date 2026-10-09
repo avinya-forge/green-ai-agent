@@ -1,26 +1,88 @@
 # Release Notes
 
-## v1.0.4 - Current
-- Completed SBOM-005: Generate ESG compliance summary PDF (E: SCI, S: Secrets, G: Debt) and achieved 100% test coverage for ESGExporter.
-- Completed SCA-001: Implement dependency graph parser for Python, Node, and Go.
-- Completed SCA-002: Integrate OSV.dev API for automated CVE lookups of dependencies.
-- Completed DASH-004: Interactive UI button to disable rules directly from the dashboard, writing back to the config.
-
 ## v1.0.5 - CI Integration & Cleanup
-- Completed TEST-002: Reached >95% overall unit test coverage by adding missing CI component tests (`CIReporter`, `GitHubClient`, CLI `ci` commands).
-- Completed QUAL-004: Cleaned up unused variables and deprecated code (e.g., `PDFExporter`, unused `ScanResultSchema`).
-- Completed QUAL-007: Fixed Bandit B324 (MD5 hash) in src/core/quality/metrics.py by adding `usedforsecurity=False`.
-- Completed SEC-004: Resolved Bandit B405 by adding nosec comment and importing defusedxml where applicable for xml_exporter.
-- Completed QUAL-008: Removed silent try...except...pass blocks across the codebase and replaced with explicit logging.
+- **QUAL-004**: Deep Cleaning: Perform a comprehensive codebase audit to remove deprecated/unused legacy code (JUnitXMLExporter).
+- **QUAL-007**: Fix Bandit B324 in metrics.py
+- **TEST-002**: Coverage: Increase overall unit test coverage strictly to >= 90%.
+- **SEC-004**: Audit: Address Bandit B405 (defusedxml substitution) in `xml_exporter.py`.
+- **QUAL-008**: Code Quality: Remove silent `try...except...pass` (B110) blocks in `config.py`, `domain.py`, `export/__init__.py`, `worker.py`, and `lsp/server.py`.
+- **SEC-002**: Audit: Address Bandit B404/B603 (subprocess execution risk) in `data_collector.py`, `scaphandre_integration.py`, and `benchmark.py`.
+- **SEC-003**: Audit: Address Bandit B607/B603 (partial path subprocess execution risk) in `git_operations.py`.
+- **SEC-005**: Audit: Address Bandit B404/B603 in `src/agents/runtime_monitor/data_collector.py`.
+- **SEC-006**: Audit: Address Bandit B404/B603 in `src/agents/runtime_monitor/scaphandre_integration.py`.
+- **SEC-007**: Audit: Address Bandit B404/B603 in `src/benchmarks/benchmark.py`.
+- **SEC-008**: Audit: Address Bandit B404/B607/B603 in `src/core/git_operations.py`.
+- **SEC-009**: Audit: Address Bandit B102 in `src/agents/runtime_monitor/data_collector.py`.
+- **BUG-027**: Fix inaccurate rule ID links in Dashboard
+- **BUG-028**: Validate all `file_path` parameters strictly against project root to prevent path traversal in `api_remediation_preview`.
+- **BUG-029**: Fix `TypeError` when configuration file is malformed.
 
-### Fixed
+## v1.0.4
+- **VER-001**: Version bump to v1.0.4 and doc consolidation.
+- **SBOM-005**: Report: Generate ESG compliance summary PDF (E: SCI, S: Secrets, G: Debt).
+- **DASH-004**: Interactive: Allow disabling rules directly from the dashboard UI (writing back to config).
+- **SCA-001**: SCA: Implement dependency graph parser for Python, Node, and Go.
+- **SCA-002**: SCA: Integrate OSV.dev API for automated CVE lookups of dependencies.
 
-- **QUAL-004:** Deep Cleaning: Perform a comprehensive codebase audit to remove deprecated/unused legacy code (JUnitXMLExporter).
-- **QUAL-006**: Establish strict PR templates and automated code review workflows (Bug Hunter).
-- **DASH-001**: Redesigned Dashboard UI to SonarQube-style with Projects grid, Issues drill-down, and Debt trends.
-- **DASH-003**: Scanning Profiles (fast, thorough, etc) added via `perf-profile` and other options.
-- **QUAL-005**: Conducted accessibility and visual consistency audits across all dashboard views.
+## v1.0.3 and earlier
+- **DASH-001**: Dashboard: Redesign UI to SonarQube-style (Projects grid, Issues drill-down, Debt trends).
+- **DASH-003**: Profiles: Implement "Scanning Profiles" (e.g., 'fast', 'thorough', 'security-only').
+- **QUAL-003**: Metrics: Integrate `Vulture` as a library for dead-code identification.
+- **QUAL-005**: UI Auditing: Conduct thorough accessibility and visual consistency audits across all dashboard views.
+- **QUAL-006**: Code Review: Establish strict PR templates and automated code review workflows (Bug Hunter).
+- **RUST-001**: Lang: Integrate `tree-sitter-rust` and implement `RustASTDetector`.
 - **TEST-001**: E2E Testing: Implement comprehensive end-to-end browser tests using Playwright.
-- **BUG-029**: Fixed TypeError when `.green-ai.yaml` is a valid YAML but not a dictionary.
-- **BUG-027**: Fixed inaccurate rule ID links in Dashboard
-- **BUG-028**: Validated all `file_path` parameters strictly against project root to prevent path traversal.
+- **ANALYSIS-001a**: Define architecture for passing AST context to LLMs without exceeding token limits.
+- **ANALYSIS-001b**: Evaluate LibCST vs raw string replacement for LLM-suggested code fixes.
+- **ANALYSIS-002a**: Research OSV.dev and GSF API rate limits for dynamic standard syncing.
+- **ANALYSIS-002b**: Design DB schema for caching external standard definitions locally.
+- **ANALYSIS-003a**: Design YAML configuration hierarchy (Global > Org > User).
+- **ANALYSIS-004a**: Determine performance impact of running 'git blame' on every violation during scan.
+- **IMPL-001**: Database Schema: Create SQLAlchemy models for standard_sources and rules caching.
+- **IMPL-002**: Alembic Migration: Generate migration script for new rule schema.
+- **IMPL-003**: Git Blame: Add author, author_email, and commit_date to Violation domain model.
+- **IMPL-004**: Git Blame: Update worker.py to attach pygit2 blame metadata to violations natively.
+- **IMPL-005**: Configuration: Update config.py to merge Global, Org, Project, and Local rules hierarchies.
+- **IMPL-006**: Context Limiting: Add token counting utility for AST snippets in remediation engine.
+- **IMPL-007**: Fallback Remediation: Implement surgical byte-slice replacement fallback for non-Python nodes.
+- **IMPL-008**: Dashboard Filters: Implement Git author breakdown aggregation endpoint in app_fastapi.py.
+- **IMPL-009**: OSV Client: Create initial stub for downloading OSV.dev vulnerability databases.
+- **IMPL-010**: GSF Rules Client: Create initial stub for authenticating and fetching GSF GitHub rules.
+- **BUG-007**: websockets.legacy deprecation in test output (Upstream uvicorn issue).
+- **BUG-017a**: Ensure proper cleanup of temporary directories in multiprocessing mode.
+- **BUG-017b**: Synchronize scan progress state across worker processes for accurate UI updates.
+- **BUG-021**: CLI help text mismatch in `tests/test_cli_refactored.py`.
+- **BUG-022**: Update starlette to 1.0.1 to fix PYSEC-2026-161 (URL spoofing).
+- **BUG-023**: Update pytest to 9.0.3 to fix CVE-2025-71176 (DoS).
+- **BUG-024**: Fix Bandit B501 (verify=False) in src/standards/sync_engine.py.
+- **BUG-025**: Fix Bandit B701 (Jinja2 autoescape=False) in PDF/ESG exporters.
+- **BUG-026**: Fix Bandit B324 (MD5 hash) in src/core/detectors/cache.py.
+- **IDE-001a**: VS Code extension: Initialize scaffold with `yo code` and configure extension manifests.
+- **IDE-001b**: VS Code extension: Implement settings provider for `.green-ai.yaml` editing.
+- **IDE-002a**: LSP: Implement base server handshake and workspace synchronization.
+- **IDE-002b**: LSP: Port Python/JS AST detectors to run in-process for LSP diagnostics.
+- **DASH-002**: Git: Integrate `git blame` data to show authors in violation details.
+- **AUDIT-003**: Security: Create automated XSS payload tests for all dashboard fields.
+- **AUDIT-005**: Security: Implement unit tests for path traversal in `/api/remediation/preview`.
+- **TEAM-001a**: Database: Setup SQLAlchemy Core and migration environment (Alembic).
+- **TEAM-001b**: Database: Implement User, Project, and Team relational models.
+- **TEAM-002**: API: Create REST endpoints for team creation and membership management.
+- **SEC-001**: SAST: Port 40+ remaining OWASP Top 10 rules to YAML engine.
+- **QUAL-001**: Metrics: Implement AST-based cyclomatic and cognitive complexity scoring.
+- **QUAL-002**: Metrics: Implement Type-1 and Type-2 code duplication detector.
+- **DEBT-001**: Debt: Define remediation effort (minutes) for every existing rule.
+- **DEBT-002**: Debt: Compute aggregate "cleanliness" and "remediation time" scores.
+- **ESG-001**: ESG: Define weighted aggregate score algorithm (40% E, 30% S, 30% G).
+- **ENG-018**: Final audit of scrubbed code paths in `src/core/detectors/python_detector.py`.
+- **ENG-019**: Audit and standardize `Query(...)` validation across all 20+ FastAPI endpoints.
+- **ENG-020**: Implement auto-sync check between `vision.md` and `architecture.md` (CI gate).
+- **ENG-021**: Removed JSONExporter and fixed flake8 errors
+- **BASE-001**: Implement `green-ai baseline create` command.
+- **BASE-002**: Implement baseline comparison filtering in Scanner.
+- **BASE-003**: Implement `# green-ai: ignore next-line` support.
+- **BASE-004**: Implement `.green-ai/suppress.yaml` support.
+- **SBOM-001**: Implement CycloneDX 1.5 JSON generator.
+- **SBOM-002**: Implement SPDX 2.3 JSON generator.
+- **SBOM-003**: Implement `green-ai sbom` CLI command.
+- **SBOM-004**: Implement GSF Software Carbon Intensity (SCI) logic.
+- **SBOM-006**: Achieve 95%+ coverage on new SBOM/Baseline features.
