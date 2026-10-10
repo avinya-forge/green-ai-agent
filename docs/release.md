@@ -16,6 +16,16 @@
 - **BUG-027**: Fix inaccurate rule ID links in Dashboard
 - **BUG-028**: Validate all `file_path` parameters strictly against project root to prevent path traversal in `api_remediation_preview`.
 - **BUG-029**: Fix `TypeError` when configuration file is malformed.
+- **EPIC-09-1**: Implement LSP server initialization, sync, and diagnostics.
+- **EPIC-14-1**: Add tree-sitter-rust + RustASTDetector + 3 rules + E2E tests.
+- **EPIC-19-1**: Add full OWASP Top 10 rules across all 6 languages and CWE mapping.
+- **EPIC-21-1**: Parse requirements.txt/package.json/go.mod/pom.xml and CVE lookup via OSV.dev.
+- **EPIC-22-1**: Add cyclomatic + cognitive complexity scoring per function, and duplicate code detection (Type 1/2 clones).
+- **EPIC-26-2**: Implement `green-ai baseline create` exports current violations as accepted baseline.
+- **EPIC-27-1**: Generate CycloneDX and SPDX format SBOMs. License compliance report. Export for audit (SOC2, CSRD, ISO 14001). SCI (Software Carbon Intensity) score per GSF spec.
+- **EPIC-28-1**: Detect AI/LLM SDK usage (Anthropic, OpenAI, LangChain, Ollama, Bedrock, Vertex, Groq, Mistral, Cohere, LlamaIndex, LiteLLM).
+- **EPIC-28-2**: Flag 12 unsustainable AI patterns (overkill model selection, missing token budget, no prompt caching, API calls in loops, PII in prompts, prompt injection risk, unvalidated output, sync client in async context). Estimate CO2 per detected call by model tier.
+- **EPIC-29-1**: Automated fetch-validate-store pipeline for live standards: GSF patterns, ecoCode rules, OWASP Top 10, CWE/MITRE, EPSS. Version manifest with hash verification.
 
 ## v1.0.4
 - **VER-001**: Version bump to v1.0.4 and doc consolidation.
