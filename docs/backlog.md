@@ -7,61 +7,63 @@
 ### EPIC-09: Full VS Code extension (scaffold, quick fix, diagnostics)
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EXT-003 | P3 | Develop a VS Code extension for inline Green-AI linting. | TODO |
-| EPIC-09-1 | P1 | Implement LSP server initialization, sync, and diagnostics. | TODO |
+| EPIC-09-3 | P3 | Develop VS Code UI webview for Dashboard integration. | TODO |
+| EPIC-09-4 | P2 | Implement inline code actions (Quick Fix) using LLM remediation in LSP server. | TODO |
+| EPIC-09-5 | P1 | Package and publish VS Code extension to the marketplace. | TODO |
 
 ### EPIC-12: Team database schema + CRUD API + RBAC
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EPIC-12-1 | P2 | Design Team database schema + CRUD API + RBAC. | TODO |
-| EPIC-12-2 | P2 | Implement Team dashboard UI (Chart.js) + historical trends. | TODO |
+| EPIC-12-1 | P2 | Implement Role-Based Access Control (RBAC) middleware for existing Team API endpoints. | TODO |
+| EPIC-12-2 | P2 | Implement Team dashboard UI (Chart.js) + historical trends visualization. | TODO |
+| EPIC-12-3 | P3 | Add audit logging for team management actions (add/remove members). | TODO |
 
 ### EPIC-13: Dataset → PyTorch model → ONNX export → MLDetector
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EPIC-13-1 | P2 | Dataset → PyTorch model → ONNX export → MLDetector. | TODO |
-| EPIC-13-2 | P2 | Add `--enable-ml` CLI flag + integration tests. | TODO |
-
-### EPIC-14: tree-sitter-rust + RustASTDetector + 3 rules + E2E
-| ID | Priority | Task | Status |
-|---|---|---|---|
-| EPIC-14-1 | P2 | Add tree-sitter-rust + RustASTDetector + 3 rules + E2E tests. | TODO |
+| EPIC-13-1 | P2 | Prepare training dataset of energy-inefficient code patterns. | TODO |
+| EPIC-13-2 | P2 | Train PyTorch model and export to ONNX format. | TODO |
+| EPIC-13-3 | P2 | Implement MLDetector class to run ONNX model inference. | TODO |
+| EPIC-13-4 | P2 | Add `--enable-ml` CLI flag + integration tests. | TODO |
 
 ## Phase 3: Security, Quality & ESG (PLANNED)
 
 ### EPIC-19: SAST Expansion
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EPIC-19-1 | P1 | Add full OWASP Top 10 rules across all 6 languages and CWE mapping. | TODO |
-| EPIC-19-2 | P1 | Implement taint tracking for injection (SQL injection, command injection, SSRF, path traversal, XXE, insecure deserialization). | TODO |
+| EPIC-19-2 | P1 | Implement taint tracking for SQL injection detection. | TODO |
+| EPIC-19-3 | P1 | Implement taint tracking for command injection and SSRF. | TODO |
+| EPIC-19-4 | P2 | Implement taint tracking for path traversal and XXE. | TODO |
+| EPIC-19-5 | P2 | Implement insecure deserialization detection. | TODO |
 
 ### EPIC-20: Secret Scanning v2
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EPIC-20-1 | P1 | Add 100+ proven secret patterns (AWS, GCP, Azure, GitHub, Stripe, Twilio, JWT, RSA, SSH) and Git history scan. | TODO |
+| EPIC-20-1 | P1 | Implement 100+ proven secret regex patterns (AWS, GCP, Azure, GitHub, Stripe, Twilio, JWT, RSA, SSH). | TODO |
+| EPIC-20-2 | P2 | Integrate git history scan for historical secrets. | TODO |
+| EPIC-20-3 | P1 | Implement Shannon Entropy detection for high-entropy strings (e.g., base64 encoded secrets). | TODO |
 
 ### EPIC-21: Dependency & SCA
 | ID | Priority | Task | Status |
 |---|---|---|---|
 | EXT-002 | P3 | Add support for automated dependency updates and PR creation. | TODO |
-| EPIC-21-1 | P2 | Parse requirements.txt/package.json/go.mod/pom.xml and CVE lookup via OSV.dev. | TODO |
-| EPIC-21-2 | P2 | Add license detection, policy enforcement, and outdated package flagging. | TODO |
+| EPIC-21-2 | P2 | Implement license detection and policy enforcement. | TODO |
+| EPIC-21-3 | P2 | Add outdated package flagging. | TODO |
 
 ### EPIC-22: Code Quality Engine
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EPIC-22-1 | P2 | Add cyclomatic + cognitive complexity scoring per function, and duplicate code detection (Type 1/2 clones). | TODO |
-| EPIC-22-2 | P2 | Implement dead code analysis (integrate Vulture), method length, class size, coupling metrics. | TODO |
+| EPIC-22-2 | P2 | Implement method length, class size, and coupling metrics scoring. | TODO |
 
 ### EPIC-23: Technical Debt Scoring
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EPIC-23-1 | P2 | Assign remediation effort (hours) per violation category and aggregate debt score per file, module, project. | TODO |
+| EPIC-23-1 | P2 | Aggregate debt score per file, module, and project based on remediation effort. | TODO |
 
 ### EPIC-24: ESG Score Engine
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EPIC-24-1 | P2 | Compute E-score (energy violations + carbon), S-score (security vulns + secrets + deps), G-score (quality + debt + test coverage + license). | TODO |
+| EPIC-24-1 | P2 | Compute composite ESG score aggregating E-score, S-score, and G-score. | TODO |
 
 ### EPIC-25: Unified Dashboard Redesign
 | ID | Priority | Task | Status |
@@ -72,21 +74,10 @@
 ### EPIC-26: Custom Rules Engine & Baseline & Suppression
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EPIC-26-1 | P2 | Implement user-definable YAML rules (Semgrep-style). Pattern: regex, AST query, or taint. Community rule registry. Rule versioning and import. | TODO |
-| EPIC-26-2 | P2 | Implement `green-ai baseline create` exports current violations as accepted baseline. | TODO |
-
-### EPIC-27: SBOM & Compliance
-| ID | Priority | Task | Status |
-|---|---|---|---|
-| EPIC-27-1 | P2 | Generate CycloneDX and SPDX format SBOMs. License compliance report. Export for audit (SOC2, CSRD, ISO 14001). SCI (Software Carbon Intensity) score per GSF spec. | TODO |
+| EPIC-26-1 | P2 | Implement user-definable YAML rules (Semgrep-style). Pattern: regex, AST query, or taint. | TODO |
+| EPIC-26-3 | P3 | Create community rule registry and rule versioning/import system. | TODO |
 
 ### EPIC-28: Sustainable AI Usage Analyzer
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EPIC-28-1 | P1 | Detect AI/LLM SDK usage (Anthropic, OpenAI, LangChain, Ollama, Bedrock, Vertex, Groq, Mistral, Cohere, LlamaIndex, LiteLLM). | TODO |
-| EPIC-28-2 | P1 | Flag 12 unsustainable patterns: overkill model selection, missing token budget, no prompt caching, API calls in loops, PII in prompts, prompt injection risk, unvalidated output, sync client in async context. Estimate CO2 per detected call by model tier. | TODO |
-
-### EPIC-29: Standards Sync Engine
-| ID | Priority | Task | Status |
-|---|---|---|---|
-| EPIC-29-1 | P1 | Automated fetch-validate-store pipeline for live standards: GSF patterns, ecoCode rules, OWASP Top 10, CWE/MITRE, EPSS. Version manifest with hash verification. | TODO |
+| EPIC-28-3 | P2 | Add configuration for custom token cost and carbon emission factors per model tier. | TODO |
