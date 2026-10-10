@@ -31,17 +31,17 @@
 ### EPIC-19: SAST Expansion
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EPIC-19-2 | P1 | Implement taint tracking for SQL injection detection. | TODO |
-| EPIC-19-3 | P1 | Implement taint tracking for command injection and SSRF. | TODO |
+| EPIC-19-2 | P1 | Implement taint tracking for SQL injection detection. | DONE |
+| EPIC-19-3 | P1 | Implement taint tracking for command injection and SSRF. | DONE |
 | EPIC-19-4 | P2 | Implement taint tracking for path traversal and XXE. | TODO |
 | EPIC-19-5 | P2 | Implement insecure deserialization detection. | TODO |
 
 ### EPIC-20: Secret Scanning v2
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EPIC-20-1 | P1 | Implement 100+ proven secret regex patterns (AWS, GCP, Azure, GitHub, Stripe, Twilio, JWT, RSA, SSH). | TODO |
+| EPIC-20-1 | P1 | Implement 100+ proven secret regex patterns (AWS, GCP, Azure, GitHub, Stripe, Twilio, JWT, RSA, SSH). | DONE |
 | EPIC-20-2 | P2 | Integrate git history scan for historical secrets. | TODO |
-| EPIC-20-3 | P1 | Implement Shannon Entropy detection for high-entropy strings (e.g., base64 encoded secrets). | TODO |
+| EPIC-20-3 | P1 | Implement Shannon Entropy detection for high-entropy strings (e.g., base64 encoded secrets). | DONE |
 
 ### EPIC-21: Dependency & SCA
 | ID | Priority | Task | Status |
