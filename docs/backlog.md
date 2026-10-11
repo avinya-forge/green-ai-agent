@@ -2,6 +2,17 @@
 
 > **Vision:** One tool — Environmental (energy/carbon) + Security (SAST/secrets/SCA) + Governance (quality/debt/license) + AI Fix. Single CLI, VS Code, CI/CD, and Dashboard.
 
+## 🌌 6–8 Month Strategic Roadmap & Horizon Plan
+
+| Horizon | Core Strategic Milestone | Lead Focus | Key Deliverables |
+|:---:|:---|:---|:---|
+| **Month 1–2** | **SAST & Secret Scanning v2 Hardening** | AST Analysis & Entropy | Taint tracking for path traversal/XXE, 100+ regex secret patterns, Shannon entropy scanner |
+| **Month 3–4** | **Energy Inefficiency ML Detection (ONNX)** | Model Training & Inference | PyTorch energy pattern training, ONNX export, MLDetector CLI integration (`--enable-ml`) |
+| **Month 5–6** | **VS Code Extension & Interactive LSP Remediation** | IDE Developer Experience | LSP server with LLM quick-fixes, dashboard webview, automated PR creation for SCA |
+| **Month 7–8** | **Unified ESG Scoring & Scaphandre Real-time Telemetry** | Full-Stack Metrics & Dashboard | Composite ESG score aggregation, Scaphandre hardware energy tracking, Semgrep-style custom YAML rules |
+
+---
+
 ## Phase 2: Action & Expansion (ACTIVE)
 
 ### EPIC-09: Full VS Code extension (scaffold, quick fix, diagnostics)
