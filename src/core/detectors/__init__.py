@@ -14,6 +14,7 @@ from .go_detector import GoASTDetector
 from .csharp_detector import CSharpASTDetector
 from .rust_detector import RustASTDetector
 from .pattern_detector import PatternBasedDetector
+from src.core.security.secret_scanner import SecretScanner
 from src.core.detectors.cache import detection_cache
 
 
@@ -29,6 +30,10 @@ def detect_violations(content: str, file_path: str, language: str = 'python') ->
         return cached_violations
 
     violations = []
+
+    # Run secret scanner on all files regardless of language
+    secret_scanner = SecretScanner()
+    violations.extend(secret_scanner.scan(content, file_path))
 
     if language == 'python':
         # AST-based detection

@@ -20,6 +20,7 @@ class PythonViolationDetector(ast.NodeVisitor):
         self.current_function = None
         self.unused_variables = {}
         self.used_variables = set()
+        self.tainted_vars = set()
         self.imports = {}
         self.var_types = {}
 
@@ -193,6 +194,48 @@ class PythonViolationDetector(ast.NodeVisitor):
             func_name = f"{node.func.value.id}.{node.func.attr}"
 
         if func_name:
+            # Taint tracking: check for sinks
+            sensitive_sinks = {
+                'sql': ['cursor.execute', 'session.execute'],
+                'command': ['subprocess.run', 'subprocess.Popen', 'os.system', 'os.popen'],
+                'ssrf': ['requests.get', 'requests.post', 'urllib.request.urlopen']
+            }
+
+            for sink_type, sinks in sensitive_sinks.items():
+                if func_name in sinks or any(func_name.endswith(f'.{s.split(".")[-1]}') for s in sinks):
+                    for arg in node.args:
+                        if isinstance(arg, ast.Name) and arg.id in self.tainted_vars:
+                            self.violations.append({
+                                'id': f'{sink_type}_injection_taint',
+                                'line': node.lineno,
+                                'severity': 'critical',
+                                'message': f'Possible {sink_type.upper()} injection: Tainted variable "{arg.id}" passed to "{func_name}()".',
+                                'pattern_match': f'taint_{sink_type}'
+                            })
+                        elif isinstance(arg, ast.JoinedStr):
+                            for val in arg.values:
+                                if isinstance(val, ast.FormattedValue) and isinstance(val.value, ast.Name):
+                                    if val.value.id in self.tainted_vars:
+                                        self.violations.append({
+                                            'id': f'{sink_type}_injection_taint',
+                                            'line': node.lineno,
+                                            'severity': 'critical',
+                                            'message': f'Possible {sink_type.upper()} injection: Tainted variable "{val.value.id}" used in f-string passed to "{func_name}()".',
+                                            'pattern_match': f'taint_{sink_type}'
+                                        })
+                        elif isinstance(arg, ast.BinOp) and isinstance(arg.op, ast.Add):
+                            left_tainted = isinstance(arg.left, ast.Name) and arg.left.id in self.tainted_vars
+                            right_tainted = isinstance(arg.right, ast.Name) and arg.right.id in self.tainted_vars
+                            if left_tainted or right_tainted:
+                                var_name = arg.left.id if left_tainted else arg.right.id
+                                self.violations.append({
+                                    'id': f'{sink_type}_injection_taint',
+                                    'line': node.lineno,
+                                    'severity': 'critical',
+                                    'message': f'Possible {sink_type.upper()} injection: Tainted variable "{var_name}" used in concatenation passed to "{func_name}()".',
+                                    'pattern_match': f'taint_{sink_type}'
+                                })
+
             # Rule: IO in Loop
             if self.in_loop:
                 io_patterns = ['open', 'read', 'write', 'requests', 'urlopen']
@@ -624,6 +667,40 @@ class PythonViolationDetector(ast.NodeVisitor):
 
         # Check for hardcoded secrets
         self._check_hardcoded_secrets(node)
+
+        # Taint tracking: Check if assigned value is from an untrusted source
+        is_tainted = False
+        if isinstance(node.value, ast.Call):
+            func_name = ""
+            if isinstance(node.value.func, ast.Name):
+                func_name = node.value.func.id
+            elif isinstance(node.value.func, ast.Attribute):
+                def get_attr_name(n):
+                    if isinstance(n, ast.Name):
+                        return n.id
+                    elif isinstance(n, ast.Attribute):
+                        return f"{get_attr_name(n.value)}.{n.attr}"
+                    return ""
+                func_name = get_attr_name(node.value.func)
+
+            untrusted_sources = ["request.GET.get", "request.POST.get", "request.args.get", "request.form.get", "os.getenv", "os.environ.get", "sys.argv", "input"]
+            if func_name in untrusted_sources:
+                is_tainted = True
+        elif isinstance(node.value, ast.Subscript):
+            def get_attr_name(n):
+                if isinstance(n, ast.Name):
+                    return n.id
+                elif isinstance(n, ast.Attribute):
+                    return f"{get_attr_name(n.value)}.{n.attr}"
+                return ""
+            src_name = get_attr_name(node.value.value)
+            if src_name in ["request.GET", "request.POST", "request.args", "request.form", "os.environ", "sys.argv"]:
+                is_tainted = True
+
+        if is_tainted:
+            for target in node.targets:
+                if isinstance(target, ast.Name):
+                    self.tainted_vars.add(target.id)
 
         # Check for high entropy in complex structures
         for target in node.targets:
