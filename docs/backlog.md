@@ -42,17 +42,13 @@
 ### EPIC-19: SAST Expansion
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EPIC-19-2 | P1 | Implement taint tracking for SQL injection detection. | DONE |
-| EPIC-19-3 | P1 | Implement taint tracking for command injection and SSRF. | DONE |
 | EPIC-19-4 | P2 | Implement taint tracking for path traversal and XXE. | TODO |
 | EPIC-19-5 | P2 | Implement insecure deserialization detection. | TODO |
 
 ### EPIC-20: Secret Scanning v2
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EPIC-20-1 | P1 | Implement 100+ proven secret regex patterns (AWS, GCP, Azure, GitHub, Stripe, Twilio, JWT, RSA, SSH). | DONE |
 | EPIC-20-2 | P2 | Integrate git history scan for historical secrets. | TODO |
-| EPIC-20-3 | P1 | Implement Shannon Entropy detection for high-entropy strings (e.g., base64 encoded secrets). | DONE |
 
 ### EPIC-21: Dependency & SCA
 | ID | Priority | Task | Status |
@@ -92,3 +88,10 @@
 | ID | Priority | Task | Status |
 |---|---|---|---|
 | EPIC-28-3 | P2 | Add configuration for custom token cost and carbon emission factors per model tier. | TODO |
+
+### EPIC-30: Core Security Hardening (NEW)
+| ID | Priority | Task | Status |
+|---|---|---|---|
+| SEC-010 | P1 | Audit and replace all MD5 hashing functions with SHA-256 for security compliance. | TODO |
+| SEC-011 | P1 | Replace all risky `os.system` and `subprocess.call` usages with safe subprocess.run with shell=False. | TODO |
+| SEC-012 | P1 | Ensure LLM inputs are isolated from system instructions to prevent Prompt Injection (LLM01). | TODO |
