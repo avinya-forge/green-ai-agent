@@ -42,53 +42,64 @@
 ### EPIC-19: SAST Expansion
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EPIC-19-2 | P1 | Implement taint tracking for SQL injection detection. | DONE |
-| EPIC-19-3 | P1 | Implement taint tracking for command injection and SSRF. | DONE |
-| EPIC-19-4 | P2 | Implement taint tracking for path traversal and XXE. | TODO |
-| EPIC-19-5 | P2 | Implement insecure deserialization detection. | TODO |
+| EPIC-19-4a | P1 | Implement AST taint tracking for path traversal vulnerability detection. | TODO |
+| EPIC-19-4b | P2 | Implement AST taint tracking for XXE (XML External Entity) injection detection. | TODO |
+| EPIC-19-5 | P2 | Implement insecure deserialization detection (pickle, yaml, etc.). | TODO |
 
 ### EPIC-20: Secret Scanning v2
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EPIC-20-1 | P1 | Implement 100+ proven secret regex patterns (AWS, GCP, Azure, GitHub, Stripe, Twilio, JWT, RSA, SSH). | DONE |
-| EPIC-20-2 | P2 | Integrate git history scan for historical secrets. | TODO |
-| EPIC-20-3 | P1 | Implement Shannon Entropy detection for high-entropy strings (e.g., base64 encoded secrets). | DONE |
+| EPIC-20-2a | P2 | Integrate pygit2 for git history scanning of historical secrets across branches. | TODO |
+| EPIC-20-2b | P2 | Design and implement an optimized caching layer for git history scanning to prevent performance degradation. | TODO |
 
 ### EPIC-21: Dependency & SCA
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EXT-002 | P3 | Add support for automated dependency updates and PR creation. | TODO |
-| EPIC-21-2 | P2 | Implement license detection and policy enforcement. | TODO |
-| EPIC-21-3 | P2 | Add outdated package flagging. | TODO |
+| EXT-002a | P3 | Research and implement an automated PR creation bot for outdated or vulnerable dependency updates. | TODO |
+| EXT-002b | P3 | Add automated integration tests for the PR creation bot. | TODO |
+| EPIC-21-2a | P2 | Parse licenses from `package.json`, `requirements.txt`, `go.mod`, and `pom.xml`. | TODO |
+| EPIC-21-2b | P2 | Enforce strict license policies (fail CI if AGPL/GPL is detected in proprietary mode). | TODO |
+| EPIC-21-3 | P2 | Add outdated package flagging by calling respective package registry APIs (PyPI, npm, etc). | TODO |
 
 ### EPIC-22: Code Quality Engine
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EPIC-22-2 | P2 | Implement method length, class size, and coupling metrics scoring. | TODO |
+| EPIC-22-2a | P2 | Implement AST-based method length metric scoring with configurable thresholds. | TODO |
+| EPIC-22-2b | P2 | Implement AST-based class size metric scoring. | TODO |
+| EPIC-22-2c | P2 | Implement coupling metrics (fan-in/fan-out) scoring for classes and modules. | TODO |
 
 ### EPIC-23: Technical Debt Scoring
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EPIC-23-1 | P2 | Aggregate debt score per file, module, and project based on remediation effort. | TODO |
+| EPIC-23-1a | P2 | Define remediation effort mapping (in minutes) for each rule id in the rule registry. | TODO |
+| EPIC-23-1b | P2 | Calculate and aggregate debt score (total minutes) per file, module, and project. | TODO |
 
 ### EPIC-24: ESG Score Engine
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EPIC-24-1 | P2 | Compute composite ESG score aggregating E-score, S-score, and G-score. | TODO |
+| EPIC-24-1a | P2 | Define formula to compute Environmental (E), Social/Security (S), and Governance (G) sub-scores. | TODO |
+| EPIC-24-1b | P2 | Compute composite ESG score aggregating E-score, S-score, and G-score and integrate into `Scanner` output. | TODO |
 
 ### EPIC-25: Unified Dashboard Redesign
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EXT-001 | P3 | Implement real-time energy usage visualization via Scaphandre on the dashboard. | TODO |
-| EPIC-25-1 | P2 | Implement single dashboard showing ESG score, drill-down to each pillar, per-file breakdown, trend over time, fix priority queue. | TODO |
+| EXT-001a | P3 | Research Scaphandre API and define data models for real-time energy usage. | TODO |
+| EXT-001b | P3 | Implement real-time energy usage visualization via Scaphandre on the dashboard. | TODO |
+| EPIC-25-1a | P2 | Design comprehensive ESG dashboard mockups (Score, Drill-down, Per-file breakdown). | TODO |
+| EPIC-25-1b | P2 | Implement unified dashboard UI components in React/Vue or HTML templates for ESG scores. | TODO |
+| EPIC-25-1c | P2 | Implement fix priority queue view sorted by severity and technical debt in the dashboard. | TODO |
 
 ### EPIC-26: Custom Rules Engine & Baseline & Suppression
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EPIC-26-1 | P2 | Implement user-definable YAML rules (Semgrep-style). Pattern: regex, AST query, or taint. | TODO |
-| EPIC-26-3 | P3 | Create community rule registry and rule versioning/import system. | TODO |
+| EPIC-26-1a | P2 | Define Semgrep-style YAML schema for user-definable custom rules. | TODO |
+| EPIC-26-1b | P2 | Implement regex, AST query, and taint pattern matchers for custom YAML rules. | TODO |
+| EPIC-26-3a | P3 | Create schema and registry API for community rules. | TODO |
+| EPIC-26-3b | P3 | Implement rule versioning and an import system (`green-ai rules pull <namespace/rule>`). | TODO |
 
 ### EPIC-28: Sustainable AI Usage Analyzer
 | ID | Priority | Task | Status |
 |---|---|---|---|
-| EPIC-28-3 | P2 | Add configuration for custom token cost and carbon emission factors per model tier. | TODO |
+| EPIC-28-3a | P2 | Create YAML configuration schema for custom token cost per model tier. | TODO |
+| EPIC-28-3b | P2 | Create YAML configuration schema for carbon emission factors per model tier. | TODO |
+| EPIC-28-3c | P2 | Integrate custom cost and emission configurations into AI Usage calculation engine. | TODO |

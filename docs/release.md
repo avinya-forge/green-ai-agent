@@ -1,6 +1,10 @@
 # Release Notes
 
 ## v1.0.5 - CI Integration & Cleanup
+- **EPIC-20-3**: Implement Shannon Entropy detection for high-entropy strings (e.g., base64 encoded secrets).
+- **EPIC-20-1**: Implement 100+ proven secret regex patterns (AWS, GCP, Azure, GitHub, Stripe, Twilio, JWT, RSA, SSH).
+- **EPIC-19-3**: Implement taint tracking for command injection and SSRF.
+- **EPIC-19-2**: Implement taint tracking for SQL injection detection.
 - **QUAL-004**: Deep Cleaning: Perform a comprehensive codebase audit to remove deprecated/unused legacy code (JUnitXMLExporter).
 - **QUAL-007**: Fix Bandit B324 in metrics.py
 - **TEST-002**: Coverage: Increase overall unit test coverage strictly to >= 90%.
