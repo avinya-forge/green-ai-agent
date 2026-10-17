@@ -41,7 +41,6 @@
 
 ### EPIC-19: SAST Expansion
 | ID | Priority | Task | Status |
-|---|---|---|---|
 | EPIC-19-4a | P1 | Implement AST taint tracking for path traversal vulnerability detection. | TODO |
 | EPIC-19-4b | P2 | Implement AST taint tracking for XXE (XML External Entity) injection detection. | TODO |
 | EPIC-19-5 | P2 | Implement insecure deserialization detection (pickle, yaml, etc.). | TODO |
@@ -100,6 +99,17 @@
 ### EPIC-28: Sustainable AI Usage Analyzer
 | ID | Priority | Task | Status |
 |---|---|---|---|
+<<<<<<< HEAD
 | EPIC-28-3a | P2 | Create YAML configuration schema for custom token cost per model tier. | TODO |
 | EPIC-28-3b | P2 | Create YAML configuration schema for carbon emission factors per model tier. | TODO |
 | EPIC-28-3c | P2 | Integrate custom cost and emission configurations into AI Usage calculation engine. | TODO |
+=======
+| EPIC-28-3 | P2 | Add configuration for custom token cost and carbon emission factors per model tier. | TODO |
+
+### EPIC-30: Core Security Hardening (NEW)
+| ID | Priority | Task | Status |
+|---|---|---|---|
+| SEC-010 | P1 | Audit and replace all MD5 hashing functions with SHA-256 for security compliance. | TODO |
+| SEC-011 | P1 | Replace all risky `os.system` and `subprocess.call` usages with safe subprocess.run with shell=False. | TODO |
+| SEC-012 | P1 | Ensure LLM inputs are isolated from system instructions to prevent Prompt Injection (LLM01). | TODO |
+>>>>>>> origin/docs/update-backlog-release-13559265004434037698
