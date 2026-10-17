@@ -1,24 +1,24 @@
 {
-  "last_updated": "2026-06-03T19:49:00Z",
-  "project": "Vishwa-Vani",
+  "last_updated": "2026-10-17T12:00:00Z",
+  "project": "green-ai-agent",
   "architecture": {
-    "framework": "Next.js 16, React 19",
-    "patterns": ["Server Components", "Tailwind 4", "SQLite WASM", "TypeScript strict"],
-    "data": ["JSON shards", "SQLite lake files", "NVF 1.0 format"]
+    "framework": "Python 3.12+, FastAPI, AST Analysis, PyTorch/ONNX",
+    "pillars": ["Environmental (Software Carbon Intensity / Scaphandre)", "Security (SAST / Secrets / SCA / OWASP Top 10)", "Governance (Quality / Debt / License / ESG)"],
+    "interfaces": ["CLI tool", "LSP Language Server (VS Code)", "Dashboard UI", "CI/CD Gatekeeper"]
   },
   "current_sprint": {
-    "priority_gate": "STABILITY GATE - EPIC 7",
+    "priority_gate": "GATEKEEPER [0-Hygiene-Error | SAST-Pass | Pytest-90%]",
     "active_tasks": [
-      "BUG-069",
-      "BUG-070",
-      "BUG-071"
+      "EPIC-19-4a: AST taint tracking for path traversal detection",
+      "EPIC-19-4b: AST taint tracking for XXE injection detection",
+      "EPIC-20-2a: pygit2 git history scanning for historical secrets"
     ]
   },
   "memory_pointers": {
-    "rules": ".agents/rules/code-style-guide.md",
     "backlog": "docs/backlog.md",
-    "release_notes": "docs/release-notes.md",
+    "release_notes": "docs/release.md",
     "vision": "docs/vision.md",
-    "blueprint": "docs/architecture/blueprint.md"
+    "roadmap": "docs/roadmap.md",
+    "jules": "JULES.md"
   }
 }
