@@ -43,7 +43,7 @@ pyee==13.0.1
 libcst>=1.0,<2.0
 
 # Reporting (PDF + charts)
-weasyprint>=60.0,<70.0
+weasyprint>=70.0,<71.0
 matplotlib>=3.7,<4.0
 
 # Telemetry / runtime emissions
