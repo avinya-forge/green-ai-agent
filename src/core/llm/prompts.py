@@ -22,55 +22,55 @@ class PromptManager:
             "Optimize the following Python loop for performance and energy efficiency.\n"
             "Consider using vectorization (numpy), list comprehensions, or built-in functions (map, filter) where appropriate.\n"
             "Avoid unnecessary computations inside the loop.\n\n"
-            "Violation: {violation}\n"
-            "Code:\n```python\n{code}\n```"
+            "Violation: <user_input>{violation}</user_input>\n"
+            "Code:\n<user_input>\n```python\n{code}\n```\n</user_input>"
         ),
         ("python", "io"): (
             "Optimize the following Python I/O operation for performance and energy efficiency.\n"
             "Consider using buffered I/O, asynchronous I/O (asyncio), or batch processing.\n"
             "Ensure resources are properly managed (context managers).\n\n"
-            "Violation: {violation}\n"
-            "Code:\n```python\n{code}\n```"
+            "Violation: <user_input>{violation}</user_input>\n"
+            "Code:\n<user_input>\n```python\n{code}\n```\n</user_input>"
         ),
         ("python", "logic"): (
             "Optimize the following Python logic for computational efficiency.\n"
             "Reduce complexity, remove redundant checks, and use efficient data structures.\n\n"
-            "Violation: {violation}\n"
-            "Code:\n```python\n{code}\n```"
+            "Violation: <user_input>{violation}</user_input>\n"
+            "Code:\n<user_input>\n```python\n{code}\n```\n</user_input>"
         ),
 
         # JavaScript / TypeScript
         ("javascript", "loop"): (
             "Optimize the following JavaScript loop for performance.\n"
             "Consider using `for...of`, `map`, `reduce`, or avoiding layout thrashing if DOM is involved.\n\n"
-            "Violation: {violation}\n"
-            "Code:\n```javascript\n{code}\n```"
+            "Violation: <user_input>{violation}</user_input>\n"
+            "Code:\n<user_input>\n```javascript\n{code}\n```\n</user_input>"
         ),
         ("typescript", "loop"): (
             "Optimize the following TypeScript loop for performance.\n"
             "Consider using `for...of`, `map`, `reduce`, or avoiding layout thrashing if DOM is involved.\n\n"
-            "Violation: {violation}\n"
-            "Code:\n```typescript\n{code}\n```"
+            "Violation: <user_input>{violation}</user_input>\n"
+            "Code:\n<user_input>\n```typescript\n{code}\n```\n</user_input>"
         ),
         ("javascript", "dom"): (
             "Optimize the following JavaScript DOM manipulation.\n"
             "Batch DOM updates, use `documentFragment`, or `requestAnimationFrame` to avoid reflows and repaints.\n\n"
-            "Violation: {violation}\n"
-            "Code:\n```javascript\n{code}\n```"
+            "Violation: <user_input>{violation}</user_input>\n"
+            "Code:\n<user_input>\n```javascript\n{code}\n```\n</user_input>"
         ),
         ("typescript", "dom"): (
             "Optimize the following TypeScript DOM manipulation.\n"
             "Batch DOM updates, use `documentFragment`, or `requestAnimationFrame` to avoid reflows and repaints.\n\n"
-            "Violation: {violation}\n"
-            "Code:\n```typescript\n{code}\n```"
+            "Violation: <user_input>{violation}</user_input>\n"
+            "Code:\n<user_input>\n```typescript\n{code}\n```\n</user_input>"
         ),
 
         # Generic fallback
         "generic": (
             "Fix the following green software violation.\n"
             "Focus on energy efficiency and performance.\n\n"
-            "Violation: {violation}\n"
-            "Code:\n```{language}\n{code}\n```"
+            "Violation: <user_input>{violation}</user_input>\n"
+            "Code:\n<user_input>\n```{language}\n{code}\n```\n</user_input>"
         )
     }
 

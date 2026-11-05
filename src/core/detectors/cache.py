@@ -40,8 +40,8 @@ class DetectionCache:
 
     def _make_key(self, content: str, language: str) -> Tuple[str, str]:
         """Create a hash key for the content."""
-        # MD5 is fast enough for this purpose
-        content_hash = hashlib.md5(content.encode('utf-8'), usedforsecurity=False).hexdigest()
+        # SHA256 is used for better security
+        content_hash = hashlib.sha256(content.encode('utf-8'), usedforsecurity=False).hexdigest()
         return (content_hash, language)
 
 

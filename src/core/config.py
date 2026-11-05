@@ -156,7 +156,7 @@ class ConfigLoader:
         cache_dir.mkdir(parents=True, exist_ok=True)
 
         # Hash URL for filename
-        url_hash = hashlib.md5(url.encode('utf-8'), usedforsecurity=False).hexdigest()
+        url_hash = hashlib.sha256(url.encode('utf-8'), usedforsecurity=False).hexdigest()
         cache_file = cache_dir / f"{url_hash}.yaml"
 
         # Cache lookup: use cached file if present. Smarter TTL/ETag caching

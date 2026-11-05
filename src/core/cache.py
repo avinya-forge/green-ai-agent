@@ -32,8 +32,8 @@ class DiskCache:
         self._cache_dir_created = True
 
     def _get_hash(self, content: str, language: str) -> str:
-        """Compute MD5 hash of content and language + version."""
-        hasher = hashlib.md5(usedforsecurity=False)
+        """Compute SHA256 hash of content and language + version."""
+        hasher = hashlib.sha256(usedforsecurity=False)
         hasher.update(content.encode('utf-8'))
         hasher.update(language.encode('utf-8'))
         hasher.update(self.version.encode('utf-8'))
